@@ -10,7 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PlatformRouteImport } from './routes/platform'
+import { Route as JourneyRouteImport } from './routes/journey'
+import { Route as InvestorsRouteImport } from './routes/investors'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CommunitiesRouteImport } from './routes/communities'
 import { Route as IndexRouteImport } from './routes/index'
 
 const PlatformRoute = PlatformRouteImport.update({
@@ -18,9 +21,24 @@ const PlatformRoute = PlatformRouteImport.update({
   path: '/platform',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JourneyRoute = JourneyRouteImport.update({
+  id: '/journey',
+  path: '/journey',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvestorsRoute = InvestorsRouteImport.update({
+  id: '/investors',
+  path: '/investors',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunitiesRoute = CommunitiesRouteImport.update({
+  id: '/communities',
+  path: '/communities',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -31,31 +49,62 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/communities': typeof CommunitiesRoute
   '/dashboard': typeof DashboardRoute
+  '/investors': typeof InvestorsRoute
+  '/journey': typeof JourneyRoute
   '/platform': typeof PlatformRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/communities': typeof CommunitiesRoute
   '/dashboard': typeof DashboardRoute
+  '/investors': typeof InvestorsRoute
+  '/journey': typeof JourneyRoute
   '/platform': typeof PlatformRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/communities': typeof CommunitiesRoute
   '/dashboard': typeof DashboardRoute
+  '/investors': typeof InvestorsRoute
+  '/journey': typeof JourneyRoute
   '/platform': typeof PlatformRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/platform'
+  fullPaths:
+    | '/'
+    | '/communities'
+    | '/dashboard'
+    | '/investors'
+    | '/journey'
+    | '/platform'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/platform'
-  id: '__root__' | '/' | '/dashboard' | '/platform'
+  to:
+    | '/'
+    | '/communities'
+    | '/dashboard'
+    | '/investors'
+    | '/journey'
+    | '/platform'
+  id:
+    | '__root__'
+    | '/'
+    | '/communities'
+    | '/dashboard'
+    | '/investors'
+    | '/journey'
+    | '/platform'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CommunitiesRoute: typeof CommunitiesRoute
   DashboardRoute: typeof DashboardRoute
+  InvestorsRoute: typeof InvestorsRoute
+  JourneyRoute: typeof JourneyRoute
   PlatformRoute: typeof PlatformRoute
 }
 
@@ -68,11 +117,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlatformRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/journey': {
+      id: '/journey'
+      path: '/journey'
+      fullPath: '/journey'
+      preLoaderRoute: typeof JourneyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/investors': {
+      id: '/investors'
+      path: '/investors'
+      fullPath: '/investors'
+      preLoaderRoute: typeof InvestorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/communities': {
+      id: '/communities'
+      path: '/communities'
+      fullPath: '/communities'
+      preLoaderRoute: typeof CommunitiesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -87,7 +157,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CommunitiesRoute: CommunitiesRoute,
   DashboardRoute: DashboardRoute,
+  InvestorsRoute: InvestorsRoute,
+  JourneyRoute: JourneyRoute,
   PlatformRoute: PlatformRoute,
 }
 export const routeTree = rootRouteImport
