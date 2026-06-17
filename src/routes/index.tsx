@@ -151,7 +151,7 @@ function LandingPage() {
               </p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <Button variant="hero" size="lg" asChild>
-                  <Link to="/dashboard">
+                  <Link to="/auth">
                     Start your assessment
                     <ArrowRight />
                   </Link>
@@ -282,7 +282,7 @@ function LandingPage() {
             </p>
             <div className="mt-8 flex justify-center">
               <Button variant="gold" size="lg" asChild>
-                <Link to="/dashboard">
+                <Link to="/auth">
                   Get started free
                   <ArrowRight />
                 </Link>

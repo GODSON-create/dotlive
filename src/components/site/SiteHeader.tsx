@@ -38,10 +38,10 @@ export function SiteHeader() {
         <div className="hidden items-center gap-2 md:flex">
           <ThemeToggle />
           <Button variant="ghost" size="sm" asChild>
-            <Link to="/dashboard">Sign in</Link>
+            <Link to="/auth">Sign in</Link>
           </Button>
           <Button variant="hero" size="sm" asChild>
-            <Link to="/dashboard">Get started</Link>
+            <Link to="/auth">Get started</Link>
           </Button>
         </div>
 
@@ -78,12 +78,12 @@ export function SiteHeader() {
           ))}
           <div className="mt-2 flex flex-col gap-2">
             <Button variant="outline" asChild>
-              <Link to="/dashboard" onClick={() => setOpen(false)}>
+              <Link to="/auth" onClick={() => setOpen(false)}>
                 Sign in
               </Link>
             </Button>
             <Button variant="hero" asChild>
-              <Link to="/dashboard" onClick={() => setOpen(false)}>
+              <Link to="/auth" onClick={() => setOpen(false)}>
                 Get started
               </Link>
             </Button>
