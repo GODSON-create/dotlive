@@ -31,13 +31,14 @@ export const JOURNEY_STAGES = [
 
 export type JourneyStage = (typeof JOURNEY_STAGES)[number];
 
-export type AppRole = "founder" | "community_leader" | "investor" | "admin";
+export type AppRole = "founder" | "community_leader" | "investor" | "admin" | "super_admin";
 
 export const ROLE_LABELS: Record<AppRole, string> = {
   founder: "Founder",
   community_leader: "Community Leader",
   investor: "Investor",
   admin: "Admin",
+  super_admin: "Super Admin",
 };
 
 export const INDUSTRIES = [
