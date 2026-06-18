@@ -10,16 +10,35 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PlatformRouteImport } from './routes/platform'
 import { Route as JourneyRouteImport } from './routes/journey'
 import { Route as InvestorsRouteImport } from './routes/investors'
-import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CommunitiesRouteImport } from './routes/communities'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
+import { Route as AuthenticatedVantageRouteImport } from './routes/_authenticated/vantage'
+import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
+import { Route as AuthenticatedPitchathonsRouteImport } from './routes/_authenticated/pitchathons'
+import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedInvestorRouteImport } from './routes/_authenticated/investor'
+import { Route as AuthenticatedDemoRouteImport } from './routes/_authenticated/demo'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCommunityRouteImport } from './routes/_authenticated/community'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAcademyRouteImport } from './routes/_authenticated/academy'
+import { Route as AuthenticatedJoinCodeRouteImport } from './routes/_authenticated/join.$code'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlatformRoute = PlatformRouteImport.update({
@@ -37,14 +56,18 @@ const InvestorsRoute = InvestorsRouteImport.update({
   path: '/investors',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CommunitiesRoute = CommunitiesRouteImport.update({
   id: '/communities',
   path: '/communities',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -52,72 +75,215 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedWalletRoute = AuthenticatedWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedVantageRoute = AuthenticatedVantageRouteImport.update({
+  id: '/vantage',
+  path: '/vantage',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSessionsRoute = AuthenticatedSessionsRouteImport.update({
+  id: '/sessions',
+  path: '/sessions',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPitchathonsRoute =
+  AuthenticatedPitchathonsRouteImport.update({
+    id: '/pitchathons',
+    path: '/pitchathons',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedInvestorRoute = AuthenticatedInvestorRouteImport.update({
+  id: '/investor',
+  path: '/investor',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDemoRoute = AuthenticatedDemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCommunityRoute = AuthenticatedCommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAcademyRoute = AuthenticatedAcademyRouteImport.update({
+  id: '/academy',
+  path: '/academy',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedJoinCodeRoute = AuthenticatedJoinCodeRouteImport.update({
+  id: '/join/$code',
+  path: '/join/$code',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/communities': typeof CommunitiesRoute
-  '/dashboard': typeof DashboardRoute
   '/investors': typeof InvestorsRoute
   '/journey': typeof JourneyRoute
   '/platform': typeof PlatformRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/academy': typeof AuthenticatedAcademyRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/community': typeof AuthenticatedCommunityRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/demo': typeof AuthenticatedDemoRoute
+  '/investor': typeof AuthenticatedInvestorRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/pitchathons': typeof AuthenticatedPitchathonsRoute
+  '/sessions': typeof AuthenticatedSessionsRoute
+  '/vantage': typeof AuthenticatedVantageRoute
+  '/wallet': typeof AuthenticatedWalletRoute
+  '/join/$code': typeof AuthenticatedJoinCodeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/communities': typeof CommunitiesRoute
-  '/dashboard': typeof DashboardRoute
   '/investors': typeof InvestorsRoute
   '/journey': typeof JourneyRoute
   '/platform': typeof PlatformRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/academy': typeof AuthenticatedAcademyRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/community': typeof AuthenticatedCommunityRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/demo': typeof AuthenticatedDemoRoute
+  '/investor': typeof AuthenticatedInvestorRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/pitchathons': typeof AuthenticatedPitchathonsRoute
+  '/sessions': typeof AuthenticatedSessionsRoute
+  '/vantage': typeof AuthenticatedVantageRoute
+  '/wallet': typeof AuthenticatedWalletRoute
+  '/join/$code': typeof AuthenticatedJoinCodeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/communities': typeof CommunitiesRoute
-  '/dashboard': typeof DashboardRoute
   '/investors': typeof InvestorsRoute
   '/journey': typeof JourneyRoute
   '/platform': typeof PlatformRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/academy': typeof AuthenticatedAcademyRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/community': typeof AuthenticatedCommunityRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/demo': typeof AuthenticatedDemoRoute
+  '/_authenticated/investor': typeof AuthenticatedInvestorRoute
+  '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/pitchathons': typeof AuthenticatedPitchathonsRoute
+  '/_authenticated/sessions': typeof AuthenticatedSessionsRoute
+  '/_authenticated/vantage': typeof AuthenticatedVantageRoute
+  '/_authenticated/wallet': typeof AuthenticatedWalletRoute
+  '/_authenticated/join/$code': typeof AuthenticatedJoinCodeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/communities'
-    | '/dashboard'
     | '/investors'
     | '/journey'
     | '/platform'
+    | '/reset-password'
     | '/sitemap.xml'
+    | '/academy'
+    | '/admin'
+    | '/community'
+    | '/dashboard'
+    | '/demo'
+    | '/investor'
+    | '/onboarding'
+    | '/pitchathons'
+    | '/sessions'
+    | '/vantage'
+    | '/wallet'
+    | '/join/$code'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/communities'
-    | '/dashboard'
     | '/investors'
     | '/journey'
     | '/platform'
+    | '/reset-password'
     | '/sitemap.xml'
+    | '/academy'
+    | '/admin'
+    | '/community'
+    | '/dashboard'
+    | '/demo'
+    | '/investor'
+    | '/onboarding'
+    | '/pitchathons'
+    | '/sessions'
+    | '/vantage'
+    | '/wallet'
+    | '/join/$code'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
+    | '/auth'
     | '/communities'
-    | '/dashboard'
     | '/investors'
     | '/journey'
     | '/platform'
+    | '/reset-password'
     | '/sitemap.xml'
+    | '/_authenticated/academy'
+    | '/_authenticated/admin'
+    | '/_authenticated/community'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/demo'
+    | '/_authenticated/investor'
+    | '/_authenticated/onboarding'
+    | '/_authenticated/pitchathons'
+    | '/_authenticated/sessions'
+    | '/_authenticated/vantage'
+    | '/_authenticated/wallet'
+    | '/_authenticated/join/$code'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   CommunitiesRoute: typeof CommunitiesRoute
-  DashboardRoute: typeof DashboardRoute
   InvestorsRoute: typeof InvestorsRoute
   JourneyRoute: typeof JourneyRoute
   PlatformRoute: typeof PlatformRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
@@ -128,6 +294,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/platform': {
@@ -151,18 +324,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvestorsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/communities': {
       id: '/communities'
       path: '/communities'
       fullPath: '/communities'
       preLoaderRoute: typeof CommunitiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -172,16 +352,135 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/wallet': {
+      id: '/_authenticated/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof AuthenticatedWalletRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/vantage': {
+      id: '/_authenticated/vantage'
+      path: '/vantage'
+      fullPath: '/vantage'
+      preLoaderRoute: typeof AuthenticatedVantageRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/sessions': {
+      id: '/_authenticated/sessions'
+      path: '/sessions'
+      fullPath: '/sessions'
+      preLoaderRoute: typeof AuthenticatedSessionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/pitchathons': {
+      id: '/_authenticated/pitchathons'
+      path: '/pitchathons'
+      fullPath: '/pitchathons'
+      preLoaderRoute: typeof AuthenticatedPitchathonsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/investor': {
+      id: '/_authenticated/investor'
+      path: '/investor'
+      fullPath: '/investor'
+      preLoaderRoute: typeof AuthenticatedInvestorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/demo': {
+      id: '/_authenticated/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof AuthenticatedDemoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/community': {
+      id: '/_authenticated/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof AuthenticatedCommunityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/academy': {
+      id: '/_authenticated/academy'
+      path: '/academy'
+      fullPath: '/academy'
+      preLoaderRoute: typeof AuthenticatedAcademyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/join/$code': {
+      id: '/_authenticated/join/$code'
+      path: '/join/$code'
+      fullPath: '/join/$code'
+      preLoaderRoute: typeof AuthenticatedJoinCodeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAcademyRoute: typeof AuthenticatedAcademyRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedCommunityRoute: typeof AuthenticatedCommunityRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDemoRoute: typeof AuthenticatedDemoRoute
+  AuthenticatedInvestorRoute: typeof AuthenticatedInvestorRoute
+  AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedPitchathonsRoute: typeof AuthenticatedPitchathonsRoute
+  AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRoute
+  AuthenticatedVantageRoute: typeof AuthenticatedVantageRoute
+  AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
+  AuthenticatedJoinCodeRoute: typeof AuthenticatedJoinCodeRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAcademyRoute: AuthenticatedAcademyRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedCommunityRoute: AuthenticatedCommunityRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDemoRoute: AuthenticatedDemoRoute,
+  AuthenticatedInvestorRoute: AuthenticatedInvestorRoute,
+  AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedPitchathonsRoute: AuthenticatedPitchathonsRoute,
+  AuthenticatedSessionsRoute: AuthenticatedSessionsRoute,
+  AuthenticatedVantageRoute: AuthenticatedVantageRoute,
+  AuthenticatedWalletRoute: AuthenticatedWalletRoute,
+  AuthenticatedJoinCodeRoute: AuthenticatedJoinCodeRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   CommunitiesRoute: CommunitiesRoute,
-  DashboardRoute: DashboardRoute,
   InvestorsRoute: InvestorsRoute,
   JourneyRoute: JourneyRoute,
   PlatformRoute: PlatformRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
