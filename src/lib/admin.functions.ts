@@ -28,7 +28,7 @@ export const elevateUser = createServerFn({ method: "POST" })
     const { error } = await context.supabase.rpc("elevate_user_to_admin", {
       _target_user_id: data.targetUserId,
       _new_role: data.newRole,
-      _reason: data.reason ?? null,
+      _reason: data.reason ?? undefined,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -42,7 +42,7 @@ export const revokeAdmin = createServerFn({ method: "POST" })
     const { error } = await context.supabase.rpc("revoke_admin_role", {
       _target_user_id: data.targetUserId,
       _role: data.role,
-      _reason: data.reason ?? null,
+      _reason: data.reason ?? undefined,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
