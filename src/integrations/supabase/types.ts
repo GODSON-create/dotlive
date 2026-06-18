@@ -541,6 +541,39 @@ export type Database = {
         }
         Relationships: []
       }
+      role_audit_log: {
+        Row: {
+          action: string
+          assigned_by: string | null
+          created_at: string
+          id: string
+          new_role: string
+          previous_role: string | null
+          reason: string | null
+          target_user_id: string
+        }
+        Insert: {
+          action: string
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          new_role: string
+          previous_role?: string | null
+          reason?: string | null
+          target_user_id: string
+        }
+        Update: {
+          action?: string
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          new_role?: string
+          previous_role?: string | null
+          reason?: string | null
+          target_user_id?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
@@ -624,9 +657,18 @@ export type Database = {
         }
         Returns: number
       }
+      bootstrap_super_admin: { Args: { _email: string }; Returns: string }
       deposit_dot: {
         Args: { _amount: number; _description: string }
         Returns: number
+      }
+      elevate_user_to_admin: {
+        Args: {
+          _new_role?: Database["public"]["Enums"]["app_role"]
+          _reason?: string
+          _target_user_id: string
+        }
+        Returns: undefined
       }
       has_role: {
         Args: {
@@ -634,6 +676,14 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      revoke_admin_role: {
+        Args: {
+          _reason?: string
+          _role?: Database["public"]["Enums"]["app_role"]
+          _target_user_id: string
+        }
+        Returns: undefined
       }
       reward_dot: {
         Args: { _amount: number; _description: string }
@@ -645,7 +695,12 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "founder" | "community_leader" | "investor" | "admin"
+      app_role:
+        | "founder"
+        | "community_leader"
+        | "investor"
+        | "admin"
+        | "super_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -773,7 +828,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["founder", "community_leader", "investor", "admin"],
+      app_role: [
+        "founder",
+        "community_leader",
+        "investor",
+        "admin",
+        "super_admin",
+      ],
     },
   },
 } as const
