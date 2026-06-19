@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { useMyEnrollments } from "@/hooks/use-dot-data";
+import { useServerFn } from "@tanstack/react-start";
+import { completeCourse } from "@/lib/academy.functions";
 import { formatDot } from "@/lib/constants";
 import { toast } from "sonner";
 
