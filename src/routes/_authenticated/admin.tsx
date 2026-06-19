@@ -384,7 +384,7 @@ function MembersTab() {
             <div className="space-y-2">
               <Label>Type</Label>
               <div className="flex gap-2">
-                {["Reward", "Admin Adjustment", "Refund"].map((t) => (
+                {["Admin Credit", "Reward", "Admin Adjustment", "Refund"].map((t) => (
                   <button
                     key={t}
                     onClick={() => setType(t)}
