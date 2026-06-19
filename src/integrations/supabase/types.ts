@@ -376,6 +376,54 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          channel: string | null
+          created_at: string
+          credited_at: string | null
+          dot_amount: number
+          id: string
+          metadata: Json
+          naira_amount: number
+          paid_at: string | null
+          paystack_reference: string | null
+          reference: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          channel?: string | null
+          created_at?: string
+          credited_at?: string | null
+          dot_amount: number
+          id?: string
+          metadata?: Json
+          naira_amount: number
+          paid_at?: string | null
+          paystack_reference?: string | null
+          reference: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          channel?: string | null
+          created_at?: string
+          credited_at?: string | null
+          dot_amount?: number
+          id?: string
+          metadata?: Json
+          naira_amount?: number
+          paid_at?: string | null
+          paystack_reference?: string | null
+          reference?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       pitchathon_applications: {
         Row: {
           created_at: string
@@ -665,6 +713,7 @@ export type Database = {
         Args: { _course_id: string; _user_id: string }
         Returns: number
       }
+      credit_paystack_payment: { Args: { _reference: string }; Returns: number }
       deposit_dot: {
         Args: { _amount: number; _description: string }
         Returns: number
