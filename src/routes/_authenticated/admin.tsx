@@ -30,7 +30,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
-import { formatDot, ROLE_LABELS, type AppRole } from "@/lib/constants";
+import { formatDot, formatNaira, ROLE_LABELS, type AppRole } from "@/lib/constants";
 import { elevateUser, revokeAdmin, claimSuperAdmin } from "@/lib/admin.functions";
 import { toast } from "sonner";
 
