@@ -25,6 +25,7 @@ export const Route = createFileRoute("/_authenticated/academy")({
 function AcademyPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const completeCourseFn = useServerFn(completeCourse);
   const { data: courses = [], isLoading } = useQuery({
     queryKey: ["courses"],
     queryFn: async () => {
