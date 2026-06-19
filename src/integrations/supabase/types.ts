@@ -131,6 +131,7 @@ export type Database = {
           course_id: string
           created_at: string
           id: string
+          rewarded_at: string | null
           status: string
           user_id: string
         }
@@ -140,6 +141,7 @@ export type Database = {
           course_id: string
           created_at?: string
           id?: string
+          rewarded_at?: string | null
           status?: string
           user_id: string
         }
@@ -149,6 +151,7 @@ export type Database = {
           course_id?: string
           created_at?: string
           id?: string
+          rewarded_at?: string | null
           status?: string
           user_id?: string
         }
@@ -658,6 +661,10 @@ export type Database = {
         Returns: number
       }
       bootstrap_super_admin: { Args: { _email: string }; Returns: string }
+      claim_course_reward: {
+        Args: { _course_id: string; _user_id: string }
+        Returns: number
+      }
       deposit_dot: {
         Args: { _amount: number; _description: string }
         Returns: number
@@ -669,6 +676,15 @@ export type Database = {
           _target_user_id: string
         }
         Returns: undefined
+      }
+      get_pitchathon_leaderboard: {
+        Args: { _pitchathon_id: string }
+        Returns: {
+          application_id: string
+          avg_score: number
+          score_count: number
+          venture_name: string
+        }[]
       }
       has_role: {
         Args: {
