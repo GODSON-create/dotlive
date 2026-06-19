@@ -31,15 +31,36 @@ export const JOURNEY_STAGES = [
 
 export type JourneyStage = (typeof JOURNEY_STAGES)[number];
 
-export type AppRole = "founder" | "community_leader" | "investor" | "admin" | "super_admin";
+export type AppRole =
+  | "founder"
+  | "builder"
+  | "vendor"
+  | "community_leader"
+  | "investor"
+  | "capital_partner"
+  | "admin"
+  | "super_admin";
 
 export const ROLE_LABELS: Record<AppRole, string> = {
   founder: "Founder",
+  builder: "Builder",
+  vendor: "Vendor",
   community_leader: "Community Leader",
   investor: "Investor",
+  capital_partner: "Capital Partner",
   admin: "Admin",
   super_admin: "Super Admin",
 };
+
+// Roles a user can self-assign / switch into from the app
+export const SELF_ASSIGNABLE_ROLES: AppRole[] = [
+  "founder",
+  "builder",
+  "vendor",
+  "community_leader",
+  "investor",
+  "capital_partner",
+];
 
 export const INDUSTRIES = [
   "Agriculture",
