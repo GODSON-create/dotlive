@@ -60,15 +60,9 @@ function AcademyPage() {
   async function complete(courseId: string, reward: number) {
     if (!user) return;
     try {
-      const { error } = await supabase
-        .from("course_enrollments")
-        .update({ status: "completed", completed_at: new Date().toISOString() })
-        .eq("course_id", courseId)
-        .eq("user_id", user.id);
-      if (error) throw error;
-      if (reward > 0) {
-        await supabase.rpc("reward_dot", { _amount: reward, _description: "Course completion reward" });
-      }
+      // Completion and the DOT reward are verified and granted server-side
+      // (idempotent). The client cannot set the amount or self-award.
+      await completeCourseFn({ data: { courseId } });
       qc.invalidateQueries({ queryKey: ["enrollments", user.id] });
       qc.invalidateQueries({ queryKey: ["wallet", user.id] });
       qc.invalidateQueries({ queryKey: ["transactions", user.id] });
