@@ -51,25 +51,14 @@ function WalletPage() {
   const [open, setOpen] = useState(false);
 
   async function handleDeposit() {
-    if (amount < MIN_DEPOSIT_DOT) {
-      toast.error(`Minimum deposit is ${formatDot(MIN_DEPOSIT_DOT)} DOT`);
-      return;
-    }
-    setBusy(true);
-    try {
-      const { error } = await supabase.rpc("deposit_dot", {
-        _amount: amount,
-        _description: `Deposit of ${formatDot(amount)} DOT`,
-      });
-      if (error) throw error;
-      toast.success(`${formatDot(amount)} DOT added to your wallet`);
-      qc.invalidateQueries({ queryKey: ["wallet", user?.id] });
-      qc.invalidateQueries({ queryKey: ["transactions", user?.id] });
-      setOpen(false);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Deposit failed");
-    } finally {
-      setBusy(false);
+    // Deposits must go through a verified payment provider (Paystack).
+    // Self-service crediting has been disabled for wallet integrity.
+    toast.info("Card & bank funding via Paystack is coming soon.");
+    setOpen(false);
+  }
+  // referenced to keep imports/vars stable while payments are wired up
+  void busy;
+  void setBusy;
     }
   }
 
