@@ -88,10 +88,12 @@ function AdminPage() {
       <Tabs defaultValue="members" className="mt-6">
         <TabsList>
           <TabsTrigger value="members">Members</TabsTrigger>
+          <TabsTrigger value="payments">Payments</TabsTrigger>
           <TabsTrigger value="content">Content</TabsTrigger>
           {isSuperAdmin && <TabsTrigger value="roles">Roles & Audit</TabsTrigger>}
         </TabsList>
         <TabsContent value="members"><MembersTab /></TabsContent>
+        <TabsContent value="payments"><PaymentsTab /></TabsContent>
         <TabsContent value="content"><ContentTab /></TabsContent>
         {isSuperAdmin && (
           <TabsContent value="roles"><RolesTab /></TabsContent>
