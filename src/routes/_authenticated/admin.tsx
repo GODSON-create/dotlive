@@ -412,6 +412,108 @@ function MembersTab() {
   );
 }
 
+function PaymentsTab() {
+  const { data: payments = [], isLoading } = useQuery({
+    queryKey: ["admin-payments"],
+    queryFn: async () => {
+      const [{ data: rows }, { data: profiles }] = await Promise.all([
+        supabase
+          .from("payments")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(200),
+        supabase.from("profiles").select("id, name, email"),
+      ]);
+      const pmap = new Map((profiles ?? []).map((p) => [p.id, p]));
+      return (rows ?? []).map((r) => ({ ...r, profile: pmap.get(r.user_id) }));
+    },
+  });
+
+  const totals = payments.reduce(
+    (acc, p) => {
+      if (p.credited_at) {
+        acc.dot += Number(p.dot_amount);
+        acc.naira += Number(p.naira_amount);
+        acc.count += 1;
+      }
+      return acc;
+    },
+    { dot: 0, naira: 0, count: 0 },
+  );
+
+  if (isLoading) return <Loader2 className="mt-6 size-6 animate-spin text-primary" />;
+
+  return (
+    <div className="mt-4 space-y-6">
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Stat label="Successful payments" value={String(totals.count)} />
+        <Stat label="DOT funded" value={`${formatDot(totals.dot)} DOT`} />
+        <Stat label="Revenue" value={formatNaira(totals.naira)} />
+      </div>
+
+      <div className="overflow-x-auto rounded-2xl border border-border bg-card">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border text-left text-muted-foreground">
+              <th className="p-4 font-medium">User</th>
+              <th className="p-4 font-medium">DOT</th>
+              <th className="p-4 font-medium">Amount</th>
+              <th className="p-4 font-medium">Status</th>
+              <th className="p-4 font-medium">Channel</th>
+              <th className="p-4 font-medium">Reference</th>
+              <th className="p-4 font-medium">Date</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {payments.length === 0 && (
+              <tr>
+                <td colSpan={7} className="p-8 text-center text-muted-foreground">
+                  No payments recorded yet.
+                </td>
+              </tr>
+            )}
+            {payments.map((p) => (
+              <tr key={p.id}>
+                <td className="p-4">
+                  <div className="font-medium">{p.profile?.name ?? "—"}</div>
+                  <div className="text-xs text-muted-foreground">{p.profile?.email}</div>
+                </td>
+                <td className="p-4">{formatDot(Number(p.dot_amount))}</td>
+                <td className="p-4">{formatNaira(Number(p.naira_amount))}</td>
+                <td className="p-4">
+                  <Badge
+                    variant={
+                      p.credited_at ? "default" : p.status === "pending" ? "secondary" : "destructive"
+                    }
+                  >
+                    {p.credited_at ? "credited" : p.status}
+                  </Badge>
+                </td>
+                <td className="p-4 text-muted-foreground">{p.channel ?? "—"}</td>
+                <td className="p-4 font-mono text-xs text-muted-foreground">{p.reference}</td>
+                <td className="p-4 text-muted-foreground">{new Date(p.created_at).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Wallets are credited only after Paystack verifies the payment. To credit or refund manually,
+        use the <strong>Members</strong> tab — every change is written permanently to the ledger.
+      </p>
+    </div>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-border bg-card p-5">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="mt-1 font-display text-2xl font-bold">{value}</p>
+    </div>
+  );
+}
+
 function ContentTab() {
   const qc = useQueryClient();
   return (
