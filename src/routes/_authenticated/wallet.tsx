@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { Wallet, ArrowDownToLine, Loader2, Plus, Minus, Gift, Settings2 } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { Wallet, ArrowDownToLine, Loader2, Plus, Minus, Gift, Settings2, ShoppingBag, CalendarDays, CheckCircle2 } from "lucide-react";
 import { AppShell } from "@/components/app/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,10 +15,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { supabase } from "@/integrations/supabase/client";
 import { useWallet, useTransactions } from "@/hooks/use-dot-data";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/use-auth";
+import { initPaystackPayment, verifyPaystackPayment } from "@/lib/paystack.functions";
 import {
   MIN_DEPOSIT_DOT,
   DOT_RATE_NGN,
@@ -36,30 +36,76 @@ export const Route = createFileRoute("/_authenticated/wallet")({
 const TYPE_META: Record<string, { icon: typeof Plus; tone: string }> = {
   Deposit: { icon: ArrowDownToLine, tone: "text-primary" },
   Reward: { icon: Gift, tone: "text-gold" },
+  "Academy Reward": { icon: Gift, tone: "text-gold" },
   Spend: { icon: Minus, tone: "text-destructive" },
+  "Marketplace Spend": { icon: ShoppingBag, tone: "text-destructive" },
+  "Marketplace Earnings": { icon: Plus, tone: "text-primary" },
+  "Event Payment": { icon: CalendarDays, tone: "text-destructive" },
   Refund: { icon: Plus, tone: "text-primary" },
   "Admin Adjustment": { icon: Settings2, tone: "text-muted-foreground" },
+  "Admin Credit": { icon: Settings2, tone: "text-primary" },
 };
 
 function WalletPage() {
-  const { user } = useAuth();
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const { data: balance = 0 } = useWallet();
   const { data: transactions = [] } = useTransactions();
   const [amount, setAmount] = useState(MIN_DEPOSIT_DOT);
   const [busy, setBusy] = useState(false);
   const [open, setOpen] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [receipt, setReceipt] = useState<{ dot: number; naira: number; reference: string } | null>(null);
+
+  const initFn = useServerFn(initPaystackPayment);
+  const verifyFn = useServerFn(verifyPaystackPayment);
+
+  const refresh = useCallback(() => {
+    qc.invalidateQueries({ queryKey: ["wallet"] });
+    qc.invalidateQueries({ queryKey: ["transactions"] });
+  }, [qc]);
+
+  // Handle return from Paystack hosted checkout (?reference=... &trxref=...)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const reference = params.get("reference") || params.get("trxref");
+    if (!reference) return;
+
+    setVerifying(true);
+    verifyFn({ data: { reference } })
+      .then((res) => {
+        if (res.status === "success") {
+          setReceipt({ dot: res.dotAmount, naira: dotToNaira(res.dotAmount), reference });
+          toast.success(`Wallet funded with ${formatDot(res.dotAmount)} DOT`);
+          refresh();
+        } else {
+          toast.error("Payment was not completed. You were not charged any DOT.");
+        }
+      })
+      .catch((e) => toast.error(e instanceof Error ? e.message : "Verification failed"))
+      .finally(() => {
+        setVerifying(false);
+        navigate({ to: "/wallet", replace: true });
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleDeposit() {
-    // Deposits must go through a verified payment provider (Paystack).
-    // Self-service crediting has been disabled for wallet integrity.
-    toast.info("Card & bank funding via Paystack is coming soon.");
-    setOpen(false);
+    if (amount < MIN_DEPOSIT_DOT) {
+      toast.error(`Minimum deposit is ${formatDot(MIN_DEPOSIT_DOT)} DOT`);
+      return;
+    }
+    setBusy(true);
+    try {
+      const { authorizationUrl } = await initFn({
+        data: { dotAmount: Math.floor(amount), callbackUrl: `${window.location.origin}/wallet` },
+      });
+      window.location.href = authorizationUrl;
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not start payment");
+      setBusy(false);
+    }
   }
-  // setBusy retained for the upcoming Paystack flow
-  void setBusy;
-
-
 
   return (
     <AppShell>
@@ -67,6 +113,12 @@ function WalletPage() {
       <p className="mt-1 text-sm text-muted-foreground">
         Your internal ecosystem credits · 1 DOT = {formatNaira(DOT_RATE_NGN)}
       </p>
+
+      {verifying && (
+        <div className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-card p-4 text-sm">
+          <Loader2 className="size-4 animate-spin text-primary" /> Verifying your payment…
+        </div>
+      )}
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-border bg-card p-6 sm:col-span-2 [background-image:var(--gradient-primary)]">
@@ -124,13 +176,13 @@ function WalletPage() {
               <DialogFooter>
                 <Button variant="hero" onClick={handleDeposit} disabled={busy}>
                   {busy && <Loader2 className="size-4 animate-spin" />}
-                  Confirm deposit
+                  Pay with Paystack
                 </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
           <p className="text-center text-xs text-muted-foreground">
-            Card & bank payment via Paystack/Flutterwave coming soon
+            Secure card & bank payment via Paystack
           </p>
         </div>
       </div>
@@ -165,6 +217,40 @@ function WalletPage() {
           </ul>
         )}
       </div>
+
+      <Dialog open={!!receipt} onOpenChange={(o) => !o && setReceipt(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <div className="mx-auto mb-2 flex size-12 items-center justify-center rounded-full bg-primary/10">
+              <CheckCircle2 className="size-6 text-primary" />
+            </div>
+            <DialogTitle className="text-center">Payment receipt</DialogTitle>
+            <DialogDescription className="text-center">Your DOT wallet has been funded.</DialogDescription>
+          </DialogHeader>
+          {receipt && (
+            <div className="space-y-2 rounded-xl border border-border bg-muted/40 p-4 text-sm">
+              <Row label="DOT credited" value={`${formatDot(receipt.dot)} DOT`} />
+              <Row label="Amount paid" value={formatNaira(receipt.naira)} />
+              <Row label="Reference" value={receipt.reference} mono />
+              <Row label="Date" value={new Date().toLocaleString()} />
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="hero" className="w-full" onClick={() => setReceipt(null)}>
+              Done
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
+  );
+}
+
+function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <span className="text-muted-foreground">{label}</span>
+      <span className={cn("font-medium", mono && "font-mono text-xs")}>{value}</span>
+    </div>
   );
 }
