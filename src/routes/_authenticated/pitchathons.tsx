@@ -173,17 +173,20 @@ function Leaderboard({ pitchathonId }: { pitchathonId: string }) {
   const { data } = useQuery({
     queryKey: ["leaderboard", pitchathonId],
     queryFn: async () => {
-      const { data: apps, error } = await supabase
-        .from("pitchathon_applications")
-        .select("id, venture_name, pitchathon_scores(score)")
-        .eq("pitchathon_id", pitchathonId);
+      // Uses a security-definer RPC that returns only venture name + average
+      // score, so individual judge scores and applications stay private.
+      const { data: rows, error } = await supabase.rpc("get_pitchathon_leaderboard", {
+        _pitchathon_id: pitchathonId,
+      });
       if (error) throw error;
-      return (apps ?? [])
-        .map((a) => {
-          const scores = (a.pitchathon_scores as { score: number }[]) ?? [];
-          const avg = scores.length ? scores.reduce((s, x) => s + Number(x.score), 0) / scores.length : 0;
-          return { id: a.id, name: a.venture_name ?? "Unnamed", avg, count: scores.length };
-        })
+      return (rows ?? [])
+        .map((r) => ({
+          id: r.application_id,
+          name: r.venture_name ?? "Unnamed",
+          avg: Number(r.avg_score),
+          count: Number(r.score_count),
+        }))
+        .filter((r) => r.count > 0)
         .sort((a, b) => b.avg - a.avg);
     },
   });
