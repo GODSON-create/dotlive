@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { useMyEnrollments } from "@/hooks/use-dot-data";
+import { useServerFn } from "@tanstack/react-start";
+import { completeCourse } from "@/lib/academy.functions";
 import { formatDot } from "@/lib/constants";
 import { toast } from "sonner";
 
@@ -23,6 +25,7 @@ export const Route = createFileRoute("/_authenticated/academy")({
 function AcademyPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const completeCourseFn = useServerFn(completeCourse);
   const { data: courses = [], isLoading } = useQuery({
     queryKey: ["courses"],
     queryFn: async () => {
@@ -57,15 +60,9 @@ function AcademyPage() {
   async function complete(courseId: string, reward: number) {
     if (!user) return;
     try {
-      const { error } = await supabase
-        .from("course_enrollments")
-        .update({ status: "completed", completed_at: new Date().toISOString() })
-        .eq("course_id", courseId)
-        .eq("user_id", user.id);
-      if (error) throw error;
-      if (reward > 0) {
-        await supabase.rpc("reward_dot", { _amount: reward, _description: "Course completion reward" });
-      }
+      // Completion and the DOT reward are verified and granted server-side
+      // (idempotent). The client cannot set the amount or self-award.
+      await completeCourseFn({ data: { courseId } });
       qc.invalidateQueries({ queryKey: ["enrollments", user.id] });
       qc.invalidateQueries({ queryKey: ["wallet", user.id] });
       qc.invalidateQueries({ queryKey: ["transactions", user.id] });
