@@ -59,8 +59,7 @@ function WalletPage() {
   // referenced to keep imports/vars stable while payments are wired up
   void busy;
   void setBusy;
-    }
-  }
+
 
   return (
     <AppShell>
