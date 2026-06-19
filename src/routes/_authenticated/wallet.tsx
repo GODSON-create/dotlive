@@ -56,9 +56,9 @@ function WalletPage() {
     toast.info("Card & bank funding via Paystack is coming soon.");
     setOpen(false);
   }
-  // referenced to keep imports/vars stable while payments are wired up
-  void busy;
+  // setBusy retained for the upcoming Paystack flow
   void setBusy;
+
 
 
   return (
