@@ -80,14 +80,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "DOT — Africa's Venture Progression Network" },
+      { title: "DOT — Africa's Venture Creation Network" },
       {
         name: "description",
         content:
           "DOT helps African founders Assess, Learn, Improve, Validate, Pitch, Fund and Scale — a measurable venture progression network.",
       },
       { name: "author", content: "DOT" },
-      { property: "og:title", content: "DOT — Africa's Venture Progression Network" },
+      { property: "og:title", content: "DOT — Africa's Venture Creation Network" },
       {
         property: "og:description",
         content:
@@ -96,6 +96,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@DOTafrica" },
+      { name: "twitter:title", content: "DOT — Africa's Venture Creation Network" },
+      { name: "description", content: "DOT is Africa's venture-building network that helps builders learn skills, join teams, launch startups, and access opportunities." },
+      { property: "og:description", content: "DOT is Africa's venture-building network that helps builders learn skills, join teams, launch startups, and access opportunities." },
+      { name: "twitter:description", content: "DOT is Africa's venture-building network that helps builders learn skills, join teams, launch startups, and access opportunities." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/izLwHKTn5oRTgqHxFz7cy3Kvtlg1/social-images/social-1781945909310-ChatGPT_Image_Jun_20,_2026,_09_58_17_AM.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/izLwHKTn5oRTgqHxFz7cy3Kvtlg1/social-images/social-1781945909310-ChatGPT_Image_Jun_20,_2026,_09_58_17_AM.webp" },
     ],
     links: [
       {
