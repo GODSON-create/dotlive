@@ -24,16 +24,13 @@ function JoinPage() {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase
-        .from("communities")
-        .select("id, name, description")
-        .eq("referral_code", code)
-        .maybeSingle();
-      if (error || !data) {
+      const { data, error } = await supabase.rpc("find_community_by_referral_code", { _code: code });
+      const match = Array.isArray(data) ? data[0] : data;
+      if (error || !match) {
         setStatus("error");
         return;
       }
-      setCommunity(data);
+      setCommunity(match);
       setStatus("found");
     })();
   }, [code]);
