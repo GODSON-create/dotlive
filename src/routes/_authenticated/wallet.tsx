@@ -205,8 +205,9 @@ function WalletPage() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+          <TransferDialog balance={balance} myDotId={dotId} />
           <p className="text-center text-xs text-muted-foreground">
-            Secure card & bank payment via Paystack
+            Send instantly by DOT ID · fund via Paystack
           </p>
         </div>
       </div>
