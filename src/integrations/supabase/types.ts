@@ -566,6 +566,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          dot_id: string
           email: string | null
           id: string
           name: string | null
@@ -575,6 +576,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          dot_id?: string
           email?: string | null
           id: string
           name?: string | null
@@ -584,6 +586,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           created_at?: string
+          dot_id?: string
           email?: string | null
           id?: string
           name?: string | null
@@ -734,6 +737,7 @@ export type Database = {
           name: string
         }[]
       }
+      generate_dot_id: { Args: never; Returns: string }
       get_my_referral_code: { Args: never; Returns: string }
       get_pitchathon_leaderboard: {
         Args: { _pitchathon_id: string }
@@ -751,6 +755,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      lookup_dot_id: { Args: { _dot_id: string }; Returns: string }
       revoke_admin_role: {
         Args: {
           _reason?: string
@@ -765,6 +770,10 @@ export type Database = {
       }
       spend_dot: {
         Args: { _amount: number; _description: string }
+        Returns: number
+      }
+      transfer_dot: {
+        Args: { _amount: number; _note?: string; _recipient_dot_id: string }
         Returns: number
       }
     }

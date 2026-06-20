@@ -19,6 +19,23 @@ export function useWallet() {
   });
 }
 
+export function useMyProfile() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["my_profile", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, name, email, dot_id, avatar_url")
+        .eq("id", user!.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
 export function useTransactions() {
   const { user } = useAuth();
   return useQuery({

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Wallet, ArrowDownToLine, Loader2, Plus, Minus, Gift, Settings2, ShoppingBag, CalendarDays, CheckCircle2 } from "lucide-react";
+import { Wallet, ArrowDownToLine, Loader2, Plus, Minus, Gift, Settings2, ShoppingBag, CalendarDays, CheckCircle2, Send, Copy, Check } from "lucide-react";
 import { AppShell } from "@/components/app/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,9 +15,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useWallet, useTransactions } from "@/hooks/use-dot-data";
+import { useWallet, useTransactions, useMyProfile } from "@/hooks/use-dot-data";
 import { useQueryClient } from "@tanstack/react-query";
 import { initPaystackPayment, verifyPaystackPayment } from "@/lib/paystack.functions";
+import { TransferDialog } from "@/components/app/TransferDialog";
 import {
   MIN_DEPOSIT_DOT,
   DOT_RATE_NGN,
@@ -38,6 +39,7 @@ const TYPE_META: Record<string, { icon: typeof Plus; tone: string }> = {
   Reward: { icon: Gift, tone: "text-gold" },
   "Academy Reward": { icon: Gift, tone: "text-gold" },
   Spend: { icon: Minus, tone: "text-destructive" },
+  Transfer: { icon: Send, tone: "text-foreground" },
   "Marketplace Spend": { icon: ShoppingBag, tone: "text-destructive" },
   "Marketplace Earnings": { icon: Plus, tone: "text-primary" },
   "Event Payment": { icon: CalendarDays, tone: "text-destructive" },
@@ -51,11 +53,23 @@ function WalletPage() {
   const navigate = useNavigate();
   const { data: balance = 0 } = useWallet();
   const { data: transactions = [] } = useTransactions();
+  const { data: profile } = useMyProfile();
   const [amount, setAmount] = useState(MIN_DEPOSIT_DOT);
   const [busy, setBusy] = useState(false);
   const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [receipt, setReceipt] = useState<{ dot: number; naira: number; reference: string } | null>(null);
+
+  const dotId = profile?.dot_id ?? null;
+
+  function copyDotId() {
+    if (!dotId) return;
+    navigator.clipboard.writeText(dotId);
+    setCopied(true);
+    toast.success("DOT ID copied");
+    setTimeout(() => setCopied(false), 1500);
+  }
 
   const initFn = useServerFn(initPaystackPayment);
   const verifyFn = useServerFn(verifyPaystackPayment);
@@ -130,6 +144,16 @@ function WalletPage() {
             {formatDot(balance)} <span className="text-2xl font-medium">DOT</span>
           </p>
           <p className="mt-1 text-sm text-primary-foreground/80">≈ {formatNaira(dotToNaira(balance))}</p>
+          {dotId && (
+            <button
+              onClick={copyDotId}
+              className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary-foreground/10 px-3 py-1.5 text-xs font-medium text-primary-foreground transition hover:bg-primary-foreground/20"
+            >
+              <span className="text-primary-foreground/70">Your DOT ID</span>
+              <span className="font-mono font-semibold">{dotId}</span>
+              {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+            </button>
+          )}
         </div>
         <div className="flex flex-col justify-center gap-3 rounded-2xl border border-border bg-card p-6">
           <Dialog open={open} onOpenChange={setOpen}>
@@ -181,8 +205,9 @@ function WalletPage() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+          <TransferDialog balance={balance} myDotId={dotId} />
           <p className="text-center text-xs text-muted-foreground">
-            Secure card & bank payment via Paystack
+            Send instantly by DOT ID · fund via Paystack
           </p>
         </div>
       </div>
