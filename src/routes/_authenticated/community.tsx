@@ -49,11 +49,13 @@ function CommunityPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("communities")
-        .select("*")
+        .select("id, name, description, category, region, leader_id, created_at, updated_at")
         .eq("leader_id", user!.id)
         .maybeSingle();
       if (error) throw error;
-      return data;
+      if (!data) return null;
+      const { data: code } = await supabase.rpc("get_my_referral_code");
+      return { ...data, referral_code: (code as string | null) ?? "" };
     },
   });
 
