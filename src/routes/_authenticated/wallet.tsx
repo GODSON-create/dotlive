@@ -144,6 +144,16 @@ function WalletPage() {
             {formatDot(balance)} <span className="text-2xl font-medium">DOT</span>
           </p>
           <p className="mt-1 text-sm text-primary-foreground/80">≈ {formatNaira(dotToNaira(balance))}</p>
+          {dotId && (
+            <button
+              onClick={copyDotId}
+              className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary-foreground/10 px-3 py-1.5 text-xs font-medium text-primary-foreground transition hover:bg-primary-foreground/20"
+            >
+              <span className="text-primary-foreground/70">Your DOT ID</span>
+              <span className="font-mono font-semibold">{dotId}</span>
+              {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+            </button>
+          )}
         </div>
         <div className="flex flex-col justify-center gap-3 rounded-2xl border border-border bg-card p-6">
           <Dialog open={open} onOpenChange={setOpen}>
