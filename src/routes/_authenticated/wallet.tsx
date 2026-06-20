@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Wallet, ArrowDownToLine, Loader2, Plus, Minus, Gift, Settings2, ShoppingBag, CalendarDays, CheckCircle2 } from "lucide-react";
+import { Wallet, ArrowDownToLine, Loader2, Plus, Minus, Gift, Settings2, ShoppingBag, CalendarDays, CheckCircle2, Send, Copy, Check } from "lucide-react";
 import { AppShell } from "@/components/app/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,9 +15,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useWallet, useTransactions } from "@/hooks/use-dot-data";
+import { useWallet, useTransactions, useMyProfile } from "@/hooks/use-dot-data";
 import { useQueryClient } from "@tanstack/react-query";
 import { initPaystackPayment, verifyPaystackPayment } from "@/lib/paystack.functions";
+import { TransferDialog } from "@/components/app/TransferDialog";
 import {
   MIN_DEPOSIT_DOT,
   DOT_RATE_NGN,
@@ -38,6 +39,7 @@ const TYPE_META: Record<string, { icon: typeof Plus; tone: string }> = {
   Reward: { icon: Gift, tone: "text-gold" },
   "Academy Reward": { icon: Gift, tone: "text-gold" },
   Spend: { icon: Minus, tone: "text-destructive" },
+  Transfer: { icon: Send, tone: "text-foreground" },
   "Marketplace Spend": { icon: ShoppingBag, tone: "text-destructive" },
   "Marketplace Earnings": { icon: Plus, tone: "text-primary" },
   "Event Payment": { icon: CalendarDays, tone: "text-destructive" },
