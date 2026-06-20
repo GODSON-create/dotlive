@@ -726,6 +726,15 @@ export type Database = {
         }
         Returns: undefined
       }
+      find_community_by_referral_code: {
+        Args: { _code: string }
+        Returns: {
+          description: string
+          id: string
+          name: string
+        }[]
+      }
+      get_my_referral_code: { Args: never; Returns: string }
       get_pitchathon_leaderboard: {
         Args: { _pitchathon_id: string }
         Returns: {
