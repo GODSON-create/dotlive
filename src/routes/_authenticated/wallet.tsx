@@ -53,11 +53,23 @@ function WalletPage() {
   const navigate = useNavigate();
   const { data: balance = 0 } = useWallet();
   const { data: transactions = [] } = useTransactions();
+  const { data: profile } = useMyProfile();
   const [amount, setAmount] = useState(MIN_DEPOSIT_DOT);
   const [busy, setBusy] = useState(false);
   const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [receipt, setReceipt] = useState<{ dot: number; naira: number; reference: string } | null>(null);
+
+  const dotId = profile?.dot_id ?? null;
+
+  function copyDotId() {
+    if (!dotId) return;
+    navigator.clipboard.writeText(dotId);
+    setCopied(true);
+    toast.success("DOT ID copied");
+    setTimeout(() => setCopied(false), 1500);
+  }
 
   const initFn = useServerFn(initPaystackPayment);
   const verifyFn = useServerFn(verifyPaystackPayment);
