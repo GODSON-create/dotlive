@@ -119,3 +119,88 @@ export function useMyMembership() {
     },
   });
 }
+
+// ============ DOT Work ============
+
+export function useServices(category?: string, search?: string) {
+  return useQuery({
+    queryKey: ["services", category ?? "all", search ?? ""],
+    queryFn: async () => {
+      let q = supabase
+        .from("services")
+        .select("*")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
+      if (category) q = q.eq("category", category);
+      if (search && search.trim()) q = q.ilike("title", `%${search.trim()}%`);
+      const { data, error } = await q;
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useMyBuilderProfile() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["builder_profile", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("builder_profiles")
+        .select("*")
+        .eq("id", user!.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useMyServices() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["my_services", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("services")
+        .select("*")
+        .eq("builder_id", user!.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useMyOrders(role: "client" | "builder") {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["orders", role, user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const col = role === "client" ? "client_id" : "builder_id";
+      const { data, error } = await supabase
+        .from("service_orders")
+        .select("*")
+        .eq(col, user!.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useBuilderStats(builderId?: string) {
+  return useQuery({
+    queryKey: ["builder_stats", builderId],
+    enabled: !!builderId,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_builder_stats", { _builder_id: builderId! });
+      if (error) throw error;
+      return data?.[0] ?? { orders_completed: 0, total_earned: 0, avg_rating: 0, review_count: 0 };
+    },
+  });
+}
+
