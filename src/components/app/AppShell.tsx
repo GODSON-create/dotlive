@@ -33,6 +33,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
   { label: "Vantage", to: "/vantage", icon: Gauge, roles: ["founder"] },
   { label: "Wallet", to: "/wallet", icon: Wallet },
+  { label: "DOT Work", to: "/work", icon: Hammer },
   { label: "Academy", to: "/academy", icon: BookOpen, roles: ["founder"] },
   { label: "Sessions", to: "/sessions", icon: CalendarCheck },
   { label: "Pitchathons", to: "/pitchathons", icon: Trophy, roles: ["founder"] },
