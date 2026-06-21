@@ -272,7 +272,7 @@ function OrdersTab() {
   const qc = useQueryClient();
   const [review, setReview] = useState<{ id: string; title: string } | null>(null);
 
-  async function run(call: Promise<{ error: unknown }>, ok: string) {
+  async function run(call: PromiseLike<{ error: unknown }>, ok: string) {
     try {
       const { error } = await call;
       if (error) throw error;
