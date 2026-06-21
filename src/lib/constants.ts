@@ -75,6 +75,28 @@ export const INDUSTRIES = [
   "Other",
 ] as const;
 
+export const WORK_CATEGORIES = [
+  "Graphics",
+  "Website/App Development",
+  "Content",
+  "Marketing",
+  "AI Services",
+  "Operations",
+  "Sales",
+  "Customer Support",
+  "Design",
+  "Finance",
+] as const;
+
+export type WorkCategory = (typeof WORK_CATEGORIES)[number];
+
+export const ORDER_STATUS_META: Record<string, { label: string; tone: string }> = {
+  in_progress: { label: "In progress", tone: "text-gold" },
+  delivered: { label: "Delivered", tone: "text-primary" },
+  completed: { label: "Completed", tone: "text-primary" },
+  cancelled: { label: "Cancelled", tone: "text-destructive" },
+};
+
 export const AFRICAN_COUNTRIES = [
   "Nigeria",
   "Ghana",
