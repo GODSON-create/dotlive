@@ -318,14 +318,14 @@ function OrdersTab() {
                   <Button
                     variant="hero"
                     size="sm"
-                    onClick={() => run("complete_service_order", { _order_id: o.id }, "Order completed — builder paid.")}
+                    onClick={() => run(supabase.rpc("complete_service_order", { _order_id: o.id }), "Order completed — builder paid.")}
                   >
                     <CheckCircle2 className="size-4" /> Confirm & pay
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => run("cancel_service_order", { _order_id: o.id }, "Order cancelled — you were refunded.")}
+                    onClick={() => run(supabase.rpc("cancel_service_order", { _order_id: o.id }), "Order cancelled — you were refunded.")}
                   >
                     Cancel
                   </Button>
