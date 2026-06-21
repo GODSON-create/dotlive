@@ -272,9 +272,9 @@ function OrdersTab() {
   const qc = useQueryClient();
   const [review, setReview] = useState<{ id: string; title: string } | null>(null);
 
-  async function run(fn: string, args: Record<string, unknown>, ok: string) {
+  async function run(call: Promise<{ error: unknown }>, ok: string) {
     try {
-      const { error } = await supabase.rpc(fn as never, args as never);
+      const { error } = await call;
       if (error) throw error;
       qc.invalidateQueries({ queryKey: ["orders", "client"] });
       qc.invalidateQueries({ queryKey: ["wallet"] });
@@ -284,6 +284,7 @@ function OrdersTab() {
       toast.error(e instanceof Error ? e.message : "Action failed");
     }
   }
+
 
   if (isLoading) return <Loader2 className="mt-8 size-6 animate-spin text-primary" />;
   if (orders.length === 0) return <Empty icon={Package} text="You haven't ordered any services yet." />;
