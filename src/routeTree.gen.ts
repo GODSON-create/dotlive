@@ -18,6 +18,7 @@ import { Route as CommunitiesRouteImport } from './routes/communities'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedWorkRouteImport } from './routes/_authenticated/work'
 import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as AuthenticatedVantageRouteImport } from './routes/_authenticated/vantage'
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
@@ -75,6 +76,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedWorkRoute = AuthenticatedWorkRouteImport.update({
+  id: '/work',
+  path: '/work',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedWalletRoute = AuthenticatedWalletRouteImport.update({
   id: '/wallet',
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/sessions': typeof AuthenticatedSessionsRoute
   '/vantage': typeof AuthenticatedVantageRoute
   '/wallet': typeof AuthenticatedWalletRoute
+  '/work': typeof AuthenticatedWorkRoute
   '/join/$code': typeof AuthenticatedJoinCodeRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
@@ -187,6 +194,7 @@ export interface FileRoutesByTo {
   '/sessions': typeof AuthenticatedSessionsRoute
   '/vantage': typeof AuthenticatedVantageRoute
   '/wallet': typeof AuthenticatedWalletRoute
+  '/work': typeof AuthenticatedWorkRoute
   '/join/$code': typeof AuthenticatedJoinCodeRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
@@ -212,6 +220,7 @@ export interface FileRoutesById {
   '/_authenticated/sessions': typeof AuthenticatedSessionsRoute
   '/_authenticated/vantage': typeof AuthenticatedVantageRoute
   '/_authenticated/wallet': typeof AuthenticatedWalletRoute
+  '/_authenticated/work': typeof AuthenticatedWorkRoute
   '/_authenticated/join/$code': typeof AuthenticatedJoinCodeRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
@@ -237,6 +246,7 @@ export interface FileRouteTypes {
     | '/sessions'
     | '/vantage'
     | '/wallet'
+    | '/work'
     | '/join/$code'
     | '/api/public/webhooks/paystack'
   fileRoutesByTo: FileRoutesByTo
@@ -260,6 +270,7 @@ export interface FileRouteTypes {
     | '/sessions'
     | '/vantage'
     | '/wallet'
+    | '/work'
     | '/join/$code'
     | '/api/public/webhooks/paystack'
   id:
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/_authenticated/sessions'
     | '/_authenticated/vantage'
     | '/_authenticated/wallet'
+    | '/_authenticated/work'
     | '/_authenticated/join/$code'
     | '/api/public/webhooks/paystack'
   fileRoutesById: FileRoutesById
@@ -365,6 +377,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/work': {
+      id: '/_authenticated/work'
+      path: '/work'
+      fullPath: '/work'
+      preLoaderRoute: typeof AuthenticatedWorkRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/wallet': {
       id: '/_authenticated/wallet'
@@ -472,6 +491,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRoute
   AuthenticatedVantageRoute: typeof AuthenticatedVantageRoute
   AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
+  AuthenticatedWorkRoute: typeof AuthenticatedWorkRoute
   AuthenticatedJoinCodeRoute: typeof AuthenticatedJoinCodeRoute
 }
 
@@ -487,6 +507,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSessionsRoute: AuthenticatedSessionsRoute,
   AuthenticatedVantageRoute: AuthenticatedVantageRoute,
   AuthenticatedWalletRoute: AuthenticatedWalletRoute,
+  AuthenticatedWorkRoute: AuthenticatedWorkRoute,
   AuthenticatedJoinCodeRoute: AuthenticatedJoinCodeRoute,
 }
 
