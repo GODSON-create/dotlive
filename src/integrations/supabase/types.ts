@@ -56,6 +56,36 @@ export type Database = {
         }
         Relationships: []
       }
+      builder_profiles: {
+        Row: {
+          available: boolean
+          bio: string | null
+          created_at: string
+          headline: string
+          id: string
+          skills: string[]
+          updated_at: string
+        }
+        Insert: {
+          available?: boolean
+          bio?: string | null
+          created_at?: string
+          headline: string
+          id: string
+          skills?: string[]
+          updated_at?: string
+        }
+        Update: {
+          available?: boolean
+          bio?: string | null
+          created_at?: string
+          headline?: string
+          id?: string
+          skills?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       communities: {
         Row: {
           category: string | null
@@ -628,6 +658,146 @@ export type Database = {
         }
         Relationships: []
       }
+      service_orders: {
+        Row: {
+          amount_dot: number
+          builder_id: string
+          client_id: string
+          completed_at: string | null
+          created_at: string
+          delivery_note: string | null
+          id: string
+          requirements: string | null
+          service_id: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          amount_dot: number
+          builder_id: string
+          client_id: string
+          completed_at?: string | null
+          created_at?: string
+          delivery_note?: string | null
+          id?: string
+          requirements?: string | null
+          service_id: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          amount_dot?: number
+          builder_id?: string
+          client_id?: string
+          completed_at?: string | null
+          created_at?: string
+          delivery_note?: string | null
+          id?: string
+          requirements?: string | null
+          service_id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_orders_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_reviews: {
+        Row: {
+          builder_id: string
+          client_id: string
+          comment: string | null
+          created_at: string
+          id: string
+          order_id: string
+          rating: number
+          service_id: string
+        }
+        Insert: {
+          builder_id: string
+          client_id: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          order_id: string
+          rating: number
+          service_id: string
+        }
+        Update: {
+          builder_id?: string
+          client_id?: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          order_id?: string
+          rating?: number
+          service_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_reviews_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      services: {
+        Row: {
+          builder_id: string
+          category: string
+          created_at: string
+          delivery_days: number
+          description: string
+          id: string
+          is_active: boolean
+          price_dot: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          builder_id: string
+          category: string
+          created_at?: string
+          delivery_days?: number
+          description: string
+          id?: string
+          is_active?: boolean
+          price_dot: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          builder_id?: string
+          category?: string
+          created_at?: string
+          delivery_days?: number
+          description?: string
+          id?: string
+          is_active?: boolean
+          price_dot?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
@@ -712,11 +882,24 @@ export type Database = {
         Returns: number
       }
       bootstrap_super_admin: { Args: { _email: string }; Returns: string }
+      cancel_service_order: { Args: { _order_id: string }; Returns: undefined }
       claim_course_reward: {
         Args: { _course_id: string; _user_id: string }
         Returns: number
       }
+      complete_service_order: {
+        Args: { _order_id: string }
+        Returns: undefined
+      }
+      create_service_order: {
+        Args: { _requirements?: string; _service_id: string }
+        Returns: string
+      }
       credit_paystack_payment: { Args: { _reference: string }; Returns: number }
+      deliver_service_order: {
+        Args: { _note?: string; _order_id: string }
+        Returns: undefined
+      }
       deposit_dot: {
         Args: { _amount: number; _description: string }
         Returns: number
@@ -738,6 +921,15 @@ export type Database = {
         }[]
       }
       generate_dot_id: { Args: never; Returns: string }
+      get_builder_stats: {
+        Args: { _builder_id: string }
+        Returns: {
+          avg_rating: number
+          orders_completed: number
+          review_count: number
+          total_earned: number
+        }[]
+      }
       get_my_referral_code: { Args: never; Returns: string }
       get_pitchathon_leaderboard: {
         Args: { _pitchathon_id: string }
@@ -756,6 +948,10 @@ export type Database = {
         Returns: boolean
       }
       lookup_dot_id: { Args: { _dot_id: string }; Returns: string }
+      review_service_order: {
+        Args: { _comment?: string; _order_id: string; _rating: number }
+        Returns: undefined
+      }
       revoke_admin_role: {
         Args: {
           _reason?: string
