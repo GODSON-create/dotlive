@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_id: string | null
+          amount: number | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_id?: string | null
+          amount?: number | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string | null
+          amount?: number | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       assessments: {
         Row: {
           answers: Json
@@ -625,6 +658,54 @@ export type Database = {
         }
         Relationships: []
       }
+      reserve_allocations: {
+        Row: {
+          allocated_by: string | null
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          purpose: string
+          recipient_id: string | null
+        }
+        Insert: {
+          allocated_by?: string | null
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          purpose: string
+          recipient_id?: string | null
+        }
+        Update: {
+          allocated_by?: string | null
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          purpose?: string
+          recipient_id?: string | null
+        }
+        Relationships: []
+      }
+      reserve_wallet: {
+        Row: {
+          balance: number
+          id: boolean
+          updated_at: string
+        }
+        Insert: {
+          balance?: number
+          id?: boolean
+          updated_at?: string
+        }
+        Update: {
+          balance?: number
+          id?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       role_audit_log: {
         Row: {
           action: string
@@ -850,18 +931,21 @@ export type Database = {
         Row: {
           balance: number
           created_at: string
+          status: string
           updated_at: string
           user_id: string
         }
         Insert: {
           balance?: number
           created_at?: string
+          status?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           balance?: number
           created_at?: string
+          status?: string
           updated_at?: string
           user_id?: string
         }
@@ -881,6 +965,27 @@ export type Database = {
         }
         Returns: number
       }
+      admin_ledger_adjust: {
+        Args: {
+          _amount: number
+          _description: string
+          _reason?: string
+          _type: string
+          _user_id: string
+        }
+        Returns: number
+      }
+      allocate_from_reserve: {
+        Args: {
+          _amount: number
+          _description?: string
+          _purpose: string
+          _reason?: string
+          _recipient: string
+        }
+        Returns: number
+      }
+      assert_wallet_active: { Args: { _user_id: string }; Returns: undefined }
       bootstrap_super_admin: { Args: { _email: string }; Returns: string }
       cancel_service_order: { Args: { _order_id: string }; Returns: undefined }
       claim_course_reward: {
@@ -921,6 +1026,7 @@ export type Database = {
         }[]
       }
       generate_dot_id: { Args: never; Returns: string }
+      get_admin_overview: { Args: never; Returns: Json }
       get_builder_stats: {
         Args: { _builder_id: string }
         Returns: {
@@ -963,6 +1069,10 @@ export type Database = {
       reward_dot: {
         Args: { _amount: number; _description: string }
         Returns: number
+      }
+      set_wallet_status: {
+        Args: { _reason?: string; _status: string; _user_id: string }
+        Returns: undefined
       }
       spend_dot: {
         Args: { _amount: number; _description: string }
