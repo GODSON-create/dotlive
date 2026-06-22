@@ -967,7 +967,7 @@ function SessionsManager() {
       rows={rows}
       fields={fields}
       columns={[{ key: "title", label: "Title" }, { key: "speaker", label: "Speaker" }]}
-      toForm={(r) => ({ ...r, event_date: r.event_date ? new Date(r.event_date).toISOString().slice(0, 16) : "" })}
+      toForm={(r) => ({ ...r, event_date: r.event_date ? new Date(r.event_date as string).toISOString().slice(0, 16) : "" })}
       onCreate={async (v) => {
         const { error } = await supabase.from("events").insert({
           title: v.title, description: v.description, speaker: v.speaker,
@@ -1018,8 +1018,8 @@ function PitchathonsManager() {
       columns={[{ key: "title", label: "Title" }, { key: "status", label: "Status" }]}
       toForm={(r) => ({
         ...r,
-        start_date: r.start_date ? new Date(r.start_date).toISOString().slice(0, 16) : "",
-        end_date: r.end_date ? new Date(r.end_date).toISOString().slice(0, 16) : "",
+        start_date: r.start_date ? new Date(r.start_date as string).toISOString().slice(0, 16) : "",
+        end_date: r.end_date ? new Date(r.end_date as string).toISOString().slice(0, 16) : "",
       })}
       onCreate={async (v) => {
         const { error } = await supabase.from("pitchathons").insert({
