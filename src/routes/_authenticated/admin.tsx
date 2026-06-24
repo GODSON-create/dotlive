@@ -47,7 +47,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { formatDot, formatNaira, ROLE_LABELS, type AppRole } from "@/lib/constants";
-import { elevateUser, revokeAdmin, claimSuperAdmin } from "@/lib/admin.functions";
+import { elevateUser, revokeAdmin, claimSuperAdmin, adminUpdateUser } from "@/lib/admin.functions";
 import { getAdminCampaigns, updateCampaignStatus } from "@/lib/spotlight.functions";
 import { toast } from "sonner";
 
@@ -107,6 +107,7 @@ function AdminPage() {
       <Tabs defaultValue="overview" className="mt-6">
         <TabsList className="flex-wrap">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="users">User Management</TabsTrigger>
           <TabsTrigger value="wallets">Wallets</TabsTrigger>
           <TabsTrigger value="reserve">Reserve</TabsTrigger>
           <TabsTrigger value="payments">Payments</TabsTrigger>
@@ -115,6 +116,7 @@ function AdminPage() {
           {isSuperAdmin && <TabsTrigger value="roles">Roles & Audit</TabsTrigger>}
         </TabsList>
         <TabsContent value="overview"><OverviewTab /></TabsContent>
+        <TabsContent value="users"><UsersTab /></TabsContent>
         <TabsContent value="wallets"><WalletsTab /></TabsContent>
         <TabsContent value="reserve"><ReserveTab /></TabsContent>
         <TabsContent value="payments"><PaymentsTab /></TabsContent>
@@ -157,10 +159,36 @@ function OverviewTab() {
     },
   });
 
+  const { data: scholarshipCount = 0 } = useQuery({
+    queryKey: ["admin-scholarship-count"],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("reserve_allocations")
+        .select("id", { count: "exact", head: true })
+        .eq("purpose", "Founder Scholarship");
+      return count ?? 0;
+    },
+  });
+
   if (isLoading || !data) return <Loader2 className="mt-6 size-6 animate-spin text-primary" />;
+
+  const totalUsers = Number(data.users.total) || 1;
+  const communityMembers = Number(data.communities.members) || 0;
+  const referralRate = ((communityMembers / totalUsers) * 100).toFixed(1);
+  const newToday = Number(data.users.new_today) || 0;
+  const newWeek = Number(data.users.new_week) || 0;
+  const dailyGrowth = ((newToday / totalUsers) * 100).toFixed(1);
+  const weeklyGrowth = ((newWeek / totalUsers) * 100).toFixed(1);
 
   return (
     <div className="mt-4 space-y-8">
+      <MetricGroup title="Growth & Referral Statistics" icon={TrendingUp}>
+        <Stat label="Daily User Growth" value={`+${dailyGrowth}%`} />
+        <Stat label="Weekly User Growth" value={`+${weeklyGrowth}%`} />
+        <Stat label="Referral Network Rate" value={`${referralRate}%`} />
+        <Stat label="Scholarship Activations" value={String(scholarshipCount)} />
+      </MetricGroup>
+
       <MetricGroup title="Users" icon={Users}>
         <Stat label="Total users" value={String(data.users.total)} />
         <Stat label="New today" value={String(data.users.new_today)} />
@@ -604,16 +632,44 @@ function ReserveTab() {
                 <th className="p-4 font-medium">When</th>
                 <th className="p-4 font-medium">Action</th>
                 <th className="p-4 font-medium">Amount</th>
-                <th className="p-4 font-medium">Reason</th>
+                <th className="p-4 font-medium">Update Summary</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {audit.map((a) => (
                 <tr key={a.id}>
                   <td className="p-4 text-muted-foreground">{new Date(a.created_at).toLocaleString()}</td>
-                  <td className="p-4"><Badge variant="outline">{a.action}</Badge></td>
+                  <td className="p-4">
+                    <Badge variant="outline" className="capitalize">{a.action.replace(/_/g, " ")}</Badge>
+                  </td>
                   <td className="p-4">{a.amount != null ? `${formatDot(Number(a.amount))} DOT` : "—"}</td>
-                  <td className="p-4 text-muted-foreground">{a.reason ?? "—"}</td>
+                  <td className="p-4">
+                    <div className="font-medium text-xs">{a.reason ?? "—"}</div>
+                    {(a.before_value || a.after_value) && (
+                      <div className="text-[10px] text-slate-400 mt-1 font-mono bg-slate-900/40 p-2 rounded border border-border/40 max-w-sm truncate whitespace-pre-wrap">
+                        {(() => {
+                          try {
+                            const b = JSON.parse(a.before_value || "{}");
+                            const af = JSON.parse(a.after_value || "{}");
+                            
+                            const diffs = [];
+                            if (b.verified !== af.verified) {
+                              diffs.push(`Verified: ${b.verified} → ${af.verified}`);
+                            }
+                            if (b.suspended !== af.suspended) {
+                              diffs.push(`Suspended: ${b.suspended} → ${af.suspended}`);
+                            }
+                            if (JSON.stringify(b.roles) !== JSON.stringify(af.roles)) {
+                              diffs.push(`Roles: [${b.roles?.join(", ")}] → [${af.roles?.join(", ")}]`);
+                            }
+                            return diffs.join(" | ") || `Changes: ${a.before_value} → ${a.after_value}`;
+                          } catch (e) {
+                            return `Before: ${a.before_value} | After: ${a.after_value}`;
+                          }
+                        })()}
+                      </div>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -1541,6 +1597,260 @@ function SpotlightTab() {
               </DialogFooter>
             </form>
           )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function UsersTab() {
+  const qc = useQueryClient();
+  const [search, setSearch] = useState("");
+  const [target, setTarget] = useState<any>(null);
+  const [verified, setVerified] = useState(false);
+  const [suspended, setSuspended] = useState(false);
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [reason, setReason] = useState("");
+  const [busy, setBusy] = useState(false);
+  
+  const updateUserFn = useServerFn(adminUpdateUser);
+
+  const { data: users = [], isLoading } = useQuery({
+    queryKey: ["admin-users-list"],
+    queryFn: async () => {
+      const [{ data: profiles }, { data: roleRows }] = await Promise.all([
+        supabase.from("profiles").select("id, name, email, dot_id, verified, suspended, created_at"),
+        supabase.from("user_roles").select("user_id, role"),
+      ]);
+      const rmap = new Map<string, string[]>();
+      (roleRows ?? []).forEach((r) => {
+        const arr = rmap.get(r.user_id) ?? [];
+        arr.push(r.role);
+        rmap.set(r.user_id, arr);
+      });
+      return (profiles ?? []).map((p: any) => ({
+        ...p,
+        roles: rmap.get(p.id) ?? [],
+      }));
+    },
+  });
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return users;
+    return users.filter(
+      (u) =>
+        (u.name ?? "").toLowerCase().includes(q) ||
+        (u.email ?? "").toLowerCase().includes(q) ||
+        (u.dot_id ?? "").toLowerCase().includes(q)
+    );
+  }, [users, search]);
+
+  function startEdit(user: any) {
+    setTarget(user);
+    setVerified(user.verified ?? false);
+    setSuspended(user.suspended ?? false);
+    setSelectedRoles(user.roles);
+    setReason("");
+  }
+
+  async function handleSave() {
+    if (!target) return;
+    setBusy(true);
+    try {
+      await updateUserFn({
+        data: {
+          targetUserId: target.id,
+          verified,
+          suspended,
+          roles: selectedRoles,
+          reason: reason || undefined,
+        }
+      });
+      toast.success("User profile and status updated");
+      qc.invalidateQueries({ queryKey: ["admin-users-list"] });
+      qc.invalidateQueries({ queryKey: ["admin-audit"] });
+      setTarget(null);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update user");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function exportToCSV() {
+    const headers = ["ID", "Name", "Email", "Dot ID", "Verified", "Suspended", "Roles", "Created At"];
+    const rows = filtered.map((u) => [
+      u.id,
+      u.name ?? "",
+      u.email ?? "",
+      u.dot_id ?? "",
+      u.verified ? "Yes" : "No",
+      u.suspended ? "Yes" : "No",
+      u.roles.join(", "),
+      u.created_at,
+    ]);
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((r) => r.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(","))
+    ].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `dot_users_export_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  if (isLoading) return <Loader2 className="mt-6 size-6 animate-spin text-primary" />;
+
+  const AVAILABLE_ROLES = ["super_admin", "admin", "community_leader", "investor", "capital_partner", "founder", "builder", "vendor"];
+
+  return (
+    <div className="mt-4 space-y-4">
+      <div className="flex flex-col sm:flex-row justify-between gap-4">
+        <div className="relative max-w-sm w-full">
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search name, email or DOT ID"
+            className="pl-9"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <Button variant="outline" onClick={exportToCSV}>
+          Export to CSV
+        </Button>
+      </div>
+
+      <div className="overflow-x-auto rounded-2xl border border-border bg-card">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border text-left text-muted-foreground">
+              <th className="p-4 font-medium">User Details</th>
+              <th className="p-4 font-medium">DOT ID</th>
+              <th className="p-4 font-medium">Verification</th>
+              <th className="p-4 font-medium">Account State</th>
+              <th className="p-4 font-medium">Roles</th>
+              <th className="p-4 font-medium text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {filtered.map((u) => (
+              <tr key={u.id}>
+                <td className="p-4">
+                  <div className="font-medium flex items-center gap-1.5">
+                    {u.name ?? "—"}
+                    {u.verified && <ShieldCheck className="size-4 text-emerald-400 shrink-0" />}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{u.email}</div>
+                </td>
+                <td className="p-4 font-mono text-xs text-muted-foreground">{u.dot_id}</td>
+                <td className="p-4">
+                  <Badge variant={u.verified ? "default" : "secondary"}>
+                    {u.verified ? "Verified" : "Unverified"}
+                  </Badge>
+                </td>
+                <td className="p-4">
+                  <Badge variant={u.suspended ? "destructive" : "secondary"}>
+                    {u.suspended ? "Suspended" : "Active"}
+                  </Badge>
+                </td>
+                <td className="p-4">
+                  <div className="flex flex-wrap gap-1">
+                    {u.roles.map((r: string) => (
+                      <Badge key={r} variant="outline" className="text-[10px]">
+                        {ROLE_LABELS[r as AppRole] ?? r}
+                      </Badge>
+                    ))}
+                  </div>
+                </td>
+                <td className="p-4 text-right">
+                  <Button variant="outline" size="sm" onClick={() => startEdit(u)}>
+                    Edit / Manage
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <Dialog open={!!target} onOpenChange={(o) => !o && setTarget(null)}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto bg-slate-950 border-slate-900 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-white">Manage User — {target?.name || target?.email}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between border-b border-border/40 pb-3">
+              <span className="text-sm font-medium">Verified Status</span>
+              <Button
+                variant={verified ? "hero" : "outline"}
+                size="sm"
+                onClick={() => setVerified(!verified)}
+                className="cursor-pointer"
+              >
+                {verified ? "Verified" : "Unverified"}
+              </Button>
+            </div>
+
+            <div className="flex items-center justify-between border-b border-border/40 pb-3">
+              <span className="text-sm font-medium">Account Suspension</span>
+              <Button
+                variant={suspended ? "destructive" : "outline"}
+                size="sm"
+                onClick={() => setSuspended(!suspended)}
+                className="cursor-pointer"
+              >
+                {suspended ? "Suspended" : "Active"}
+              </Button>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-slate-350">Assign User Roles</Label>
+              <div className="grid grid-cols-2 gap-2 p-3 rounded-xl bg-slate-900/40 border border-slate-800">
+                {AVAILABLE_ROLES.map((role) => {
+                  const checked = selectedRoles.includes(role);
+                  return (
+                    <label key={role} className="flex items-center gap-2 text-xs text-slate-300 hover:text-white cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedRoles([...selectedRoles, role]);
+                          } else {
+                            setSelectedRoles(selectedRoles.filter((r) => r !== role));
+                          }
+                        }}
+                        className="rounded border-slate-800 bg-slate-950 text-indigo-500 focus:ring-0 cursor-pointer"
+                      />
+                      {ROLE_LABELS[role as AppRole] ?? role}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="auditReason" className="text-slate-350">Reason for Update (Audit Log)</Label>
+              <Input
+                id="auditReason"
+                placeholder="e.g. Verifying startup founder identity"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                className="bg-slate-900 border-slate-800 text-white"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="hero" onClick={handleSave} disabled={busy}>
+              {busy && <Loader2 className="size-4 animate-spin mr-1" />}
+              Save Updates
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

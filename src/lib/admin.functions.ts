@@ -73,3 +73,126 @@ export const claimSuperAdmin = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+const adminUpdateUserInput = z.object({
+  targetUserId: z.string().uuid(),
+  verified: z.boolean().optional(),
+  suspended: z.boolean().optional(),
+  roles: z.array(z.string()).optional(),
+  reason: z.string().trim().max(500).optional(),
+});
+
+export const adminUpdateUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => adminUpdateUserInput.parse(data))
+  .handler(async ({ data, context }) => {
+    const callerId = context.userId;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // 1. Check if caller is indeed admin or super_admin
+    const { data: callerRolesRow } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", callerId);
+    
+    const callerRoles = (callerRolesRow || []).map((r) => r.role);
+    const isCallerAdmin = callerRoles.includes("admin") || callerRoles.includes("super_admin");
+    const isCallerSuperAdmin = callerRoles.includes("super_admin");
+
+    if (!isCallerAdmin) {
+      throw new Error("Admins only");
+    }
+
+    // 2. Fetch target user's current profile & roles
+    const { data: targetProfile, error: targetProfileErr } = await supabaseAdmin
+      .from("profiles")
+      .select("id, name, email, verified, suspended")
+      .eq("id", data.targetUserId)
+      .maybeSingle();
+
+    if (targetProfileErr) throw targetProfileErr;
+    if (!targetProfile) throw new Error("Target user profile not found");
+
+    const { data: targetRolesRow, error: targetRolesErr } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.targetUserId);
+
+    if (targetRolesErr) throw targetRolesErr;
+    const targetRoles = (targetRolesRow || []).map((r) => r.role);
+
+    // 3. Prepare updates
+    const updates: Record<string, any> = {};
+    if (data.verified !== undefined) updates.verified = data.verified;
+    if (data.suspended !== undefined) updates.suspended = data.suspended;
+
+    const beforeValue = {
+      verified: targetProfile.verified ?? false,
+      suspended: targetProfile.suspended ?? false,
+      roles: targetRoles,
+    };
+
+    // Apply profile updates
+    if (Object.keys(updates).length > 0) {
+      const { error: profileUpdateErr } = await supabaseAdmin
+        .from("profiles")
+        .update(updates)
+        .eq("id", data.targetUserId);
+      if (profileUpdateErr) throw profileUpdateErr;
+    }
+
+    // Apply role updates if provided
+    let finalRoles = targetRoles;
+    if (data.roles !== undefined) {
+      // If adding/removing admin/super_admin roles, enforce super admin privileges
+      const isModifyingAdminRoles = 
+        data.roles.includes("admin") !== targetRoles.includes("admin") || 
+        data.roles.includes("super_admin") !== targetRoles.includes("super_admin");
+
+      if (isModifyingAdminRoles && !isCallerSuperAdmin) {
+        throw new Error("Only Super Admins can grant or revoke administrative roles");
+      }
+
+      // Delete target user roles
+      const { error: deleteRolesErr } = await supabaseAdmin
+        .from("user_roles")
+        .delete()
+        .eq("user_id", data.targetUserId);
+      if (deleteRolesErr) throw deleteRolesErr;
+
+      // Insert new roles
+      if (data.roles.length > 0) {
+        const roleInserts = data.roles.map((r) => ({
+          user_id: data.targetUserId,
+          role: r,
+        }));
+        const { error: insertRolesErr } = await supabaseAdmin
+          .from("user_roles")
+          .insert(roleInserts);
+        if (insertRolesErr) throw insertRolesErr;
+      }
+      finalRoles = data.roles;
+    }
+
+    const afterValue = {
+      verified: data.verified ?? beforeValue.verified,
+      suspended: data.suspended ?? beforeValue.suspended,
+      roles: finalRoles,
+    };
+
+    // 4. Log to admin_audit_log
+    const { error: auditErr } = await supabaseAdmin
+      .from("admin_audit_log")
+      .insert({
+        admin_id: callerId,
+        action: "admin_update_user",
+        target_user_id: data.targetUserId,
+        reason: data.reason ?? "Admin user profile update",
+        before_value: JSON.stringify(beforeValue),
+        after_value: JSON.stringify(afterValue),
+      });
+
+    if (auditErr) throw auditErr;
+
+    return { ok: true };
+  });

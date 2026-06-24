@@ -17,6 +17,10 @@ import {
   Clock,
   MapPin,
   Loader2,
+  Edit3,
+  Users,
+  Award,
+  Calendar,
 } from "lucide-react";
 import { AppShell } from "@/components/app/AppShell";
 import { Button } from "@/components/ui/button";
@@ -35,6 +39,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { buyUpgrade } from "@/lib/vantage.functions";
 import { toast } from "sonner";
+import { ProfileEditDialog } from "@/components/app/ProfileEditDialog";
+import { Progress } from "@/components/ui/progress";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -47,7 +53,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function Dashboard() {
-  const { profile, primaryRole, roles, user } = useAuth();
+  const { profile, primaryRole, roles, user, refresh } = useAuth();
   const { data: balance = 0 } = useWallet();
   const { data: founder } = useFounderProfile();
   const { data: assessments = [] } = useAssessments();
@@ -57,6 +63,45 @@ function Dashboard() {
   const qc = useQueryClient();
   const buyUpgradeFn = useServerFn(buyUpgrade);
   const [buying, setBuying] = useState<string | null>(null);
+  const [showEditProfile, setShowEditProfile] = useState(false);
+
+  // Load sessions attended count
+  const { data: attendedCount = 0 } = useQuery({
+    queryKey: ["sessions-attended-count", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("event_registrations")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user!.id)
+        .eq("attended", true);
+      if (error) throw error;
+      return count ?? 0;
+    }
+  });
+
+  // Load referral signups count
+  const { data: referralCount = 0 } = useQuery({
+    queryKey: ["referral-count", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data: comms } = await supabase
+        .from("communities")
+        .select("id")
+        .eq("leader_id", user!.id);
+      
+      if (!comms || comms.length === 0) return 0;
+      
+      const commIds = comms.map(c => c.id);
+      const { count, error } = await supabase
+        .from("community_members")
+        .select("id", { count: "exact", head: true })
+        .in("community_id", commIds);
+        
+      if (error) throw error;
+      return count ?? 0;
+    }
+  });
 
   // Dynamic ranking metrics query
   const { data: rankings } = useQuery({
@@ -105,6 +150,44 @@ function Dashboard() {
   const archetype = founder?.founder_archetype ?? latest?.founder_archetype ?? "Venture Builder";
   const investmentReadiness = founder?.investment_readiness ?? latest?.investment_readiness ?? 0;
 
+  const allAchievements = [
+    {
+      id: "first_assessment",
+      title: "Valuation Pioneer",
+      desc: "Completed your first Vantage assessment",
+      icon: Gauge,
+      unlocked: assessments.length > 0 || (profile?.achievements || []).includes("first_assessment"),
+    },
+    {
+      id: "vantage_guru",
+      title: "Vantage Elite",
+      desc: "Attained a Vantage score over 700",
+      icon: Trophy,
+      unlocked: vantagePoint > 700 || (profile?.achievements || []).includes("vantage_guru"),
+    },
+    {
+      id: "scholar",
+      title: "Venture Scholar",
+      desc: "Completed at least one course module",
+      icon: BookOpen,
+      unlocked: completed > 0 || (profile?.achievements || []).includes("scholar"),
+    },
+    {
+      id: "catalyst",
+      title: "Network Catalyst",
+      desc: "Referred a founder to join the network",
+      icon: Users,
+      unlocked: referralCount > 0 || (profile?.achievements || []).includes("catalyst"),
+    },
+    {
+      id: "networker",
+      title: "Active Member",
+      desc: "Attended at least one live session",
+      icon: Calendar,
+      unlocked: attendedCount > 0 || (profile?.achievements || []).includes("networker"),
+    },
+  ];
+
   // Query runway ventures for challenge widget
   const { data: runwayVentures = [] } = useQuery({
     queryKey: ["dashboard-runway-ventures"],
@@ -135,7 +218,18 @@ function Dashboard() {
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
           <p className="text-sm text-muted-foreground">Welcome back,</p>
-          <h1 className="font-display text-3xl font-bold">{profile?.name || "Founder"}</h1>
+          <h1 className="font-display text-3xl font-bold flex items-center gap-3">
+            {profile?.name || "Founder"}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowEditProfile(true)}
+              className="size-8 rounded-full border border-border/40 hover:bg-slate-900 cursor-pointer"
+              title="Edit Profile"
+            >
+              <Edit3 className="size-3.5 text-slate-400" />
+            </Button>
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {founder?.venture_name ? `${founder.venture_name} · ` : ""}
             {isFounder ? <>Stage: <span className="text-foreground">{stage}</span></> : primaryRole}
@@ -157,6 +251,11 @@ function Dashboard() {
               {rankings.university?.rank && (
                 <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-slate-900 border border-slate-800 text-slate-400 px-3 py-1 rounded-full">
                   <Trophy className="size-3 text-yellow-400" /> #{rankings.university.rank} in {rankings.university.name}
+                </span>
+              )}
+              {rankings.community?.rank && (
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-slate-900 border border-slate-800 text-slate-400 px-3 py-1 rounded-full">
+                  <Users className="size-3 text-purple-400" /> #{rankings.community.rank} in {rankings.community.name}
                 </span>
               )}
             </div>
@@ -404,8 +503,96 @@ function Dashboard() {
               </div>
             </div>
           )}
+
+          {/* Learning & Sessions Widget */}
+          {isFounder && (
+            <div className="rounded-2xl border border-border bg-card p-6">
+              <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2 mb-4">
+                <BookOpen className="size-4 text-indigo-400" />
+                Learning & Live Sessions
+              </h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-xs mb-1.5">
+                    <span className="text-slate-300 font-medium">Course Modules</span>
+                    <span className="text-indigo-400 font-bold">{completed}/{enrollments.length} Completed</span>
+                  </div>
+                  <Progress value={enrollments.length > 0 ? (completed / enrollments.length) * 100 : 0} className="h-2 bg-slate-900 border border-slate-800" />
+                </div>
+
+                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900/40 border border-border/40 text-xs">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="size-4 text-emerald-400" />
+                    <span className="text-slate-300">Live Sessions Attended</span>
+                  </div>
+                  <span className="font-bold text-white bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-0.5 rounded-full">{attendedCount}</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Network & Referrals Widget */}
+          {isFounder && (
+            <div className="rounded-2xl border border-border bg-card p-6">
+              <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2 mb-4">
+                <Users className="size-4 text-purple-400" />
+                Network & Referrals
+              </h2>
+              
+              <div className="space-y-3.5 text-xs">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900/40 border border-border/40">
+                  <span className="text-slate-300">Total Referrals</span>
+                  <span className="font-bold text-white bg-purple-500/10 border border-purple-500/25 px-2.5 py-0.5 rounded-full">{referralCount}</span>
+                </div>
+                
+                {profile?.community && (
+                  <p className="text-[10px] text-slate-400 italic text-center">
+                    Share your community invite to level up your referral count!
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Achievements Card */}
+          {isFounder && (
+            <div className="rounded-2xl border border-border bg-card p-6">
+              <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2 mb-4">
+                <Award className="size-4 text-gold" />
+                Vantage Achievements
+              </h2>
+              
+              <div className="space-y-3">
+                {allAchievements.map((ach) => (
+                  <div 
+                    key={ach.id} 
+                    className={cn(
+                      "flex items-start gap-3 p-2.5 rounded-xl border transition-all duration-200",
+                      ach.unlocked 
+                        ? "bg-slate-900/30 border-gold/15 text-white" 
+                        : "bg-slate-950/10 border-border/30 opacity-40 grayscale"
+                    )}
+                  >
+                    <div className={cn(
+                      "p-1.5 rounded-lg shrink-0",
+                      ach.unlocked ? "bg-gold/10 text-gold border border-gold/25" : "bg-slate-900 text-slate-500 border border-slate-800"
+                    )}>
+                      <ach.icon className="size-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="text-xs font-bold truncate">{ach.title}</h4>
+                      <p className="text-[10px] text-slate-400 mt-0.5 leading-snug">{ach.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      <ProfileEditDialog open={showEditProfile} onOpenChange={setShowEditProfile} />
     </AppShell>
   );
 }

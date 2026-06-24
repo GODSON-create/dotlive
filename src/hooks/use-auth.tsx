@@ -17,6 +17,19 @@ interface Profile {
   phone: string | null;
   avatar_url: string | null;
   dot_id: string | null;
+  username: string | null;
+  active_role: string | null;
+  banner_url: string | null;
+  bio: string | null;
+  location: string | null;
+  website: string | null;
+  linkedin: string | null;
+  twitter: string | null;
+  whatsapp: string | null;
+  skills: string[];
+  industry: string | null;
+  community: string | null;
+  achievements: string[];
 }
 
 interface AuthContextValue {
@@ -25,14 +38,16 @@ interface AuthContextValue {
   profile: Profile | null;
   roles: AppRole[];
   primaryRole: AppRole | null;
+  activeRole: AppRole | null;
   loading: boolean;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
+  switchActiveRole: (role: AppRole) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-const ROLE_PRIORITY: AppRole[] = ["admin", "community_leader", "investor", "founder"];
+const ROLE_PRIORITY: AppRole[] = ["admin", "super_admin", "community_leader", "investor", "capital_partner", "founder", "builder", "vendor"];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -43,10 +58,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loadUserData = useCallback(async (uid: string) => {
     const [{ data: prof }, { data: roleRows }] = await Promise.all([
-      supabase.from("profiles").select("id, name, email, phone, avatar_url, dot_id").eq("id", uid).maybeSingle(),
+      supabase
+        .from("profiles")
+        .select(
+          "id, name, email, phone, avatar_url, dot_id, username, active_role, banner_url, bio, location, website, linkedin, twitter, whatsapp, skills, industry, community, achievements"
+        )
+        .eq("id", uid)
+        .maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", uid),
     ]);
-    setProfile((prof as Profile) ?? null);
+    setProfile((prof as any) ?? null);
     setRoles(((roleRows as { role: AppRole }[]) ?? []).map((r) => r.role));
   }, []);
 
@@ -96,11 +117,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setRoles([]);
   }, []);
 
+  const switchActiveRole = useCallback(async (role: AppRole) => {
+    if (!user) return;
+    const { error } = await supabase
+      .from("profiles")
+      .update({ active_role: role })
+      .eq("id", user.id);
+    if (error) {
+      console.error("Failed to switch active role:", error);
+      throw error;
+    }
+    setProfile((prev) => (prev ? { ...prev, active_role: role } : null));
+  }, [user]);
+
   const primaryRole = ROLE_PRIORITY.find((r) => roles.includes(r)) ?? null;
+  const activeRole = (profile?.active_role as AppRole) || primaryRole;
 
   return (
     <AuthContext.Provider
-      value={{ user, session, profile, roles, primaryRole, loading, refresh, signOut }}
+      value={{
+        user,
+        session,
+        profile,
+        roles,
+        primaryRole,
+        activeRole,
+        loading,
+        refresh,
+        signOut,
+        switchActiveRole,
+      }}
     >
       {children}
     </AuthContext.Provider>
@@ -109,6 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  if (ctx === undefined) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
 }
+
