@@ -109,10 +109,10 @@ function LandingPage() {
     // Rank percentage: better score -> lower percentage (top X%)
     const rankPercent = Math.max(1, Math.min(99, Math.round(100 - ((dotScore - 300) / 700) * 99)));
 
-    let status = "Idea Explorer 💡";
-    if (dotScore >= 800) status = "Unicorn Candidate 🦄";
-    else if (dotScore >= 600) status = "Rising Founder 🚀";
-    else if (dotScore >= 450) status = "Cohort Builder 🛠️";
+    let status = "Idea Explorer";
+    if (dotScore >= 800) status = "Unicorn Candidate";
+    else if (dotScore >= 600) status = "Rising Founder";
+    else if (dotScore >= 450) status = "Cohort Builder";
 
     return {
       dotScore,
@@ -519,7 +519,7 @@ function LandingPage() {
             <div className="mt-10 mx-auto max-w-md rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-950 to-slate-900 p-6 text-left relative overflow-hidden shadow-elegant">
               <span className="text-[9px] font-bold tracking-widest text-slate-500 uppercase">DOT WRAPPED PREVIEW</span>
               <p className="mt-4 text-xl font-bold text-white leading-relaxed">
-                "I just discovered my startup could become a <span className="text-gradient font-black">₦500M</span> company 🚀"
+                "I just discovered my startup could become a <span className="text-gradient font-black">₦500M</span> company"
               </p>
               <div className="mt-6 flex justify-between items-center text-xs border-t border-slate-900 pt-4">
                 <div>
