@@ -144,15 +144,15 @@ export function AppShell({ children }: { children: ReactNode }) {
             {roles.length > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-9 gap-1.5 text-xs border border-slate-800 bg-slate-950/40 hover:bg-slate-900 text-white rounded-lg cursor-pointer">
-                    <span className="font-semibold text-slate-300">
+                  <Button variant="ghost" size="sm" className="h-9 gap-1.5 text-xs border border-border bg-card hover:bg-muted text-foreground rounded-lg cursor-pointer">
+                    <span className="font-semibold text-muted-foreground hover:text-foreground">
                       {activeRole ? ROLE_LABELS[activeRole] : "Select Role"}
                     </span>
-                    <ChevronDown className="size-3 text-slate-400" />
+                    <ChevronDown className="size-3 text-muted-foreground" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-slate-950 border-slate-900 text-white">
-                  <div className="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                <DropdownMenuContent align="end" className="w-56 bg-popover border border-border text-popover-foreground">
+                  <div className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                     Switch Active Persona
                   </div>
                   {roles.map((r) => (
@@ -160,18 +160,18 @@ export function AppShell({ children }: { children: ReactNode }) {
                       key={r}
                       onClick={() => switchActiveRole(r)}
                       className={cn(
-                        "text-xs cursor-pointer py-2 rounded-md focus:bg-slate-900 focus:text-white",
-                        activeRole === r ? "bg-primary/20 text-white font-bold" : "text-slate-400 hover:text-white"
+                        "text-xs cursor-pointer py-2 rounded-md focus:bg-muted focus:text-foreground",
+                        activeRole === r ? "bg-primary/10 text-primary font-bold" : "text-muted-foreground hover:text-foreground"
                       )}
                     >
                       <UserCheck className="size-3.5 mr-2 text-primary" />
                       {ROLE_LABELS[r]}
                     </DropdownMenuItem>
                   ))}
-                  <DropdownMenuSeparator className="bg-slate-900" />
+                  <DropdownMenuSeparator className="bg-border" />
                   <DropdownMenuItem
                     onClick={openRoleDialog}
-                    className="text-xs cursor-pointer text-primary focus:text-primary focus:bg-slate-900 font-semibold py-2 rounded-md"
+                    className="text-xs cursor-pointer text-primary focus:text-primary focus:bg-muted font-semibold py-2 rounded-md"
                   >
                     <Settings className="size-3.5 mr-2" />
                     Manage Identities...
@@ -243,17 +243,17 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Manage Roles Dialog */}
       <Dialog open={showRoleDialog} onOpenChange={setShowRoleDialog}>
-        <DialogContent className="bg-slate-950 border border-slate-900 text-white max-w-md">
+        <DialogContent className="bg-card border border-border text-foreground max-w-md">
           <DialogHeader>
-            <DialogTitle className="font-display font-bold text-white text-base">
+            <DialogTitle className="font-display font-bold text-foreground text-base">
               Manage User Identities
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 my-2 text-left">
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs text-muted-foreground leading-relaxed">
               Select the roles that describe your identity on DOT. You can activate different dashboard features by switching between your assigned roles in the top header.
             </p>
-            <div className="space-y-3 bg-slate-900/30 border border-slate-900 p-4 rounded-2xl">
+            <div className="space-y-3 bg-muted/40 border border-border p-4 rounded-2xl">
               {SELF_ASSIGNABLE_ROLES.map((r) => {
                 const checked = tempRoles.includes(r);
                 return (
@@ -268,13 +268,13 @@ export function AppShell({ children }: { children: ReactNode }) {
                             : prev.filter((x) => x !== r)
                         );
                       }}
-                      className="mt-0.5 border-slate-800"
+                      className="mt-0.5 border-border"
                     />
                     <div className="grid gap-0.5">
-                      <Label htmlFor={`manage-role-${r}`} className="text-xs font-bold text-white cursor-pointer">
+                      <Label htmlFor={`manage-role-${r}`} className="text-xs font-bold text-foreground cursor-pointer">
                         {ROLE_LABELS[r]}
                       </Label>
-                      <span className="text-[10px] text-slate-500 leading-normal">
+                      <span className="text-[10px] text-muted-foreground/80 leading-normal">
                         {r === "founder" && "Building a venture and tracking valuation."}
                         {r === "builder" && "Offering developer, designer, or product services."}
                         {r === "vendor" && "Providing startup and legal professional services."}
@@ -295,12 +295,12 @@ export function AppShell({ children }: { children: ReactNode }) {
               </div>
             )}
           </div>
-          <DialogFooter className="pt-3 border-t border-slate-900/60">
+          <DialogFooter className="pt-3 border-t border-border">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowRoleDialog(false)}
-              className="border-slate-800 text-xs font-bold"
+              className="border-border text-xs font-bold"
             >
               Cancel
             </Button>

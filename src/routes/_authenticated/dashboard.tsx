@@ -203,9 +203,9 @@ function Dashboard() {
 
   const stats = [
     { label: "Vantage Score", value: formatDot(vantagePoint), sub: "/ 1000", icon: Gauge, accent: "text-primary" },
-    { label: "Venture Valuation", value: formatNaira(currentValuation), sub: `Potential: ${formatNaira(potentialValuation)}`, icon: TrendingUp, accent: "text-indigo-400" },
+    { label: "Venture Valuation", value: formatNaira(currentValuation), sub: `Potential: ${formatNaira(potentialValuation)}`, icon: TrendingUp, accent: "text-accent" },
     { label: "Fundability", value: `${fundability}%`, sub: `Readiness: ${investmentReadiness}%`, icon: Sparkles, accent: "text-gold" },
-    { label: "Unicorn Potential", value: `${typeof unicornPotential === 'number' ? unicornPotential.toFixed(1) : '0.0'}%`, sub: archetype, icon: Trophy, accent: "text-pink-400" },
+    { label: "Unicorn Potential", value: `${typeof unicornPotential === 'number' ? unicornPotential.toFixed(1) : '0.0'}%`, sub: archetype, icon: Trophy, accent: "text-accent" },
   ];
 
   // Exchange rate conversions for multi-currency wallet preview
@@ -224,10 +224,10 @@ function Dashboard() {
               variant="ghost"
               size="icon"
               onClick={() => setShowEditProfile(true)}
-              className="size-8 rounded-full border border-border/40 hover:bg-slate-900 cursor-pointer"
+              className="size-8 rounded-full border border-border/40 hover:bg-muted cursor-pointer"
               title="Edit Profile"
             >
-              <Edit3 className="size-3.5 text-slate-400" />
+              <Edit3 className="size-3.5 text-muted-foreground" />
             </Button>
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -239,23 +239,23 @@ function Dashboard() {
           {isFounder && rankings && !rankings.error && (
             <div className="flex flex-wrap gap-2 mt-3">
               {rankings.country?.rank && (
-                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-slate-900 border border-slate-800 text-slate-400 px-3 py-1 rounded-full">
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-muted border border-border text-muted-foreground px-3 py-1 rounded-full">
                   <MapPin className="size-3 text-primary" /> #{rankings.country.rank} in {rankings.country.name}
                 </span>
               )}
               {rankings.industry?.rank && (
-                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-slate-900 border border-slate-800 text-slate-400 px-3 py-1 rounded-full">
-                  <TrendingUp className="size-3 text-indigo-400" /> #{rankings.industry.rank} in {rankings.industry.name}
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-muted border border-border text-muted-foreground px-3 py-1 rounded-full">
+                  <TrendingUp className="size-3 text-accent" /> #{rankings.industry.rank} in {rankings.industry.name}
                 </span>
               )}
               {rankings.university?.rank && (
-                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-slate-900 border border-slate-800 text-slate-400 px-3 py-1 rounded-full">
-                  <Trophy className="size-3 text-yellow-400" /> #{rankings.university.rank} in {rankings.university.name}
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-muted border border-border text-muted-foreground px-3 py-1 rounded-full">
+                  <Trophy className="size-3 text-accent" /> #{rankings.university.rank} in {rankings.university.name}
                 </span>
               )}
               {rankings.community?.rank && (
-                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-slate-900 border border-slate-800 text-slate-400 px-3 py-1 rounded-full">
-                  <Users className="size-3 text-purple-400" /> #{rankings.community.rank} in {rankings.community.name}
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-muted border border-border text-muted-foreground px-3 py-1 rounded-full">
+                  <Users className="size-3 text-accent" /> #{rankings.community.rank} in {rankings.community.name}
                 </span>
               )}
             </div>
@@ -309,21 +309,21 @@ function Dashboard() {
           </Link>
         </div>
         <div className="mt-4 grid gap-4 sm:grid-cols-4">
-          <div className="rounded-xl bg-slate-900/50 p-4 border border-border/40">
-            <span className="text-[10px] text-slate-400 block tracking-widest font-semibold uppercase">DOT Tokens</span>
-            <span className="font-display text-xl font-bold text-white mt-1 block">{formatDot(balance)} DOT</span>
+          <div className="rounded-xl bg-muted p-4 border border-border/40">
+            <span className="text-[10px] text-muted-foreground block tracking-widest font-semibold uppercase">DOT Tokens</span>
+            <span className="font-display text-xl font-bold text-foreground mt-1 block">{formatDot(balance)} DOT</span>
           </div>
-          <div className="rounded-xl bg-slate-900/50 p-4 border border-border/40">
-            <span className="text-[10px] text-slate-400 block tracking-widest font-semibold uppercase">Naira (NGN)</span>
-            <span className="font-display text-xl font-bold text-white mt-1 block">{formatNaira(balanceNGN)}</span>
+          <div className="rounded-xl bg-muted p-4 border border-border/40">
+            <span className="text-[10px] text-muted-foreground block tracking-widest font-semibold uppercase">Naira (NGN)</span>
+            <span className="font-display text-xl font-bold text-foreground mt-1 block">{formatNaira(balanceNGN)}</span>
           </div>
-          <div className="rounded-xl bg-slate-900/50 p-4 border border-border/40">
-            <span className="text-[10px] text-slate-400 block tracking-widest font-semibold uppercase">Dollars (USD)</span>
-            <span className="font-display text-xl font-bold text-white mt-1 block">${balanceUSD.toLocaleString("en-US", { maximumFractionDigits: 2 })}</span>
+          <div className="rounded-xl bg-muted p-4 border border-border/40">
+            <span className="text-[10px] text-muted-foreground block tracking-widest font-semibold uppercase">Dollars (USD)</span>
+            <span className="font-display text-xl font-bold text-foreground mt-1 block">${balanceUSD.toLocaleString("en-US", { maximumFractionDigits: 2 })}</span>
           </div>
-          <div className="rounded-xl bg-slate-900/50 p-4 border border-border/40">
-            <span className="text-[10px] text-slate-400 block tracking-widest font-semibold uppercase">Bitcoin (BTC)</span>
-            <span className="font-display text-xl font-bold text-white mt-1 block">{balanceBTC.toFixed(6)} BTC</span>
+          <div className="rounded-xl bg-muted p-4 border border-border/40">
+            <span className="text-[10px] text-muted-foreground block tracking-widest font-semibold uppercase">Bitcoin (BTC)</span>
+            <span className="font-display text-xl font-bold text-foreground mt-1 block">{balanceBTC.toFixed(6)} BTC</span>
           </div>
         </div>
       </div>
@@ -367,33 +367,33 @@ function Dashboard() {
         <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-6">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-lg font-semibold flex items-center gap-2">
-              <MessageSquare className="size-5 text-indigo-400" />
+              <MessageSquare className="size-5 text-primary" />
               AI Advisor Recommendations
             </h2>
             {currentValuation > 0 && (
-              <span className="text-xs font-semibold text-slate-400 bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
+              <span className="text-xs font-semibold text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border">
                 Next Target: {formatNaira(potentialValuation)}
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Tailored suggestions to increase your Vantage score and venture valuation.
           </p>
 
           <div className="mt-5 space-y-3">
             {latest?.report ? (
               <>
-                <div className="rounded-xl bg-slate-900/40 border border-slate-850 p-4 mb-4 text-xs">
-                  <p className="text-slate-300 leading-relaxed">
-                    💡 <span className="font-bold text-white">Advisor Insight:</span> Your venture is currently valued at <span className="font-bold text-indigo-400">{formatNaira(currentValuation)}</span>. Act on the recommendations below to unlock your valuation potential of <span className="font-bold text-emerald-400">{formatNaira(potentialValuation)}</span>.
+                <div className="rounded-xl bg-muted/40 border border-border p-4 mb-4 text-xs">
+                  <p className="text-muted-foreground leading-relaxed">
+                    💡 <span className="font-bold text-foreground">Advisor Insight:</span> Your venture is currently valued at <span className="font-bold text-accent">{formatNaira(currentValuation)}</span>. Act on the recommendations below to unlock your valuation potential of <span className="font-bold text-primary">{formatNaira(potentialValuation)}</span>.
                   </p>
                 </div>
                 {(latest.report as { nextActions?: string[] }).nextActions?.map((a: string, i: number) => (
                   <div key={i} className="flex items-center gap-4 rounded-xl border border-border p-4">
-                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-sm font-semibold text-indigo-400">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-sm font-semibold text-primary">
                       {i + 1}
                     </span>
-                    <span className="flex-1 text-sm text-slate-300">{a}</span>
+                    <span className="flex-1 text-sm text-foreground">{a}</span>
                   </div>
                 ))}
               </>
@@ -414,7 +414,7 @@ function Dashboard() {
           {isFounder && (
             <div className="rounded-2xl border border-border bg-card p-6">
               <h2 className="font-display text-lg font-semibold flex items-center gap-2">
-                <Trophy className="size-5 text-yellow-400" />
+                <Trophy className="size-5 text-accent" />
                 DOT Runway Challenge
               </h2>
               <p className="text-xs text-muted-foreground mt-1">Top ventures ranked by progress and engagement</p>
@@ -423,12 +423,12 @@ function Dashboard() {
                 {runwayVentures.slice(0, 3).map((v: any, i: number) => (
                   <div key={v.user_id} className="flex items-center justify-between text-xs border-b border-border/40 pb-2.5 last:border-0 last:pb-0">
                     <div className="flex items-center gap-2">
-                      <span className={`inline-flex items-center justify-center size-5 rounded-full text-[10px] font-bold ${i === 0 ? 'bg-yellow-500/15 text-yellow-500' : 'bg-slate-800 text-slate-400'}`}>
+                      <span className={`inline-flex items-center justify-center size-5 rounded-full text-[10px] font-bold ${i === 0 ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'}`}>
                         {i + 1}
                       </span>
-                      <span className="font-medium text-white max-w-[120px] truncate">{v.venture_name}</span>
+                      <span className="font-medium text-foreground max-w-[120px] truncate">{v.venture_name}</span>
                     </div>
-                    <span className="font-semibold text-indigo-400">{formatNaira(v.current_valuation)}</span>
+                    <span className="font-semibold text-accent">{formatNaira(v.current_valuation)}</span>
                   </div>
                 ))}
 
@@ -449,20 +449,19 @@ function Dashboard() {
                 DOT Upgrades
               </h2>
               <p className="text-xs text-muted-foreground mt-1">Unlock premium analysis and roadmaps using your DOT credits</p>
-              
-              <div className="mt-4 space-y-4">
+                    <div className="mt-4 space-y-4">
                 {[
                   { key: "report", label: "Detailed Startup Report", cost: 250, desc: "Granular breakdown of your metrics" },
                   { key: "roadmap", label: "Growth Roadmap", cost: 500, desc: "Step-by-step cohort milestones" },
                   { key: "analysis", label: "Premium Founder Analysis", cost: 1000, desc: "Ecosystem reviews and audits" },
                 ].map((up) => (
-                  <div key={up.key} className="p-3 rounded-xl bg-slate-900/30 border border-border/60 space-y-2">
+                  <div key={up.key} className="p-3 rounded-xl bg-muted/30 border border-border/60 space-y-2">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h4 className="text-xs font-bold text-white">{up.label}</h4>
-                        <p className="text-[10px] text-slate-400 mt-0.5">{up.desc}</p>
+                        <h4 className="text-xs font-bold text-foreground">{up.label}</h4>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{up.desc}</p>
                       </div>
-                      <span className="text-[10px] bg-slate-800 border border-slate-700 px-2 py-0.5 rounded font-bold text-gold shrink-0">
+                      <span className="text-[10px] bg-muted border border-border px-2 py-0.5 rounded font-bold text-gold shrink-0">
                         {up.cost} DOT
                       </span>
                     </div>
@@ -470,7 +469,7 @@ function Dashboard() {
                       onClick={() => handleBuyUpgrade(up.key, up.cost, up.label)} 
                       disabled={buying === up.key}
                       variant="outline" 
-                      className="w-full text-[10px] py-1 h-7 border-slate-800 hover:bg-slate-900"
+                      className="w-full text-[10px] py-1 h-7 border-border hover:bg-muted cursor-pointer"
                     >
                       {buying === up.key ? <Loader2 className="size-3 animate-spin mr-1" /> : <Sparkles className="size-3 mr-1" />}
                       Purchase Upgrade
@@ -484,7 +483,7 @@ function Dashboard() {
           {/* Assessment History */}
           {isFounder && assessments.length > 0 && (
             <div className="rounded-2xl border border-border bg-card p-6">
-              <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+              <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
                 <Clock className="size-4" />
                 Assessment History
               </h2>
@@ -492,10 +491,10 @@ function Dashboard() {
                 {assessments.slice(-3).reverse().map((a: any) => (
                   <div key={a.id} className="flex items-center justify-between text-xs border-b border-border/40 pb-2.5 last:border-0 last:pb-0">
                     <div>
-                      <p className="font-semibold text-white">{new Date(a.created_at).toLocaleDateString()}</p>
-                      <p className="text-[10px] text-slate-500">Score: {a.vantage_point}</p>
+                      <p className="font-semibold text-foreground">{new Date(a.created_at).toLocaleDateString()}</p>
+                      <p className="text-[10px] text-muted-foreground">Score: {a.vantage_point}</p>
                     </div>
-                    <Link to="/result/$id" params={{ id: a.id }} className="text-indigo-400 hover:underline">
+                    <Link to="/result/$id" params={{ id: a.id }} className="text-primary hover:underline">
                       Wrapped →
                     </Link>
                   </div>
@@ -507,26 +506,26 @@ function Dashboard() {
           {/* Learning & Sessions Widget */}
           {isFounder && (
             <div className="rounded-2xl border border-border bg-card p-6">
-              <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2 mb-4">
-                <BookOpen className="size-4 text-indigo-400" />
+              <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-4">
+                <BookOpen className="size-4 text-primary" />
                 Learning & Live Sessions
               </h2>
               
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between text-xs mb-1.5">
-                    <span className="text-slate-300 font-medium">Course Modules</span>
-                    <span className="text-indigo-400 font-bold">{completed}/{enrollments.length} Completed</span>
+                    <span className="text-muted-foreground font-medium">Course Modules</span>
+                    <span className="text-primary font-bold">{completed}/{enrollments.length} Completed</span>
                   </div>
-                  <Progress value={enrollments.length > 0 ? (completed / enrollments.length) * 100 : 0} className="h-2 bg-slate-900 border border-slate-800" />
+                  <Progress value={enrollments.length > 0 ? (completed / enrollments.length) * 100 : 0} className="h-2 bg-muted border border-border" />
                 </div>
 
-                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900/40 border border-border/40 text-xs">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-muted/40 border border-border/40 text-xs">
                   <div className="flex items-center gap-2">
-                    <Calendar className="size-4 text-emerald-400" />
-                    <span className="text-slate-300">Live Sessions Attended</span>
+                    <Calendar className="size-4 text-primary" />
+                    <span className="text-muted-foreground">Live Sessions Attended</span>
                   </div>
-                  <span className="font-bold text-white bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-0.5 rounded-full">{attendedCount}</span>
+                  <span className="font-bold text-primary bg-primary/10 border border-primary/20 px-2.5 py-0.5 rounded-full">{attendedCount}</span>
                 </div>
               </div>
             </div>
@@ -535,19 +534,19 @@ function Dashboard() {
           {/* Network & Referrals Widget */}
           {isFounder && (
             <div className="rounded-2xl border border-border bg-card p-6">
-              <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2 mb-4">
-                <Users className="size-4 text-purple-400" />
+              <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-4">
+                <Users className="size-4 text-accent" />
                 Network & Referrals
               </h2>
               
               <div className="space-y-3.5 text-xs">
-                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900/40 border border-border/40">
-                  <span className="text-slate-300">Total Referrals</span>
-                  <span className="font-bold text-white bg-purple-500/10 border border-purple-500/25 px-2.5 py-0.5 rounded-full">{referralCount}</span>
+                <div className="flex items-center justify-between p-3 rounded-xl bg-muted/40 border border-border/40">
+                  <span className="text-muted-foreground">Total Referrals</span>
+                  <span className="font-bold text-accent bg-accent/10 border border-accent/20 px-2.5 py-0.5 rounded-full">{referralCount}</span>
                 </div>
                 
                 {profile?.community && (
-                  <p className="text-[10px] text-slate-400 italic text-center">
+                  <p className="text-[10px] text-muted-foreground italic text-center">
                     Share your community invite to level up your referral count!
                   </p>
                 )}
@@ -558,7 +557,7 @@ function Dashboard() {
           {/* Achievements Card */}
           {isFounder && (
             <div className="rounded-2xl border border-border bg-card p-6">
-              <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2 mb-4">
+              <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-4">
                 <Award className="size-4 text-gold" />
                 Vantage Achievements
               </h2>
@@ -570,19 +569,19 @@ function Dashboard() {
                     className={cn(
                       "flex items-start gap-3 p-2.5 rounded-xl border transition-all duration-200",
                       ach.unlocked 
-                        ? "bg-slate-900/30 border-gold/15 text-white" 
-                        : "bg-slate-950/10 border-border/30 opacity-40 grayscale"
+                        ? "bg-muted/30 border-border text-foreground" 
+                        : "bg-muted/10 border-border/30 opacity-40 grayscale"
                     )}
                   >
                     <div className={cn(
                       "p-1.5 rounded-lg shrink-0",
-                      ach.unlocked ? "bg-gold/10 text-gold border border-gold/25" : "bg-slate-900 text-slate-500 border border-slate-800"
+                      ach.unlocked ? "bg-gold/10 text-gold border border-gold/25" : "bg-muted text-muted-foreground border border-border"
                     )}>
                       <ach.icon className="size-4" />
                     </div>
                     <div className="min-w-0">
                       <h4 className="text-xs font-bold truncate">{ach.title}</h4>
-                      <p className="text-[10px] text-slate-400 mt-0.5 leading-snug">{ach.desc}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">{ach.desc}</p>
                     </div>
                   </div>
                 ))}

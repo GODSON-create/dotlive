@@ -438,8 +438,8 @@ function OnboardingPage() {
   const answeredAll = FAST_QUESTIONS.every(q => answers[q.id]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-950 text-white">
-      <header className="border-b border-slate-900 bg-slate-950/80">
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
+      <header className="border-b border-border bg-background/80">
         <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-4">
           <Logo />
           <ThemeToggle />
@@ -453,7 +453,7 @@ function OnboardingPage() {
           <div className="space-y-8">
             <div className="text-center">
               <h1 className="font-display text-3xl sm:text-4xl font-black">Choose Your Identity</h1>
-              <p className="mt-2 text-slate-400 text-sm">
+              <p className="mt-2 text-muted-foreground text-sm">
                 Select all that apply to you. You can update this later.
               </p>
             </div>
@@ -466,20 +466,20 @@ function OnboardingPage() {
                     key={opt.role}
                     onClick={() => toggleRole(opt.role)}
                     className={cn(
-                      "flex flex-col p-5 text-left border rounded-2xl transition-all relative overflow-hidden group hover:-translate-y-0.5",
+                      "flex flex-col p-5 text-left border rounded-2xl transition-all relative overflow-hidden group hover:-translate-y-0.5 cursor-pointer",
                       isSelected 
                         ? "border-primary bg-primary/10 ring-1 ring-primary" 
-                        : "border-slate-800 bg-slate-900/30 hover:border-slate-700"
+                        : "border-border bg-card hover:border-primary/50"
                     )}
                   >
                     <span className={cn(
                       "flex size-10 items-center justify-center rounded-xl mb-4 transition-colors",
-                      isSelected ? "bg-primary text-primary-foreground" : "bg-slate-900 text-slate-400"
+                      isSelected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                     )}>
                       <opt.icon className="size-5" />
                     </span>
-                    <span className="font-display text-base font-bold text-white block">{opt.title}</span>
-                    <span className="text-xs text-slate-500 mt-1 leading-relaxed">{opt.desc}</span>
+                    <span className="font-display text-base font-bold text-foreground block">{opt.title}</span>
+                    <span className="text-xs text-muted-foreground mt-1 leading-relaxed">{opt.desc}</span>
                     
                     {isSelected && (
                       <span className="absolute top-3 right-3 flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
@@ -509,13 +509,13 @@ function OnboardingPage() {
           <div className="space-y-6">
             <div className="text-center">
               <h1 className="font-display text-3xl font-black">Tell us about your venture</h1>
-              <p className="mt-2 text-slate-400 text-sm">Set up your founder profile to access the score system.</p>
+              <p className="mt-2 text-muted-foreground text-sm">Set up your founder profile to access the score system.</p>
             </div>
 
-            <form onSubmit={handleProfileSubmit} className="mx-auto w-full max-w-lg space-y-4 bg-slate-950/40 border border-slate-900 rounded-3xl p-6">
+            <form onSubmit={handleProfileSubmit} className="mx-auto w-full max-w-lg space-y-4 bg-card border border-border rounded-3xl p-6">
               
               <div className="space-y-1.5">
-                <Label htmlFor="founderName" className="text-xs font-bold text-slate-400 flex items-center gap-1">
+                <Label htmlFor="founderName" className="text-xs font-bold text-muted-foreground flex items-center gap-1">
                   Founder Name
                 </Label>
                 <Input 
@@ -524,12 +524,12 @@ function OnboardingPage() {
                   value={name} 
                   onChange={(e) => setName(e.target.value)} 
                   placeholder="Your full name"
-                  className="bg-slate-900/50 border-slate-800 text-white" 
+                  className="bg-background border-border text-foreground" 
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="startupName" className="text-xs font-bold text-slate-400 flex items-center gap-1">
+                <Label htmlFor="startupName" className="text-xs font-bold text-muted-foreground flex items-center gap-1">
                   Startup / Idea Name
                 </Label>
                 <Input 
@@ -538,27 +538,27 @@ function OnboardingPage() {
                   value={startupName} 
                   onChange={(e) => setStartupName(e.target.value)} 
                   placeholder="e.g. Nova AI" 
-                  className="bg-slate-900/50 border-slate-800 text-white"
+                  className="bg-background border-border text-foreground"
                 />
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-bold text-slate-400">Industry</Label>
+                  <Label className="text-xs font-bold text-muted-foreground">Industry</Label>
                   <Select value={industry} onValueChange={setIndustry}>
-                    <SelectTrigger className="bg-slate-900/50 border-slate-800 text-white"><SelectValue placeholder="Select" /></SelectTrigger>
-                    <SelectContent className="bg-slate-905 border-slate-800 text-white">
-                      {INDUSTRIES.map((i) => <SelectItem key={i} value={i} className="hover:bg-slate-900">{i}</SelectItem>)}
+                    <SelectTrigger className="bg-background border-border text-foreground"><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent className="bg-popover border-border text-popover-foreground">
+                      {INDUSTRIES.map((i) => <SelectItem key={i} value={i} className="hover:bg-muted cursor-pointer">{i}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-bold text-slate-400">Current Stage</Label>
+                  <Label className="text-xs font-bold text-muted-foreground">Current Stage</Label>
                   <Select value={stage} onValueChange={setStage}>
-                    <SelectTrigger className="bg-slate-900/50 border-slate-800 text-white"><SelectValue placeholder="Select" /></SelectTrigger>
-                    <SelectContent className="bg-slate-905 border-slate-800 text-white">
-                      {STAGE_OPTIONS.map((st) => <SelectItem key={st.value} value={st.value} className="hover:bg-slate-900">{st.label}</SelectItem>)}
+                    <SelectTrigger className="bg-background border-border text-foreground"><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent className="bg-popover border-border text-popover-foreground">
+                      {STAGE_OPTIONS.map((st) => <SelectItem key={st.value} value={st.value} className="hover:bg-muted cursor-pointer">{st.label}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
@@ -566,17 +566,17 @@ function OnboardingPage() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-bold text-slate-400">Location Country</Label>
+                  <Label className="text-xs font-bold text-muted-foreground">Location Country</Label>
                   <Select value={country} onValueChange={setCountry}>
-                    <SelectTrigger className="bg-slate-900/50 border-slate-800 text-white"><SelectValue placeholder="Select" /></SelectTrigger>
-                    <SelectContent className="bg-slate-905 border-slate-800 text-white h-60">
-                      {AFRICAN_COUNTRIES.map((c) => <SelectItem key={c} value={c} className="hover:bg-slate-900">{c}</SelectItem>)}
+                    <SelectTrigger className="bg-background border-border text-foreground"><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent className="bg-popover border-border text-popover-foreground h-60">
+                      {AFRICAN_COUNTRIES.map((c) => <SelectItem key={c} value={c} className="hover:bg-muted cursor-pointer">{c}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="university" className="text-xs font-bold text-slate-400 flex items-center gap-1">
+                  <Label htmlFor="university" className="text-xs font-bold text-muted-foreground flex items-center gap-1">
                     <School className="size-3" /> University (Optional)
                   </Label>
                   <Input 
@@ -584,14 +584,14 @@ function OnboardingPage() {
                     value={university} 
                     onChange={(e) => setUniversity(e.target.value)} 
                     placeholder="e.g. Covenant University" 
-                    className="bg-slate-900/50 border-slate-800 text-white"
+                    className="bg-background border-border text-foreground"
                   />
                 </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <Label htmlFor="city" className="text-xs font-bold text-slate-400 flex items-center gap-1">
+                  <Label htmlFor="city" className="text-xs font-bold text-muted-foreground flex items-center gap-1">
                     <MapPin className="size-3" /> City (Optional)
                   </Label>
                   <Input 
@@ -599,12 +599,12 @@ function OnboardingPage() {
                     value={city} 
                     onChange={(e) => setCity(e.target.value)} 
                     placeholder="e.g. Ikeja" 
-                    className="bg-slate-900/50 border-slate-800 text-white"
+                    className="bg-background border-border text-foreground"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="state" className="text-xs font-bold text-slate-400 flex items-center gap-1">
+                  <Label htmlFor="state" className="text-xs font-bold text-muted-foreground flex items-center gap-1">
                     <MapPin className="size-3" /> State (Optional)
                   </Label>
                   <Input 
@@ -612,14 +612,14 @@ function OnboardingPage() {
                     value={state} 
                     onChange={(e) => setState(e.target.value)} 
                     placeholder="e.g. Lagos" 
-                    className="bg-slate-900/50 border-slate-800 text-white"
+                    className="bg-background border-border text-foreground"
                   />
                 </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <Label htmlFor="website" className="text-xs font-bold text-slate-400 flex items-center gap-1">
+                  <Label htmlFor="website" className="text-xs font-bold text-muted-foreground flex items-center gap-1">
                     <Globe className="size-3" /> Website (Optional)
                   </Label>
                   <Input 
@@ -627,12 +627,12 @@ function OnboardingPage() {
                     value={website} 
                     onChange={(e) => setWebsite(e.target.value)} 
                     placeholder="https://" 
-                    className="bg-slate-900/50 border-slate-800 text-white"
+                    className="bg-background border-border text-foreground"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="socials" className="text-xs font-bold text-slate-400 flex items-center gap-1">
+                  <Label htmlFor="socials" className="text-xs font-bold text-muted-foreground flex items-center gap-1">
                     <Linkedin className="size-3" /> Social / LinkedIn (Optional)
                   </Label>
                   <Input 
@@ -640,13 +640,13 @@ function OnboardingPage() {
                     value={socialLink} 
                     onChange={(e) => setSocialLink(e.target.value)} 
                     placeholder="https://linkedin.com/in/" 
-                    className="bg-slate-900/50 border-slate-800 text-white"
+                    className="bg-background border-border text-foreground"
                   />
                 </div>
               </div>
 
               <div className="flex gap-3 pt-3">
-                <Button type="button" variant="outline" onClick={() => setStep(1)} className="border-slate-800">
+                <Button type="button" variant="outline" onClick={() => setStep(1)} className="border-border">
                   <ArrowLeft className="size-4 mr-2" /> Back
                 </Button>
                 <Button type="submit" variant="hero" className="flex-1 font-bold">
@@ -661,17 +661,17 @@ function OnboardingPage() {
         {step === 3 && (
           <div className="space-y-6 max-w-2xl mx-auto w-full">
             <div className="mb-6">
-              <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-500">
+              <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 <span>Fast Assessment Baseline</span>
                 <span>Question {qIdx + 1} / {FAST_QUESTIONS.length}</span>
               </div>
               <Progress value={progressPercent} className="mt-2" />
             </div>
 
-            <div className="rounded-3xl border border-slate-900 bg-slate-950/80 p-6 sm:p-8 relative overflow-hidden shadow-elegant">
+            <div className="rounded-3xl border border-border bg-card p-6 sm:p-8 relative overflow-hidden shadow-elegant">
               <div className="absolute top-0 right-0 size-24 bg-primary/5 blur-2xl -z-10" />
               <span className="text-[10px] font-bold text-primary tracking-widest uppercase">{currentQ.label}</span>
-              <h2 className="mt-2 font-display text-xl sm:text-2xl font-black text-white leading-snug">{currentQ.text}</h2>
+              <h2 className="mt-2 font-display text-xl sm:text-2xl font-black text-foreground leading-snug">{currentQ.text}</h2>
               
               <div className="mt-6 grid gap-2">
                 {SCALE.map((s) => (
@@ -679,12 +679,12 @@ function OnboardingPage() {
                     key={s.v}
                     onClick={() => handleAnswerSelect(s.v)}
                     className={cn(
-                      "flex items-center justify-between rounded-xl border p-4 text-left transition-all hover:border-primary/50",
-                      answers[currentQ.id] === s.v ? "border-primary bg-primary/10" : "border-slate-850 bg-slate-900/30"
+                      "flex items-center justify-between rounded-xl border p-4 text-left transition-all hover:border-primary/50 cursor-pointer",
+                      answers[currentQ.id] === s.v ? "border-primary bg-primary/10" : "border-border bg-background"
                     )}
                   >
                     <span className="text-sm font-semibold">{s.label}</span>
-                    <span className="font-display text-xs text-slate-500 font-bold">{s.v}</span>
+                    <span className="font-display text-xs text-muted-foreground font-bold">{s.v}</span>
                   </button>
                 ))}
               </div>
@@ -694,7 +694,7 @@ function OnboardingPage() {
                   variant="ghost"
                   onClick={() => setQIdx(i => Math.max(0, i - 1))}
                   disabled={qIdx === 0 || busy}
-                  className="text-slate-400 hover:text-white"
+                  className="text-muted-foreground hover:text-foreground"
                 >
                   <ArrowLeft className="size-4 mr-2" /> Back
                 </Button>
@@ -708,7 +708,7 @@ function OnboardingPage() {
                     variant="outline"
                     onClick={() => setQIdx(i => Math.min(FAST_QUESTIONS.length - 1, i + 1))}
                     disabled={!answers[currentQ.id] || busy}
-                    className="border-slate-800"
+                    className="border-border"
                   >
                     Next <ArrowRight className="size-4 ml-2" />
                   </Button>
@@ -722,21 +722,22 @@ function OnboardingPage() {
         {step === 4 && resultScore && (
           <div className="space-y-8 text-center max-w-md mx-auto w-full">
             <div>
-              <Sparkles className="size-8 text-pink-400 mx-auto animate-pulse" />
-              <h1 className="mt-3 font-display text-3xl font-black text-white">Your Startup Is Measured!</h1>
-              <p className="mt-1 text-slate-400 text-sm">
+              <Sparkles className="size-8 text-primary mx-auto animate-pulse" />
+              <h1 className="mt-3 font-display text-3xl font-black text-foreground">Your Startup Is Measured!</h1>
+              <p className="mt-1 text-muted-foreground text-sm">
                 Here is your baseline valuation and ranking report.
               </p>
             </div>
 
             {/* Custom styled Spotify Wrapped Card */}
-            <div className="aspect-[9/16] bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden shadow-elegant text-left">
+            <div className="aspect-[9/16] bg-black border border-border rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden shadow-elegant text-left text-white">
+              {/* Note: the share card stays obsidian black by design for high contrast presentation */}
               <div className="absolute top-0 right-0 size-32 bg-primary/10 blur-3xl -z-10" />
-              <div className="absolute bottom-0 left-0 size-32 bg-indigo-500/10 blur-3xl -z-10" />
+              <div className="absolute bottom-0 left-0 size-32 bg-[#89f336]/10 blur-3xl -z-10" />
 
               <div className="flex items-center justify-between mt-2">
-                <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">DOT WRAPPED</span>
-                <span className="text-[10px] font-bold text-pink-500">#{resultScore.founderArchetype || "Founder"}</span>
+                <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">DOT WRAPPED</span>
+                <span className="text-[10px] font-bold text-accent">#{resultScore.founderArchetype || "Founder"}</span>
               </div>
 
               <div className="my-auto space-y-6">
@@ -749,25 +750,25 @@ function OnboardingPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <span className="text-[10px] font-bold text-slate-500 block uppercase">DOT SCORE</span>
+                    <span className="text-[10px] font-bold text-slate-400 block uppercase">DOT SCORE</span>
                     <span className="font-display text-2xl font-black text-white block mt-1">{resultScore.vantagePoint}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold text-slate-500 block uppercase">POTENTIAL</span>
+                    <span className="text-[10px] font-bold text-slate-400 block uppercase">POTENTIAL</span>
                     <span className="font-display text-lg font-bold text-slate-300 block mt-1">{formatNaira(resultScore.potentialValuation)}</span>
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-900/40 border border-slate-900">
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
                   <p className="text-xs font-semibold text-slate-400">Ecosystem Rank</p>
                   <p className="font-display text-base font-bold text-white mt-1 flex items-center gap-1.5">
-                    <Trophy className="size-4 text-yellow-400" />
+                    <Trophy className="size-4 text-accent" />
                     Top {resultScore.rankPercent || 15}% of African Founders
                   </p>
                 </div>
               </div>
 
-              <div className="border-t border-slate-850 pt-4 flex items-center justify-between text-[10px] text-slate-500">
+              <div className="border-t border-white/10 pt-4 flex items-center justify-between text-[10px] text-slate-400">
                 <span>dotlive.cv/result/{resultScore.assessmentId}</span>
                 <span className="font-black text-white">DOT.</span>
               </div>
@@ -775,11 +776,11 @@ function OnboardingPage() {
 
             {/* Social Sharing buttons */}
             <div className="space-y-3">
-              <p className="text-xs font-bold text-slate-400">Share your result & build competition:</p>
+              <p className="text-xs font-bold text-muted-foreground">Share your result & build competition:</p>
               
               <Button
                 onClick={downloadCardAsImage}
-                className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:opacity-90 text-white font-bold py-6 text-sm shadow-lg shadow-pink-500/20"
+                className="w-full bg-primary hover:bg-primary/95 text-white font-bold py-6 text-sm shadow-lg shadow-primary/20"
               >
                 <Download className="mr-2 size-4.5" /> Download Share Card (PNG)
               </Button>
@@ -799,7 +800,7 @@ function OnboardingPage() {
                 </Button>
                 <Button 
                   onClick={() => handleShare("twitter")} 
-                  className="bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold py-4 border border-slate-800"
+                  className="bg-foreground text-background hover:opacity-90 text-xs font-bold py-4 border border-border"
                 >
                   X / Twitter
                 </Button>

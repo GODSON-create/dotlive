@@ -98,9 +98,9 @@ export function ProfileEditDialog({ open, onOpenChange }: ProfileEditDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-slate-950 border border-slate-900 text-white max-w-lg max-h-[85vh] overflow-y-auto">
+      <DialogContent className="bg-card border border-border text-foreground max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display font-bold text-white text-base">
+          <DialogTitle className="font-display font-bold text-foreground text-base">
             Edit Profile Details
           </DialogTitle>
         </DialogHeader>
@@ -108,85 +108,85 @@ export function ProfileEditDialog({ open, onOpenChange }: ProfileEditDialogProps
         <form onSubmit={handleSubmit} className="space-y-4 my-2 text-left">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="prof-name" className="text-xs font-bold text-slate-400">Full Name</Label>
+              <Label htmlFor="prof-name" className="text-xs font-bold text-muted-foreground">Full Name</Label>
               <Input
                 id="prof-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Sandra Cole"
-                className="bg-slate-900/50 border-slate-800 text-xs text-white"
+                className="bg-muted/40 border-border text-xs text-foreground"
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="prof-username" className="text-xs font-bold text-slate-400">Username</Label>
+              <Label htmlFor="prof-username" className="text-xs font-bold text-muted-foreground">Username</Label>
               <Input
                 id="prof-username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="e.g. sandracole"
-                className="bg-slate-900/50 border-slate-800 text-xs text-white"
+                className="bg-muted/40 border-border text-xs text-foreground"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="prof-location" className="text-xs font-bold text-slate-400">Location</Label>
+              <Label htmlFor="prof-location" className="text-xs font-bold text-muted-foreground">Location</Label>
               <Input
                 id="prof-location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="e.g. Lagos, Nigeria"
-                className="bg-slate-900/50 border-slate-800 text-xs text-white"
+                className="bg-muted/40 border-border text-xs text-foreground"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="prof-avatar" className="text-xs font-bold text-slate-400">Profile Photo URL</Label>
+              <Label htmlFor="prof-avatar" className="text-xs font-bold text-muted-foreground">Profile Photo URL</Label>
               <Input
                 id="prof-avatar"
                 value={avatarUrl}
                 onChange={(e) => setAvatarUrl(e.target.value)}
                 placeholder="https://..."
-                className="bg-slate-900/50 border-slate-800 text-xs text-white"
+                className="bg-muted/40 border-border text-xs text-foreground"
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="prof-banner" className="text-xs font-bold text-slate-400">Profile Banner URL</Label>
+              <Label htmlFor="prof-banner" className="text-xs font-bold text-muted-foreground">Profile Banner URL</Label>
               <Input
                 id="prof-banner"
                 value={bannerUrl}
                 onChange={(e) => setBannerUrl(e.target.value)}
                 placeholder="https://..."
-                className="bg-slate-900/50 border-slate-800 text-xs text-white"
+                className="bg-muted/40 border-border text-xs text-foreground"
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="prof-bio" className="text-xs font-bold text-slate-400">Bio</Label>
+            <Label htmlFor="prof-bio" className="text-xs font-bold text-muted-foreground">Bio</Label>
             <Textarea
               id="prof-bio"
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               placeholder="Tell the community about yourself, your startups, or your skills..."
               rows={3}
-              className="bg-slate-900/50 border-slate-800 text-xs text-white resize-none"
+              className="bg-muted/40 border-border text-xs text-foreground resize-none"
             />
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="prof-industry" className="text-xs font-bold text-slate-400">Industry</Label>
+              <Label htmlFor="prof-industry" className="text-xs font-bold text-muted-foreground">Industry</Label>
               <Select value={industry} onValueChange={setIndustry}>
-                <SelectTrigger className="bg-slate-900/50 border-slate-800 text-xs text-white">
+                <SelectTrigger className="bg-muted/40 border-border text-xs text-foreground">
                   <SelectValue placeholder="Industry" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-950 border-slate-900 text-white text-xs">
+                <SelectContent className="bg-popover border border-border text-popover-foreground text-xs">
                   {INDUSTRIES.map((ind) => (
-                    <SelectItem key={ind} value={ind} className="cursor-pointer focus:bg-slate-900">
+                    <SelectItem key={ind} value={ind} className="cursor-pointer focus:bg-muted">
                       {ind}
                     </SelectItem>
                   ))}
@@ -194,88 +194,88 @@ export function ProfileEditDialog({ open, onOpenChange }: ProfileEditDialogProps
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="prof-community" className="text-xs font-bold text-slate-400">Community Name</Label>
+              <Label htmlFor="prof-community" className="text-xs font-bold text-muted-foreground">Community Name</Label>
               <Input
                 id="prof-community"
                 value={community}
                 onChange={(e) => setCommunity(e.target.value)}
                 placeholder="e.g. Wigwe Hub"
-                className="bg-slate-900/50 border-slate-800 text-xs text-white"
+                className="bg-muted/40 border-border text-xs text-foreground"
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="prof-website" className="text-xs font-bold text-slate-400">Website</Label>
+              <Label htmlFor="prof-website" className="text-xs font-bold text-muted-foreground">Website</Label>
               <Input
                 id="prof-website"
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
                 placeholder="e.g. mycompany.com"
-                className="bg-slate-900/50 border-slate-800 text-xs text-white"
+                className="bg-muted/40 border-border text-xs text-foreground"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="prof-linkedin" className="text-xs font-bold text-slate-400">LinkedIn URL</Label>
+              <Label htmlFor="prof-linkedin" className="text-xs font-bold text-muted-foreground">LinkedIn URL</Label>
               <Input
                 id="prof-linkedin"
                 value={linkedin}
                 onChange={(e) => setLinkedin(e.target.value)}
                 placeholder="linkedin.com/in/..."
-                className="bg-slate-900/50 border-slate-800 text-xs text-white"
+                className="bg-muted/40 border-border text-xs text-foreground"
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="prof-twitter" className="text-xs font-bold text-slate-400">Twitter / X URL</Label>
+              <Label htmlFor="prof-twitter" className="text-xs font-bold text-muted-foreground">Twitter / X URL</Label>
               <Input
                 id="prof-twitter"
                 value={twitter}
                 onChange={(e) => setTwitter(e.target.value)}
                 placeholder="twitter.com/..."
-                className="bg-slate-900/50 border-slate-800 text-xs text-white"
+                className="bg-muted/40 border-border text-xs text-foreground"
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="prof-whatsapp" className="text-xs font-bold text-slate-400">WhatsApp Phone</Label>
+              <Label htmlFor="prof-whatsapp" className="text-xs font-bold text-muted-foreground">WhatsApp Phone</Label>
               <Input
                 id="prof-whatsapp"
                 value={whatsapp}
                 onChange={(e) => setWhatsapp(e.target.value)}
                 placeholder="e.g. +234..."
-                className="bg-slate-900/50 border-slate-800 text-xs text-white"
+                className="bg-muted/40 border-border text-xs text-foreground"
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="prof-skills" className="text-xs font-bold text-slate-400">Skills (comma-separated)</Label>
+            <Label htmlFor="prof-skills" className="text-xs font-bold text-muted-foreground">Skills (comma-separated)</Label>
             <Input
               id="prof-skills"
               value={skills}
               onChange={(e) => setSkills(e.target.value)}
               placeholder="e.g. Product Management, Next.js, Financial Modeling"
-              className="bg-slate-900/50 border-slate-800 text-xs text-white"
+              className="bg-muted/40 border-border text-xs text-foreground"
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="prof-achievements" className="text-xs font-bold text-slate-400">Achievements (comma-separated)</Label>
+            <Label htmlFor="prof-achievements" className="text-xs font-bold text-muted-foreground">Achievements (comma-separated)</Label>
             <Input
               id="prof-achievements"
               value={achievements}
               onChange={(e) => setAchievements(e.target.value)}
               placeholder="e.g. Wigwe University Top Innovator, Hackathon Winner"
-              className="bg-slate-900/50 border-slate-800 text-xs text-white"
+              className="bg-muted/40 border-border text-xs text-foreground"
             />
           </div>
 
-          <DialogFooter className="pt-3 border-t border-slate-900/60">
+          <DialogFooter className="pt-3 border-t border-border">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="border-slate-800 text-xs font-bold"
+              className="border-border text-xs font-bold"
             >
               Cancel
             </Button>

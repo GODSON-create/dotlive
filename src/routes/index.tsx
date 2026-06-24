@@ -24,7 +24,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { formatDot, formatNaira } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import heroImg from "@/assets/hero-dot.jpg";
+import foundersCollage from "@/assets/founders_collage.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -153,7 +153,13 @@ function LandingPage() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative min-h-[90vh] flex items-center py-20 lg:py-28 overflow-hidden">
-          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/25 via-background to-background" />
+          {/* Parallax collage background with deep tint and breathing animation */}
+          <div 
+            className="absolute inset-0 -z-10 bg-cover bg-center bg-no-repeat bg-parallax opacity-[0.09] dark:opacity-[0.06] transition-opacity duration-1000 animate-breathe"
+            style={{ backgroundImage: `url(${foundersCollage})` }}
+          />
+          {/* Subtle green radial overlay to tie it into the theme */}
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--color-primary)/15,_transparent_70%)] bg-background/50" />
           
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full">
             <div className="grid gap-12 lg:grid-cols-12 lg:items-center">
@@ -161,8 +167,8 @@ function LandingPage() {
               {/* Left copy column */}
               <div className="lg:col-span-6 space-y-6">
                 {/* A/B Copy Variation Tester */}
-                <div className="flex items-center gap-1.5 rounded-full bg-slate-900/60 border border-slate-800 p-1 text-xs backdrop-blur w-fit">
-                  <span className="text-[9px] text-slate-500 px-2 font-bold uppercase tracking-wider">A/B Testing:</span>
+                <div className="flex items-center gap-1.5 rounded-full bg-card border border-border p-1 text-xs backdrop-blur w-fit">
+                  <span className="text-[9px] text-muted-foreground px-2 font-bold uppercase tracking-wider">A/B Testing:</span>
                   {(["A", "B", "C", "D"] as const).map((opt) => (
                     <button
                       key={opt}
@@ -171,7 +177,7 @@ function LandingPage() {
                         "px-2.5 py-1 rounded-full font-bold transition-all text-[11px]",
                         copyOption === opt 
                           ? "bg-primary text-primary-foreground shadow-sm" 
-                          : "text-slate-400 hover:text-white"
+                          : "text-muted-foreground hover:text-foreground"
                       )}
                     >
                       {opt}
@@ -209,7 +215,7 @@ function LandingPage() {
                       <ArrowRight className="size-5 ml-1" />
                     </Link>
                   </Button>
-                  <Button variant="outline" size="lg" className="border-slate-800 text-slate-300 hover:bg-slate-900" asChild>
+                  <Button variant="outline" size="lg" className="border-border text-foreground hover:bg-muted" asChild>
                     <Link to="/auth">Check Leaderboard</Link>
                   </Button>
                 </div>
@@ -217,32 +223,32 @@ function LandingPage() {
 
               {/* Right scorecard column */}
               <div className="lg:col-span-6 flex flex-col items-center">
-                {/* Scorecard mockup wrapper */}
-                <div className="relative w-full max-w-md rounded-3xl border border-slate-800 bg-slate-950/80 p-6 shadow-2xl backdrop-blur-md overflow-hidden">
+                {/* Scorecard mockup wrapper with breathe/float effect */}
+                <div className="relative w-full max-w-md rounded-3xl border border-border bg-card/90 p-6 shadow-elegant backdrop-blur-md overflow-hidden animate-float">
                   <div className="absolute top-0 right-0 size-32 rounded-full bg-primary/10 blur-3xl -z-10" />
-                  <div className="absolute bottom-0 left-0 size-32 rounded-full bg-indigo-500/10 blur-3xl -z-10" />
+                  <div className="absolute bottom-0 left-0 size-32 rounded-full bg-primary/5 blur-3xl -z-10" />
 
                   {/* Header */}
-                  <div className="flex flex-col border-b border-slate-900 pb-4">
+                  <div className="flex flex-col border-b border-border pb-4">
                     <div className="flex items-center justify-between">
                       <div className="flex-1 mr-2">
-                        <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase block">STARTUP REPORT</span>
+                        <span className="text-[10px] font-bold text-muted-foreground tracking-wider uppercase block">STARTUP REPORT</span>
                         <input 
                           type="text"
                           value={simVenture}
                           onChange={(e) => setSimVenture(e.target.value)}
-                          className="block bg-transparent text-lg font-bold text-white focus:outline-none focus:border-primary/50 border-b border-transparent w-full"
+                          className="block bg-transparent text-lg font-bold text-foreground focus:outline-none focus:border-primary/50 border-b border-transparent w-full"
                           placeholder="Venture Name"
                         />
                       </div>
-                      <span className="text-xs font-semibold px-2.5 py-1 bg-slate-900 text-slate-400 rounded-full border border-slate-800 shrink-0">
+                      <span className="text-xs font-semibold px-2.5 py-1 bg-muted text-muted-foreground rounded-full border border-border shrink-0">
                         Rank: Top {stats.rankPercent}%
                       </span>
                     </div>
 
                     {/* Currency switcher tabs */}
-                    <div className="mt-3 flex items-center justify-between bg-slate-900/40 border border-slate-900/60 p-0.5 rounded-lg text-[9px] w-full">
-                      <span className="text-slate-500 font-bold px-2 uppercase tracking-wide">Currency:</span>
+                    <div className="mt-3 flex items-center justify-between bg-muted border border-border p-0.5 rounded-lg text-[9px] w-full">
+                      <span className="text-muted-foreground font-bold px-2 uppercase tracking-wide">Currency:</span>
                       <div className="flex gap-0.5">
                         {(["NGN", "USD", "ZAR", "EUR", "BTC"] as const).map((curr) => (
                           <button
@@ -252,8 +258,8 @@ function LandingPage() {
                             className={cn(
                               "px-2 py-0.5 rounded font-bold transition-all",
                               currency === curr 
-                                ? "bg-slate-800 text-white border border-slate-700/60" 
-                                : "text-slate-400 hover:text-white"
+                                ? "bg-primary text-primary-foreground border border-border/80" 
+                                : "text-muted-foreground hover:text-foreground"
                             )}
                           >
                             {curr}
@@ -265,27 +271,27 @@ function LandingPage() {
 
                   {/* Scores Grid */}
                   <div className="mt-5 grid grid-cols-2 gap-4">
-                    <div className="rounded-2xl bg-slate-900/30 border border-slate-900 p-4">
-                      <span className="text-[10px] font-semibold text-slate-400">Estimated Value</span>
-                      <p className="mt-1.5 font-display text-xl sm:text-2xl font-black text-white text-gradient">
+                    <div className="rounded-2xl bg-muted/30 border border-border p-4">
+                      <span className="text-[10px] font-semibold text-muted-foreground">Estimated Value</span>
+                      <p className="mt-1.5 font-display text-xl sm:text-2xl font-black text-foreground">
                         {formatVal(stats.valuation, currency)}
                       </p>
                     </div>
-                    <div className="rounded-2xl bg-slate-900/30 border border-slate-900 p-4">
-                      <span className="text-[10px] font-semibold text-slate-400">DOT Score</span>
+                    <div className="rounded-2xl bg-muted/30 border border-border p-4">
+                      <span className="text-[10px] font-semibold text-muted-foreground">DOT Score</span>
                       <div className="flex items-baseline gap-1 mt-1">
-                        <span className="font-display text-2xl font-black text-white">{stats.dotScore}</span>
-                        <span className="text-xs text-slate-500">/1000</span>
+                        <span className="font-display text-2xl font-black text-foreground">{stats.dotScore}</span>
+                        <span className="text-xs text-muted-foreground">/1000</span>
                       </div>
                     </div>
-                    <div className="rounded-2xl bg-slate-900/30 border border-slate-900 p-4">
-                      <span className="text-[10px] font-semibold text-slate-400">Potential</span>
-                      <p className="mt-1.5 font-display text-lg font-bold text-slate-300">
+                    <div className="rounded-2xl bg-muted/30 border border-border p-4">
+                      <span className="text-[10px] font-semibold text-muted-foreground">Potential</span>
+                      <p className="mt-1.5 font-display text-lg font-bold text-foreground">
                         {formatVal(stats.potential, currency)}+
                       </p>
                     </div>
-                    <div className="rounded-2xl bg-slate-900/30 border border-slate-900 p-4">
-                      <span className="text-[10px] font-semibold text-slate-400">Status</span>
+                    <div className="rounded-2xl bg-muted/30 border border-border p-4">
+                      <span className="text-[10px] font-semibold text-muted-foreground">Status</span>
                       <p className="mt-1.5 text-xs font-bold text-primary flex items-center gap-1">
                         {stats.status}
                       </p>
@@ -293,17 +299,17 @@ function LandingPage() {
                   </div>
 
                   {/* Simulator Sliders Panel */}
-                  <div className="mt-6 border-t border-slate-900 pt-5 space-y-4">
-                    <div className="flex items-center justify-between text-xs font-semibold text-slate-400 mb-1">
+                  <div className="mt-6 border-t border-border pt-5 space-y-4">
+                    <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground mb-1">
                       <span className="flex items-center gap-1"><Sliders className="size-3 text-primary" /> Venture Simulator</span>
-                      <span className="text-[10px] text-slate-500">Drag to change value</span>
+                      <span className="text-[10px] text-muted-foreground">Drag to change value</span>
                     </div>
 
                     {/* Traction slider */}
                     <div className="space-y-1">
                       <div className="flex justify-between text-[11px]">
-                        <span className="text-slate-400">Monthly Revenue / Traction</span>
-                        <span className="font-bold text-white">{formatVal(simTraction, currency)}</span>
+                        <span className="text-muted-foreground">Monthly Revenue / Traction</span>
+                        <span className="font-bold text-foreground">{formatVal(simTraction, currency)}</span>
                       </div>
                       <input 
                         type="range" 
@@ -312,15 +318,15 @@ function LandingPage() {
                         step="100000"
                         value={simTraction}
                         onChange={(e) => setSimTraction(Number(e.target.value))}
-                        className="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-primary"
+                        className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                       />
                     </div>
 
                     {/* Product Stage selector */}
                     <div className="space-y-1">
                       <div className="flex justify-between text-[11px]">
-                        <span className="text-slate-400">Product Development</span>
-                        <span className="font-bold text-white">
+                        <span className="text-muted-foreground">Product Development</span>
+                        <span className="font-bold text-foreground">
                           {simProduct === 0 ? "Idea stage" : simProduct === 1 ? "Prototype ready" : simProduct === 2 ? "MVP launched" : "Market growth"}
                         </span>
                       </div>
@@ -331,15 +337,15 @@ function LandingPage() {
                         step="1"
                         value={simProduct}
                         onChange={(e) => setSimProduct(Number(e.target.value))}
-                        className="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-primary"
+                        className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                       />
                     </div>
 
                     {/* Team Size */}
                     <div className="space-y-1">
                       <div className="flex justify-between text-[11px]">
-                        <span className="text-slate-400">Team Size & Commitment</span>
-                        <span className="font-bold text-white">{simTeam} Fulltime Members</span>
+                        <span className="text-muted-foreground">Team Size & Commitment</span>
+                        <span className="font-bold text-foreground">{simTeam} Fulltime Members</span>
                       </div>
                       <input 
                         type="range" 
@@ -348,15 +354,15 @@ function LandingPage() {
                         step="1"
                         value={simTeam}
                         onChange={(e) => setSimTeam(Number(e.target.value))}
-                        className="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-primary"
+                        className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                       />
                     </div>
 
                     {/* Market Reach */}
                     <div className="space-y-1">
                       <div className="flex justify-between text-[11px]">
-                        <span className="text-slate-400">Market Reach / Size</span>
-                        <span className="font-bold text-white">
+                        <span className="text-muted-foreground">Market Reach / Size</span>
+                        <span className="font-bold text-foreground">
                           {simMarket === 0 ? "Local Market" : simMarket === 1 ? "Regional Market" : "Global Market"}
                         </span>
                       </div>
@@ -367,7 +373,7 @@ function LandingPage() {
                         step="1"
                         value={simMarket}
                         onChange={(e) => setSimMarket(Number(e.target.value))}
-                        className="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-primary"
+                        className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                       />
                     </div>
                   </div>
@@ -384,51 +390,51 @@ function LandingPage() {
         </section>
 
         {/* How It Works Section */}
-        <section className="border-t border-slate-900 bg-slate-950/20 py-24">
+        <section className="border-t border-border bg-muted/15 py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-16">
               <span className="text-xs font-bold text-primary uppercase tracking-widest">3-STEP WORKFLOW</span>
-              <h2 className="mt-3 font-display text-4xl font-black tracking-tight text-white sm:text-5xl">
+              <h2 className="mt-3 font-display text-4xl font-black tracking-tight text-foreground sm:text-5xl">
                 Turn Your Idea Into A Score
               </h2>
-              <p className="mt-4 text-slate-400 text-lg">
+              <p className="mt-4 text-muted-foreground text-lg">
                 Stop guessing. Run your concept through the network, benchmark your metrics, and level up.
               </p>
             </div>
 
             <div className="grid gap-8 md:grid-cols-3">
               {/* Step 1 */}
-              <div className="relative rounded-2xl border border-slate-900 bg-slate-950/40 p-6 space-y-4 hover:border-slate-800 transition-all">
-                <span className="absolute top-4 right-4 text-3xl font-black text-slate-905 opacity-10">01</span>
+              <div className="relative rounded-2xl border border-border bg-card p-6 space-y-4 hover:border-primary/50 transition-all">
+                <span className="absolute top-4 right-4 text-3xl font-black text-primary/10">01</span>
                 <span className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
                   <Sliders className="size-5" />
                 </span>
-                <h3 className="font-display text-xl font-bold text-white">1. Tell Us About Your Idea</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">
+                <h3 className="font-display text-xl font-bold text-foreground">1. Tell Us About Your Idea</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   Answer straightforward questions covering your **Problem**, **Solution**, **Market Size**, **Customer Archetypes**, and **Team Strengths**.
                 </p>
               </div>
 
               {/* Step 2 */}
-              <div className="relative rounded-2xl border border-slate-900 bg-slate-950/40 p-6 space-y-4 hover:border-slate-800 transition-all">
-                <span className="absolute top-4 right-4 text-3xl font-black text-slate-905 opacity-10">02</span>
-                <span className="flex size-12 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
+              <div className="relative rounded-2xl border border-border bg-card p-6 space-y-4 hover:border-primary/50 transition-all">
+                <span className="absolute top-4 right-4 text-3xl font-black text-primary/10">02</span>
+                <span className="flex size-12 items-center justify-center rounded-xl bg-accent/15 text-accent">
                   <BarChart3 className="size-5" />
                 </span>
-                <h3 className="font-display text-xl font-bold text-white">2. Get Your Startup Report</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">
+                <h3 className="font-display text-xl font-bold text-foreground">2. Get Your Startup Report</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   Instantly receive your interactive **Startup Valuation**, **DOT Score**, **Fundability Indicator**, **Growth Level**, and **Unicorn Potential** calculation.
                 </p>
               </div>
 
               {/* Step 3 */}
-              <div className="relative rounded-2xl border border-slate-900 bg-slate-950/40 p-6 space-y-4 hover:border-slate-800 transition-all">
-                <span className="absolute top-4 right-4 text-3xl font-black text-slate-905 opacity-10">03</span>
-                <span className="flex size-12 items-center justify-center rounded-xl bg-yellow-500/10 text-yellow-400">
+              <div className="relative rounded-2xl border border-border bg-card p-6 space-y-4 hover:border-primary/50 transition-all">
+                <span className="absolute top-4 right-4 text-3xl font-black text-primary/10">03</span>
+                <span className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
                   <Trophy className="size-5" />
                 </span>
-                <h3 className="font-display text-xl font-bold text-white">3. Level Up</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">
+                <h3 className="font-display text-xl font-bold text-foreground">3. Level Up</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   Unlock dynamic roadmap actions. Gain access to the global **Founder Community**, **Learning Paths**, **Cohort Sessions**, and visibility to **Ecosystem Investors**.
                 </p>
               </div>
@@ -437,16 +443,16 @@ function LandingPage() {
         </section>
 
         {/* Gamified Competition / Leaderboard Preview Section */}
-        <section className="py-24 border-t border-slate-900 relative">
+        <section className="py-24 border-t border-border relative">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid gap-12 lg:grid-cols-12 lg:items-center">
               
               <div className="lg:col-span-5 space-y-6">
-                <span className="text-xs font-bold text-yellow-400 uppercase tracking-widest">ECOSYSTEM RANKINGS</span>
-                <h2 className="font-display text-3xl font-black text-white sm:text-4xl">
+                <span className="text-xs font-bold text-primary uppercase tracking-widest">ECOSYSTEM RANKINGS</span>
+                <h2 className="font-display text-3xl font-black text-foreground sm:text-4xl">
                   Compete with Founders Across Africa
                 </h2>
-                <p className="text-slate-400 leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed">
                   Ecosystem rankings keep you motivated. Compete for the top position by improving your DOT Score and venture metrics. Filter and compete by:
                 </p>
                 <div className="space-y-3">
@@ -455,7 +461,7 @@ function LandingPage() {
                     "Most Improved Founder & Fastest Growing Venture",
                     "Top Universities, Industries, and Regional Communities",
                   ].map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-3 text-sm text-slate-300">
+                    <div key={idx} className="flex items-center gap-3 text-sm text-foreground/80">
                       <CheckCircle2 className="size-5 text-primary shrink-0" />
                       <span>{item}</span>
                     </div>
@@ -463,12 +469,12 @@ function LandingPage() {
                 </div>
               </div>
 
-              <div className="lg:col-span-7 bg-slate-950/80 border border-slate-900 rounded-3xl p-6 shadow-xl relative overflow-hidden">
-                <div className="flex items-center justify-between border-b border-slate-900 pb-4 mb-4">
-                  <h3 className="font-display font-bold text-white flex items-center gap-2">
-                    <Trophy className="size-4.5 text-yellow-400" /> Top Universities Leaderboard
+              <div className="lg:col-span-7 bg-card border border-border rounded-3xl p-6 shadow-elegant relative overflow-hidden backdrop-blur-sm">
+                <div className="flex items-center justify-between border-b border-border pb-4 mb-4">
+                  <h3 className="font-display font-bold text-foreground flex items-center gap-2">
+                    <Trophy className="size-4.5 text-accent animate-pulse" /> Top Universities Leaderboard
                   </h3>
-                  <span className="text-[10px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded font-bold uppercase">LIVE</span>
+                  <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded font-bold uppercase">LIVE</span>
                 </div>
                 
                 {/* Mock Leaderboard rows */}
@@ -479,21 +485,21 @@ function LandingPage() {
                     { rank: 3, name: "University of Ibadan", score: 862, val: "₦850M", rate: "+12.8%" },
                     { rank: 4, name: "Covenant University", score: 840, val: "₦720M", rate: "+8.5%" },
                   ].map((row) => (
-                    <div key={row.rank} className="flex items-center justify-between p-3 rounded-xl bg-slate-900/20 border border-slate-900/60 hover:bg-slate-900/40 transition-colors">
+                    <div key={row.rank} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border hover:bg-muted/50 transition-colors">
                       <div className="flex items-center gap-3">
                         <span className={cn(
                           "flex size-6 items-center justify-center rounded-full text-xs font-black",
-                          row.rank === 1 ? "bg-yellow-400/20 text-yellow-400" :
-                          row.rank === 2 ? "bg-slate-300/20 text-slate-300" :
-                          row.rank === 3 ? "bg-amber-600/20 text-amber-500" : "text-slate-500"
+                          row.rank === 1 ? "bg-primary text-primary-foreground" :
+                          row.rank === 2 ? "bg-muted text-muted-foreground" :
+                          row.rank === 3 ? "bg-muted/50 text-muted-foreground/85" : "text-muted-foreground/60"
                         )}>
                           #{row.rank}
                         </span>
-                        <span className="text-sm font-bold text-white">{row.name}</span>
+                        <span className="text-sm font-bold text-foreground">{row.name}</span>
                       </div>
                       <div className="flex items-center gap-4 text-xs font-semibold">
-                        <span className="text-slate-400">Score: {row.score}</span>
-                        <span className="text-gradient">{row.val}</span>
+                        <span className="text-muted-foreground">Score: {row.score}</span>
+                        <span className="text-gradient font-bold">{row.val}</span>
                         <span className="text-primary">{row.rate}</span>
                       </div>
                     </div>
@@ -506,39 +512,47 @@ function LandingPage() {
         </section>
 
         {/* DOT Wrapped Loop / Share Section */}
-        <section className="py-20 border-t border-slate-900 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-pink-900/10 via-transparent to-transparent">
+        <section className="py-20 border-t border-border bg-[radial-gradient(ellipse_at_bottom_left,_var(--color-primary-glow),_transparent_70%)] relative overflow-hidden">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center max-w-3xl">
-            <Sparkle className="size-8 text-pink-400 mx-auto animate-pulse" />
-            <h2 className="mt-4 font-display text-3xl font-black text-white sm:text-5xl">
+            <Sparkle className="size-8 text-accent mx-auto animate-pulse" />
+            <h2 className="mt-4 font-display text-3xl font-black text-foreground sm:text-5xl">
               Show The World What You're Building
             </h2>
-            <p className="mt-4 text-slate-400 text-base sm:text-lg">
+            <p className="mt-4 text-muted-foreground text-base sm:text-lg">
               Get an instantly shareable, personalized **DOT Wrapped** card optimized for Instagram Stories, WhatsApp Statuses, LinkedIn, and X.
             </p>
             
-            <div className="mt-10 mx-auto max-w-md rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-950 to-slate-900 p-6 text-left relative overflow-hidden shadow-elegant">
-              <span className="text-[9px] font-bold tracking-widest text-slate-500 uppercase">DOT WRAPPED PREVIEW</span>
-              <p className="mt-4 text-xl font-bold text-white leading-relaxed">
+            <div className="mt-10 mx-auto max-w-md rounded-2xl border border-border bg-gradient-to-br from-card to-muted/40 p-6 text-left relative overflow-hidden shadow-elegant backdrop-blur-md">
+              <span className="text-[9px] font-bold tracking-widest text-muted-foreground/70 uppercase">DOT WRAPPED PREVIEW</span>
+              <p className="mt-4 text-xl font-bold text-foreground leading-relaxed">
                 "I just discovered my startup could become a <span className="text-gradient font-black">₦500M</span> company"
               </p>
-              <div className="mt-6 flex justify-between items-center text-xs border-t border-slate-900 pt-4">
+              <div className="mt-6 flex justify-between items-center text-xs border-t border-border pt-4">
                 <div>
-                  <p className="font-semibold text-slate-400">DOT Score: <span className="text-white font-bold">742</span></p>
-                  <p className="text-[10px] text-slate-500">Founder Rank: Top 10%</p>
+                  <p className="font-semibold text-muted-foreground">DOT Score: <span className="text-foreground font-bold">742</span></p>
+                  <p className="text-[10px] text-muted-foreground/60">Founder Rank: Top 10%</p>
                 </div>
-                <span className="text-sm font-black text-white">DOT.</span>
+                <span className="text-sm font-black text-foreground">DOT.</span>
               </div>
             </div>
           </div>
         </section>
 
         {/* CTA */}
-        <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8 border-t border-slate-900 pt-20">
-          <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10 p-10 text-center shadow-elegant sm:p-16">
-            <h2 className="font-display text-3xl font-black text-white sm:text-5xl">
+        <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8 border-t border-border pt-20">
+          <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-10 text-center shadow-elegant sm:p-16">
+            {/* Parallax collage background with deep tint and breathing animation */}
+            <div 
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-parallax opacity-[0.08] dark:opacity-[0.05] transition-opacity duration-1000 animate-breathe -z-10"
+              style={{ backgroundImage: `url(${foundersCollage})` }}
+            />
+            {/* Subtle overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-card/90 to-accent/5 -z-20" />
+            
+            <h2 className="font-display text-3xl font-black text-foreground sm:text-5xl">
               Ready to find your Startup Score?
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-slate-400">
+            <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
               Join the ecosystem today. First two revaluations are completely free.
             </p>
             <div className="mt-8 flex justify-center">

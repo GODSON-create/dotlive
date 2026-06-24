@@ -183,18 +183,18 @@ function PublicFounderProfile() {
 
   if (loadingProfile || loadingFounder) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
-        <Sparkles className="size-6 animate-spin text-pink-500" />
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <Sparkles className="size-6 animate-spin text-primary" />
       </div>
     );
   }
 
   if (!profile) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4 text-center text-white">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 text-center text-foreground">
         <Logo />
         <h1 className="mt-8 text-2xl font-bold font-display">Profile Not Found</h1>
-        <p className="mt-2 text-sm text-slate-400">The founder profile "{dotId}" could not be located.</p>
+        <p className="mt-2 text-sm text-muted-foreground">The founder profile "{dotId}" could not be located.</p>
         <Button variant="hero" className="mt-6" asChild>
           <Link to="/">Go Home</Link>
         </Button>
@@ -212,13 +212,13 @@ function PublicFounderProfile() {
   const achievementsArray = profile.achievements || [];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white selection:bg-pink-500/30">
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary/20">
       {/* Header */}
-      <header className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between border-b border-slate-900">
+      <header className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between border-b border-border">
         <Link to="/">
           <Logo />
         </Link>
-        <Button variant="outline" size="sm" className="border-slate-800 text-slate-300 hover:text-white" asChild>
+        <Button variant="outline" size="sm" className="border-border text-muted-foreground hover:text-foreground hover:bg-muted" asChild>
           <Link to="/auth">Join DOT Network</Link>
         </Button>
       </header>
@@ -227,54 +227,54 @@ function PublicFounderProfile() {
       <div className="mx-auto max-w-5xl px-4 py-10 md:py-16 space-y-10">
         
         {/* Profile Card */}
-        <div className="rounded-3xl border border-slate-850 bg-slate-900/40 overflow-hidden backdrop-blur-xl relative">
+        <div className="rounded-3xl border border-border bg-card overflow-hidden backdrop-blur-xl relative shadow-elegant">
           {/* Banner */}
-          <div className="h-44 w-full bg-gradient-to-r from-pink-900/40 via-purple-900/30 to-indigo-900/40 border-b border-slate-900 relative">
+          <div className="h-44 w-full bg-gradient-to-r from-primary/25 via-background/40 to-accent/20 border-b border-border relative">
             {profile.banner_url && (
               <img src={profile.banner_url} alt="" className="w-full h-full object-cover" />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/85 to-transparent" />
           </div>
 
           <div className="p-6 md:p-8 pt-0 -mt-10 relative">
             <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-6">
               <div className="flex flex-col md:flex-row items-center md:items-end gap-6 text-center md:text-left">
                 {profile.avatar_url ? (
-                  <img src={profile.avatar_url} alt={profile.name ?? ""} className="size-24 rounded-full border-4 border-slate-950 object-cover shadow-2xl bg-slate-900" />
+                  <img src={profile.avatar_url} alt={profile.name ?? ""} className="size-24 rounded-full border-4 border-card object-cover shadow-2xl bg-muted" />
                 ) : (
-                  <span className="flex size-24 items-center justify-center rounded-full bg-gradient-to-tr from-pink-500 to-indigo-500 text-3xl font-bold text-white shadow-2xl border-4 border-slate-950">
+                  <span className="flex size-24 items-center justify-center rounded-full bg-gradient-to-tr from-primary to-accent text-3xl font-bold text-primary-foreground shadow-2xl border-4 border-card">
                     {initial}
                   </span>
                 )}
 
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-                    <h1 className="font-display text-3xl font-extrabold text-white leading-tight">{profile.name}</h1>
-                    <span className="rounded-full bg-slate-900 border border-slate-800 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-pink-400">
+                    <h1 className="font-display text-3xl font-extrabold text-foreground leading-tight">{profile.name}</h1>
+                    <span className="rounded-full bg-muted border border-border px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">
                       {profile.dot_id}
                     </span>
                     {profile.username && (
-                      <span className="text-xs text-slate-500">@{profile.username}</span>
+                      <span className="text-xs text-muted-foreground/80">@{profile.username}</span>
                     )}
                   </div>
                   {founder?.venture_name && (
-                    <p className="text-sm text-indigo-400 font-semibold uppercase tracking-wider">
+                    <p className="text-sm text-primary font-semibold uppercase tracking-wider">
                       Founder of {founder.venture_name}
                     </p>
                   )}
-                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs text-slate-400 mt-2">
+                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs text-muted-foreground mt-2">
                     {locationText && (
                       <span className="flex items-center gap-1">
-                        <MapPin className="size-3.5 text-slate-500" /> {locationText}
+                        <MapPin className="size-3.5 text-muted-foreground/60" /> {locationText}
                       </span>
                     )}
                     {founder?.industry && (
                       <span className="flex items-center gap-1">
-                        <Building className="size-3.5 text-slate-500" /> {founder.industry}
+                        <Building className="size-3.5 text-muted-foreground/60" /> {founder.industry}
                       </span>
                     )}
                     <span className="flex items-center gap-1">
-                      <Calendar className="size-3.5 text-slate-500" /> Joined {new Date(profile.created_at).toLocaleDateString()}
+                      <Calendar className="size-3.5 text-muted-foreground/60" /> Joined {new Date(profile.created_at).toLocaleDateString()}
                     </span>
                   </div>
                 </div>
@@ -282,9 +282,9 @@ function PublicFounderProfile() {
 
               {/* Archetype Badge */}
               <div className="flex flex-col gap-2 items-center md:items-end w-full md:w-auto">
-                <div className="rounded-2xl bg-slate-950/80 border border-slate-900 px-4 py-2.5 text-center md:text-right shadow-lg">
-                  <span className="text-[9px] text-slate-500 uppercase tracking-widest font-semibold block">Archetype</span>
-                  <span className="font-display text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-yellow-400">
+                <div className="rounded-2xl bg-muted/80 border border-border px-4 py-2.5 text-center md:text-right shadow-soft">
+                  <span className="text-[9px] text-muted-foreground/75 uppercase tracking-widest font-semibold block">Archetype</span>
+                  <span className="font-display text-sm font-bold text-primary">
                     {archetype}
                   </span>
                 </div>
@@ -292,9 +292,9 @@ function PublicFounderProfile() {
             </div>
 
             {/* Social handles and Bio */}
-            <div className="mt-6 border-t border-slate-900 pt-6 space-y-4">
+            <div className="mt-6 border-t border-border pt-6 space-y-4">
               {bioText && (
-                <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-line max-w-3xl">
+                <p className="text-sm text-foreground/85 leading-relaxed whitespace-pre-line max-w-3xl">
                   {bioText}
                 </p>
               )}
@@ -302,30 +302,30 @@ function PublicFounderProfile() {
               {/* Social and Website Links */}
               <div className="flex flex-wrap gap-3 pt-2">
                 {websiteText && (
-                  <Button variant="outline" size="sm" className="h-8 border-slate-800 bg-slate-900/30 hover:bg-slate-900 text-xs text-slate-300" asChild>
+                  <Button variant="outline" size="sm" className="h-8 border-border bg-muted/30 hover:bg-muted text-xs text-muted-foreground hover:text-foreground" asChild>
                     <a href={websiteText.startsWith("http") ? websiteText : `https://${websiteText}`} target="_blank" rel="noopener noreferrer">
                       <Globe className="size-3.5 mr-1.5" /> Website
                     </a>
                   </Button>
                 )}
                 {profile.linkedin && (
-                  <Button variant="outline" size="sm" className="h-8 border-slate-800 bg-slate-900/30 hover:bg-slate-900 text-xs text-slate-300" asChild>
+                  <Button variant="outline" size="sm" className="h-8 border-border bg-muted/30 hover:bg-muted text-xs text-muted-foreground hover:text-foreground" asChild>
                     <a href={profile.linkedin.startsWith("http") ? profile.linkedin : `https://${profile.linkedin}`} target="_blank" rel="noopener noreferrer">
-                      <Linkedin className="size-3.5 mr-1.5 text-blue-400" /> LinkedIn
+                      <Linkedin className="size-3.5 mr-1.5 text-primary" /> LinkedIn
                     </a>
                   </Button>
                 )}
                 {profile.twitter && (
-                  <Button variant="outline" size="sm" className="h-8 border-slate-800 bg-slate-900/30 hover:bg-slate-900 text-xs text-slate-300" asChild>
+                  <Button variant="outline" size="sm" className="h-8 border-border bg-muted/30 hover:bg-muted text-xs text-muted-foreground hover:text-foreground" asChild>
                     <a href={profile.twitter.startsWith("http") ? profile.twitter : `https://${profile.twitter}`} target="_blank" rel="noopener noreferrer">
-                      <Twitter className="size-3.5 mr-1.5 text-sky-400" /> Twitter/X
+                      <Twitter className="size-3.5 mr-1.5 text-primary" /> Twitter/X
                     </a>
                   </Button>
                 )}
                 {profile.whatsapp && (
-                  <Button variant="outline" size="sm" className="h-8 border-slate-800 bg-slate-900/30 hover:bg-slate-900 text-xs text-slate-300" asChild>
+                  <Button variant="outline" size="sm" className="h-8 border-border bg-muted/30 hover:bg-muted text-xs text-muted-foreground hover:text-foreground" asChild>
                     <a href={`https://wa.me/${profile.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer">
-                      <MessageCircle className="size-3.5 mr-1.5 text-emerald-400" /> WhatsApp
+                      <MessageCircle className="size-3.5 mr-1.5 text-primary" /> WhatsApp
                     </a>
                   </Button>
                 )}
@@ -338,23 +338,23 @@ function PublicFounderProfile() {
         {rankings && !rankings.error && (
           <div className="flex flex-wrap gap-2.5">
             {rankings.country?.rank && (
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-slate-900 border border-slate-850 text-slate-400 px-3.5 py-1.5 rounded-full">
-                <MapPin className="size-3 text-pink-500" /> #{rankings.country.rank} in {rankings.country.name}
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-muted border border-border text-muted-foreground px-3.5 py-1.5 rounded-full">
+                <MapPin className="size-3 text-primary" /> #{rankings.country.rank} in {rankings.country.name}
               </span>
             )}
             {rankings.industry?.rank && (
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-slate-900 border border-slate-850 text-slate-400 px-3.5 py-1.5 rounded-full">
-                <TrendingUp className="size-3 text-indigo-400" /> #{rankings.industry.rank} in {rankings.industry.name}
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-muted border border-border text-muted-foreground px-3.5 py-1.5 rounded-full">
+                <TrendingUp className="size-3 text-primary" /> #{rankings.industry.rank} in {rankings.industry.name}
               </span>
             )}
             {rankings.university?.rank && (
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-slate-900 border border-slate-850 text-slate-400 px-3.5 py-1.5 rounded-full">
-                <Trophy className="size-3 text-yellow-500" /> #{rankings.university.rank} in {rankings.university.name}
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-muted border border-border text-muted-foreground px-3.5 py-1.5 rounded-full">
+                <Trophy className="size-3 text-accent" /> #{rankings.university.rank} in {rankings.university.name}
               </span>
             )}
             {rankings.community?.rank && (
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-slate-900 border border-slate-850 text-slate-400 px-3.5 py-1.5 rounded-full">
-                <Users className="size-3 text-purple-400" /> #{rankings.community.rank} in {rankings.community.name}
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-muted border border-border text-muted-foreground px-3.5 py-1.5 rounded-full">
+                <Users className="size-3 text-primary" /> #{rankings.community.rank} in {rankings.community.name}
               </span>
             )}
           </div>
@@ -362,55 +362,55 @@ function PublicFounderProfile() {
 
         {/* Valuation Metrics Grid */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl border border-slate-850 bg-slate-900/40 p-5 shadow-lg relative overflow-hidden">
-            <div className="absolute top-0 right-0 size-16 bg-emerald-500/5 blur-xl" />
-            <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Vantage Score</span>
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-elegant relative overflow-hidden">
+            <div className="absolute top-0 right-0 size-16 bg-primary/5 blur-xl" />
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Vantage Score</span>
             <div className="flex items-baseline gap-1 mt-2">
-              <p className="font-display text-3xl font-black text-white">{formatDot(vantagePoint)}</p>
-              <span className="text-[10px] text-slate-500">/1000</span>
+              <p className="font-display text-3xl font-black text-foreground">{formatDot(vantagePoint)}</p>
+              <span className="text-[10px] text-muted-foreground">/1000</span>
             </div>
           </div>
           
-          <div className="rounded-2xl border border-slate-850 bg-slate-900/40 p-5 shadow-lg relative overflow-hidden">
-            <div className="absolute top-0 right-0 size-16 bg-indigo-500/5 blur-xl" />
-            <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Startup Valuation</span>
-            <p className="font-display text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-pink-400 mt-2">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-elegant relative overflow-hidden">
+            <div className="absolute top-0 right-0 size-16 bg-accent/5 blur-xl" />
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Startup Valuation</span>
+            <p className="font-display text-3xl font-black text-gradient mt-2">
               {formatNaira(currentValuation)}
             </p>
-            <span className="text-[10px] text-slate-500 block mt-1">Potential: {formatNaira(potentialValuation)}</span>
+            <span className="text-[10px] text-muted-foreground block mt-1">Potential: {formatNaira(potentialValuation)}</span>
           </div>
 
-          <div className="rounded-2xl border border-slate-850 bg-slate-900/40 p-5 shadow-lg relative overflow-hidden">
-            <div className="absolute top-0 right-0 size-16 bg-yellow-500/5 blur-xl" />
-            <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Fundability</span>
-            <p className="font-display text-3xl font-black text-white mt-2">{fundability}%</p>
-            <span className="text-[10px] text-slate-500 block mt-1">Readiness: {investmentReadiness}%</span>
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-elegant relative overflow-hidden">
+            <div className="absolute top-0 right-0 size-16 bg-primary/5 blur-xl" />
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Fundability</span>
+            <p className="font-display text-3xl font-black text-foreground mt-2">{fundability}%</p>
+            <span className="text-[10px] text-muted-foreground block mt-1">Readiness: {investmentReadiness}%</span>
           </div>
 
-          <div className="rounded-2xl border border-slate-850 bg-slate-900/40 p-5 shadow-lg relative overflow-hidden">
-            <div className="absolute top-0 right-0 size-16 bg-pink-500/5 blur-xl" />
-            <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Unicorn Potential</span>
-            <p className="font-display text-3xl font-black text-pink-400 mt-2">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-elegant relative overflow-hidden">
+            <div className="absolute top-0 right-0 size-16 bg-accent/5 blur-xl" />
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Unicorn Potential</span>
+            <p className="font-display text-3xl font-black text-primary mt-2">
               {typeof unicornPotential === 'number' ? unicornPotential.toFixed(1) : '0.0'}%
             </p>
-            <span className="text-[10px] text-slate-500 block mt-1">Vantage Index</span>
+            <span className="text-[10px] text-muted-foreground block mt-1">Vantage Index</span>
           </div>
         </div>
 
         {/* History Chart */}
         {chartData.length > 0 && (
-          <div className="rounded-3xl border border-slate-850 bg-slate-900/20 p-6 shadow-xl">
-            <h2 className="font-display text-lg font-semibold text-white">Venture Growth History</h2>
-            <p className="text-xs text-slate-400 mt-1">Tracking Vantage Score & Valuation over time</p>
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-elegant">
+            <h2 className="font-display text-lg font-semibold text-foreground">Venture Growth History</h2>
+            <p className="text-xs text-muted-foreground mt-1">Tracking Vantage Score & Valuation over time</p>
             <div className="mt-6 h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-slate-850" />
-                  <XAxis dataKey="date" className="text-xs text-slate-500" />
-                  <YAxis className="text-xs text-slate-500" />
-                  <Tooltip contentStyle={{ backgroundColor: "#020617", borderColor: "#1e293b" }} />
-                  <Line type="monotone" dataKey="vantage" name="Vantage Score" stroke="#10b981" strokeWidth={2} dot />
-                  <Line type="monotone" dataKey="valuation" name="Valuation (Millions ₦)" stroke="#6366f1" strokeWidth={2} dot />
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/40" />
+                  <XAxis dataKey="date" className="text-xs text-muted-foreground" />
+                  <YAxis className="text-xs text-muted-foreground" />
+                  <Tooltip contentStyle={{ backgroundColor: "var(--color-card)", borderColor: "var(--color-border)", color: "var(--color-foreground)" }} />
+                  <Line type="monotone" dataKey="vantage" name="Vantage Score" stroke="var(--color-primary)" strokeWidth={2} dot />
+                  <Line type="monotone" dataKey="valuation" name="Valuation (Millions ₦)" stroke="var(--color-accent)" strokeWidth={2} dot />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -420,39 +420,39 @@ function PublicFounderProfile() {
         {/* Skills & Achievements arrays */}
         <div className="grid gap-6 md:grid-cols-2">
           {/* Skills Badges */}
-          <div className="rounded-3xl border border-slate-850 bg-slate-900/40 p-6 text-left shadow-lg">
-            <h3 className="font-display font-semibold text-white flex items-center gap-2">
-              <Award className="size-4.5 text-pink-500" /> Core Skills & Expertise
+          <div className="rounded-3xl border border-border bg-card p-6 text-left shadow-elegant">
+            <h3 className="font-display font-semibold text-foreground flex items-center gap-2">
+              <Award className="size-4.5 text-primary" /> Core Skills & Expertise
             </h3>
             {skillsArray.length > 0 ? (
               <div className="flex flex-wrap gap-2 mt-4">
                 {skillsArray.map((sk) => (
-                  <span key={sk} className="text-xs bg-slate-950 border border-slate-850 text-slate-300 px-3 py-1 rounded-lg">
+                  <span key={sk} className="text-xs bg-muted border border-border text-foreground px-3 py-1 rounded-lg">
                     {sk}
                   </span>
                 ))}
               </div>
             ) : (
-              <p className="mt-4 text-xs text-slate-500">No custom skills listed.</p>
+              <p className="mt-4 text-xs text-muted-foreground">No custom skills listed.</p>
             )}
           </div>
 
           {/* Achievements */}
-          <div className="rounded-3xl border border-slate-850 bg-slate-900/40 p-6 text-left shadow-lg">
-            <h3 className="font-display font-semibold text-white flex items-center gap-2">
-              <Trophy className="size-4.5 text-yellow-500" /> Achievements & Badges
+          <div className="rounded-3xl border border-border bg-card p-6 text-left shadow-elegant">
+            <h3 className="font-display font-semibold text-foreground flex items-center gap-2">
+              <Trophy className="size-4.5 text-accent animate-pulse" /> Achievements & Badges
             </h3>
             {achievementsArray.length > 0 ? (
               <div className="space-y-2.5 mt-4">
                 {achievementsArray.map((ac) => (
-                  <div key={ac} className="flex items-center gap-2.5 text-xs text-slate-300">
-                    <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
+                  <div key={ac} className="flex items-center gap-2.5 text-xs text-foreground/80">
+                    <CheckCircle2 className="size-4 text-primary shrink-0" />
                     <span>{ac}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="mt-4 text-xs text-slate-500">No achievements recorded yet.</p>
+              <p className="mt-4 text-xs text-muted-foreground">No achievements recorded yet.</p>
             )}
           </div>
         </div>
@@ -460,39 +460,39 @@ function PublicFounderProfile() {
         {/* Bottom grid (Communities & Academy progress) */}
         <div className="grid gap-6 md:grid-cols-2 text-left">
           {/* Community */}
-          <div className="rounded-3xl border border-slate-850 bg-slate-900/40 p-6 shadow-lg">
-            <h3 className="font-display font-semibold text-white">Cohort Hubs & Community</h3>
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-elegant">
+            <h3 className="font-display font-semibold text-foreground">Cohort Hubs & Community</h3>
             {founder?.communities ? (
-              <div className="mt-4 flex items-center gap-4 rounded-xl bg-slate-950/30 p-4 border border-slate-850">
-                <span className="flex size-10 items-center justify-center rounded-lg bg-pink-500/10 text-pink-400">
+              <div className="mt-4 flex items-center gap-4 rounded-xl bg-muted/40 p-4 border border-border">
+                <span className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <Building className="size-5" />
                 </span>
                 <div>
-                  <h4 className="text-sm font-bold text-white">{(founder.communities as { name: string }).name}</h4>
-                  <p className="text-xs text-slate-400">{(founder.communities as { region: string }).region || "Africa"}</p>
+                  <h4 className="text-sm font-bold text-foreground">{(founder.communities as { name: string }).name}</h4>
+                  <p className="text-xs text-muted-foreground">{(founder.communities as { region: string }).region || "Africa"}</p>
                 </div>
               </div>
             ) : (
-              <p className="mt-4 text-xs text-slate-500">
+              <p className="mt-4 text-xs text-muted-foreground">
                 This founder is not currently a member of any cohort community.
               </p>
             )}
           </div>
 
           {/* Academy completed */}
-          <div className="rounded-3xl border border-slate-850 bg-slate-900/40 p-6 shadow-lg">
-            <h3 className="font-display font-semibold text-white">Completed Course Paths</h3>
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-elegant">
+            <h3 className="font-display font-semibold text-foreground">Completed Course Paths</h3>
             {enrollments.length > 0 ? (
               <div className="mt-4 space-y-2">
                 {enrollments.map((en: any) => (
-                  <div key={en.id} className="flex items-center gap-3 rounded-xl bg-slate-950/30 p-3 border border-slate-850 text-xs">
-                    <BookOpen className="size-4 text-emerald-400 shrink-0" />
-                    <span className="font-medium text-white">{en.courses?.title}</span>
+                  <div key={en.id} className="flex items-center gap-3 rounded-xl bg-muted/40 p-3 border border-border text-xs">
+                    <BookOpen className="size-4 text-primary shrink-0" />
+                    <span className="font-medium text-foreground">{en.courses?.title}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="mt-4 text-xs text-slate-500">
+              <p className="mt-4 text-xs text-muted-foreground">
                 No academy courses completed yet. Courses help increase fundability and score progression.
               </p>
             )}
@@ -500,18 +500,17 @@ function PublicFounderProfile() {
         </div>
 
         {/* Sessions Attended summary bar */}
-        <div className="rounded-3xl border border-slate-850 bg-slate-900/20 p-6 text-left shadow-lg flex items-center justify-between">
+        <div className="rounded-3xl border border-border bg-card p-6 text-left shadow-elegant flex items-center justify-between">
           <div>
-            <h3 className="font-display font-semibold text-white text-sm">Ecosystem Sessions & Workshops</h3>
-            <p className="text-xs text-slate-500 mt-0.5">Live training webinars, cohort reviews and pitch events</p>
+            <h3 className="font-display font-semibold text-foreground text-sm">Ecosystem Sessions & Workshops</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">Live training webinars, cohort reviews and pitch events</p>
           </div>
-          <div className="rounded-2xl border border-slate-800 bg-slate-950 px-4 py-2 text-center">
-            <span className="text-[9px] text-slate-500 uppercase tracking-wider block font-bold">Attended</span>
-            <span className="font-display text-lg font-black text-white">{sessionsCount} Sessions</span>
+          <div className="rounded-2xl border border-border bg-muted px-4 py-2 text-center">
+            <span className="text-[9px] text-muted-foreground uppercase tracking-wider block font-bold">Attended</span>
+            <span className="font-display text-lg font-black text-foreground">{sessionsCount} Sessions</span>
           </div>
         </div>
       </div>
     </div>
   );
 }
-

@@ -69,21 +69,21 @@ function PublicVentureProfile() {
   const country = founder?.country || "Africa";
   const bio = founder?.bio || "No description provided.";
   const website = founder?.website || "";
-
+  
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
-        <Sparkles className="size-6 animate-spin text-pink-500" />
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <Sparkles className="size-6 animate-spin text-primary" />
       </div>
     );
   }
 
   if (!founder) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4 text-center text-white">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 text-center text-foreground">
         <Logo />
         <h1 className="mt-8 text-2xl font-bold font-display">Venture Not Found</h1>
-        <p className="mt-2 text-sm text-slate-400">The venture "{slug}" could not be located on DOT.</p>
+        <p className="mt-2 text-sm text-muted-foreground">The venture "{slug}" could not be located on DOT.</p>
         <Button variant="hero" className="mt-6" asChild>
           <Link to="/">Go Home</Link>
         </Button>
@@ -92,13 +92,13 @@ function PublicVentureProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white selection:bg-pink-500/30">
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary/20">
       {/* Header */}
-      <header className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between border-b border-slate-900">
+      <header className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between border-b border-border">
         <Link to="/">
           <Logo />
         </Link>
-        <Button variant="outline" size="sm" className="border-slate-800 text-slate-300 hover:text-white" asChild>
+        <Button variant="outline" size="sm" className="border-border text-muted-foreground hover:text-foreground hover:bg-muted" asChild>
           <Link to="/auth">Validate Your Venture</Link>
         </Button>
       </header>
@@ -106,35 +106,35 @@ function PublicVentureProfile() {
       {/* Content Container */}
       <div className="mx-auto max-w-4xl px-4 py-10 md:py-16 space-y-12">
         {/* Venture Jumbotron */}
-        <div className="rounded-3xl border border-slate-850 bg-slate-900/60 p-6 md:p-10 relative overflow-hidden backdrop-blur-xl">
-          <div className="absolute -bottom-24 -left-24 size-48 rounded-full bg-indigo-500/5 blur-3xl"></div>
+        <div className="rounded-3xl border border-border bg-card p-6 md:p-10 relative overflow-hidden backdrop-blur-xl shadow-elegant">
+          <div className="absolute -bottom-24 -left-24 size-48 rounded-full bg-primary/5 blur-3xl"></div>
           
           <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-8">
             <div className="space-y-4 text-center md:text-left">
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                <span className="rounded-full bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 text-xs font-semibold text-indigo-400">
+                <span className="rounded-full bg-primary/10 border border-primary/20 px-3 py-1 text-xs font-semibold text-primary">
                   {stage} Stage
                 </span>
-                <span className="rounded-full bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-400">
+                <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
                   {industry}
                 </span>
               </div>
               
-              <h1 className="font-display text-4xl font-extrabold text-white">
+              <h1 className="font-display text-4xl font-extrabold text-foreground">
                 {founder.venture_name}
               </h1>
               
-              <p className="text-sm text-slate-300 leading-relaxed max-w-2xl">
+              <p className="text-sm text-foreground/80 leading-relaxed max-w-2xl">
                 {bio}
               </p>
 
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 text-xs text-slate-400 pt-2">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 text-xs text-muted-foreground pt-2">
                 {country && <span>📍 {country}</span>}
                 {founder.communities && (
                   <span>🤝 Cohort: {(founder.communities as { name: string }).name}</span>
                 )}
                 {website && (
-                  <a href={website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-indigo-400 hover:underline">
+                  <a href={website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary hover:underline">
                     <Globe className="size-3.5" /> Website <ArrowUpRight className="size-3" />
                   </a>
                 )}
@@ -143,9 +143,9 @@ function PublicVentureProfile() {
 
             {/* Logo/Initial */}
             {founder.logo_url ? (
-              <img src={founder.logo_url} alt={founder.venture_name ?? ""} className="size-24 rounded-2xl border border-slate-800 object-cover shrink-0" />
+              <img src={founder.logo_url} alt={founder.venture_name ?? ""} className="size-24 rounded-2xl border border-border object-cover shrink-0" />
             ) : (
-              <span className="flex size-24 shrink-0 items-center justify-center rounded-2xl bg-slate-800 border border-slate-700 text-3xl font-black text-slate-400">
+              <span className="flex size-24 shrink-0 items-center justify-center rounded-2xl bg-muted border border-border text-3xl font-black text-muted-foreground">
                 {(founder.venture_name || "?").charAt(0).toUpperCase()}
               </span>
             )}
@@ -154,78 +154,78 @@ function PublicVentureProfile() {
 
         {/* Scores */}
         <div className="grid gap-6 sm:grid-cols-3">
-          <div className="rounded-2xl border border-slate-850 bg-slate-900/40 p-6 text-center">
-            <Gauge className="size-8 text-emerald-400 mx-auto" />
-            <h3 className="text-xs text-slate-400 uppercase tracking-widest font-semibold mt-3">Vantage Score</h3>
-            <p className="font-display text-3xl font-black text-white mt-1">{vantagePoint}</p>
-            <p className="text-[10px] text-slate-500 mt-1">out of 1000</p>
+          <div className="rounded-2xl border border-border bg-card p-6 text-center shadow-elegant">
+            <Gauge className="size-8 text-primary mx-auto" />
+            <h3 className="text-xs text-muted-foreground uppercase tracking-widest font-semibold mt-3">Vantage Score</h3>
+            <p className="font-display text-3xl font-black text-foreground mt-1">{vantagePoint}</p>
+            <p className="text-[10px] text-muted-foreground/60 mt-1">out of 1000</p>
           </div>
-          <div className="rounded-2xl border border-slate-850 bg-slate-900/40 p-6 text-center">
-            <TrendingUp className="size-8 text-indigo-400 mx-auto" />
-            <h3 className="text-xs text-slate-400 uppercase tracking-widest font-semibold mt-3">Venture Valuation</h3>
-            <p className="font-display text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-pink-400 mt-1.5">
+          <div className="rounded-2xl border border-border bg-card p-6 text-center shadow-elegant">
+            <TrendingUp className="size-8 text-primary mx-auto" />
+            <h3 className="text-xs text-muted-foreground uppercase tracking-widest font-semibold mt-3">Venture Valuation</h3>
+            <p className="font-display text-2xl font-black text-gradient mt-1.5">
               {formatNaira(currentValuation)}
             </p>
-            <p className="text-[10px] text-slate-500 mt-1">Current Base Valuation</p>
+            <p className="text-[10px] text-muted-foreground/60 mt-1">Current Base Valuation</p>
           </div>
-          <div className="rounded-2xl border border-slate-850 bg-slate-900/40 p-6 text-center">
-            <Sparkles className="size-8 text-yellow-400 mx-auto" />
-            <h3 className="text-xs text-slate-400 uppercase tracking-widest font-semibold mt-3">Fundability Score</h3>
-            <p className="font-display text-3xl font-black text-white mt-1">{fundability}%</p>
-            <p className="text-[10px] text-slate-500 mt-1">Investor Readiness: {investmentReadiness}%</p>
+          <div className="rounded-2xl border border-border bg-card p-6 text-center shadow-elegant">
+            <Sparkles className="size-8 text-accent mx-auto" />
+            <h3 className="text-xs text-muted-foreground uppercase tracking-widest font-semibold mt-3">Fundability Score</h3>
+            <p className="font-display text-3xl font-black text-foreground mt-1">{fundability}%</p>
+            <p className="text-[10px] text-muted-foreground/60 mt-1">Investor Readiness: {investmentReadiness}%</p>
           </div>
         </div>
 
         {/* Details & Founders */}
         <div className="grid gap-6 md:grid-cols-2">
           {/* Key Stats */}
-          <div className="rounded-2xl border border-slate-850 bg-slate-900/40 p-6 space-y-4">
-            <h3 className="font-display font-semibold text-white">Venture Statistics</h3>
+          <div className="rounded-2xl border border-border bg-card p-6 space-y-4 shadow-elegant">
+            <h3 className="font-display font-semibold text-foreground">Venture Statistics</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-400">Potential Valuation</span>
-                <span className="font-bold text-white">{formatNaira(potentialValuation)}</span>
+                <span className="text-muted-foreground">Potential Valuation</span>
+                <span className="font-bold text-foreground">{formatNaira(potentialValuation)}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-400">Unicorn Potential</span>
-                <span className="font-bold text-pink-400">{typeof unicornPotential === 'number' ? unicornPotential.toFixed(1) : '0.0'}%</span>
+                <span className="text-muted-foreground">Unicorn Potential</span>
+                <span className="font-bold text-primary">{typeof unicornPotential === 'number' ? unicornPotential.toFixed(1) : '0.0'}%</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-400">Investment Readiness</span>
-                <span className="font-bold text-white">{investmentReadiness}%</span>
+                <span className="text-muted-foreground">Investment Readiness</span>
+                <span className="font-bold text-foreground">{investmentReadiness}%</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-400">Founder Archetype</span>
-                <span className="font-bold text-yellow-400">{founder.founder_archetype || "Venture Builder"}</span>
+                <span className="text-muted-foreground">Founder Archetype</span>
+                <span className="font-bold text-primary">{founder.founder_archetype || "Venture Builder"}</span>
               </div>
             </div>
           </div>
 
           {/* Founder Bio */}
-          <div className="rounded-2xl border border-slate-850 bg-slate-900/40 p-6 flex flex-col justify-between">
+          <div className="rounded-2xl border border-border bg-card p-6 flex flex-col justify-between shadow-elegant">
             <div>
-              <h3 className="font-display font-semibold text-white">The Founding Team</h3>
+              <h3 className="font-display font-semibold text-foreground">The Founding Team</h3>
               {founder.profiles ? (
                 <div className="mt-4 flex items-center gap-3">
                   {founder.profiles.avatar_url ? (
-                    <img src={founder.profiles.avatar_url} alt="" className="size-10 rounded-full border border-slate-800 object-cover" />
+                    <img src={founder.profiles.avatar_url} alt="" className="size-10 rounded-full border border-border object-cover" />
                   ) : (
-                    <span className="flex size-10 items-center justify-center rounded-full bg-slate-800 text-sm font-bold text-white uppercase">
+                    <span className="flex size-10 items-center justify-center rounded-full bg-muted text-sm font-bold text-foreground uppercase">
                       {(founder.profiles.name || "?").charAt(0)}
                     </span>
                   )}
                   <div>
-                    <h4 className="text-sm font-bold text-white">{founder.profiles.name}</h4>
-                    <p className="text-[10px] text-slate-400">Owner & Chief Executive</p>
+                    <h4 className="text-sm font-bold text-foreground">{founder.profiles.name}</h4>
+                    <p className="text-[10px] text-muted-foreground">Owner & Chief Executive</p>
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-slate-400 mt-2">No founder profile linked.</p>
+                <p className="text-sm text-muted-foreground mt-2">No founder profile linked.</p>
               )}
             </div>
 
-            <div className="mt-6 border-t border-slate-800/60 pt-4 text-center">
-              <Button variant="link" className="text-indigo-400 text-xs" asChild>
+            <div className="mt-6 border-t border-border pt-4 text-center">
+              <Button variant="link" className="text-primary text-xs" asChild>
                 <Link to="/founder/$dotId" params={{ dotId: founder.profiles?.dot_id || founder.user_id }}>
                   View Founder Profile <ArrowUpRight className="size-3" />
                 </Link>

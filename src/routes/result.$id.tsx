@@ -353,10 +353,10 @@ function ResultPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
         <div className="flex flex-col items-center gap-2">
-          <Sparkles className="size-8 animate-spin text-pink-500" />
-          <p className="text-sm font-semibold tracking-wider text-slate-400 uppercase">Generating Wrapped Recap...</p>
+          <Sparkles className="size-8 animate-spin text-primary" />
+          <p className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">Generating Wrapped Recap...</p>
         </div>
       </div>
     );
@@ -364,10 +364,10 @@ function ResultPage() {
 
   if (!assessment) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4 text-center text-white">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 text-center text-foreground">
         <Logo />
         <h1 className="mt-8 text-2xl font-bold font-display">Recap Not Found</h1>
-        <p className="mt-2 text-sm text-slate-400">This assessment recap may have been removed or does not exist.</p>
+        <p className="mt-2 text-sm text-muted-foreground">This assessment recap may have been removed or does not exist.</p>
         <Button variant="hero" className="mt-6" asChild>
           <Link to="/">Go Home</Link>
         </Button>
@@ -376,13 +376,13 @@ function ResultPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white selection:bg-pink-500/30">
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary/20">
       {/* Header */}
-      <header className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between border-b border-slate-900">
+      <header className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between border-b border-border">
         <Link to="/">
           <Logo />
         </Link>
-        <span className="rounded-full bg-slate-900 border border-slate-800 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-pink-400">
+        <span className="rounded-full bg-muted border border-border px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-primary">
           V2 Valuation Network
         </span>
       </header>
@@ -391,7 +391,7 @@ function ResultPage() {
       <div className="mx-auto max-w-6xl px-4 py-8 md:py-16 grid gap-12 lg:grid-cols-12 items-center">
         {/* Left Side: Spotify Wrapped Slider */}
         <div className="lg:col-span-6 flex flex-col items-center">
-          <div className="w-full max-w-[380px] rounded-[32px] overflow-hidden bg-slate-900 border-4 border-slate-800 shadow-2xl relative">
+          <div className="w-full max-w-[380px] rounded-[32px] overflow-hidden bg-card border-4 border-border shadow-2xl relative">
             {/* Slide indicators */}
             <div className="absolute top-4 left-4 right-4 flex gap-1.5 z-10">
               {slides.map((_, i) => (
@@ -422,31 +422,31 @@ function ResultPage() {
               </div>
 
               {/* Card Footer branding */}
-              <div className="border-t border-slate-800/80 pt-4 flex items-center justify-between">
+              <div className="border-t border-slate-800/40 pt-4 flex items-center justify-between">
                 <span className="text-[9px] font-semibold text-slate-500">dotlive.cv/result/{id}</span>
                 <span className="text-[10px] font-black tracking-tighter text-white">DOT.</span>
               </div>
             </div>
           </div>
-
+ 
           {/* Slider controls */}
           <div className="mt-6 flex items-center gap-6">
             <Button
               variant="outline"
               size="icon"
-              className="rounded-full border-slate-800 bg-slate-900 text-slate-400 hover:text-white"
+              className="rounded-full border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted"
               onClick={() => setActiveSlide((prev) => Math.max(0, prev - 1))}
               disabled={activeSlide === 0}
             >
               <ChevronLeft className="size-4" />
             </Button>
-            <span className="text-xs font-semibold text-slate-500">
+            <span className="text-xs font-semibold text-muted-foreground">
               Slide {activeSlide + 1} of {slides.length}
             </span>
             <Button
               variant="outline"
               size="icon"
-              className="rounded-full border-slate-800 bg-slate-900 text-slate-400 hover:text-white"
+              className="rounded-full border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted"
               onClick={() => setActiveSlide((prev) => Math.min(slides.length - 1, prev + 1))}
               disabled={activeSlide === slides.length - 1}
             >
@@ -454,25 +454,25 @@ function ResultPage() {
             </Button>
           </div>
         </div>
-
+ 
         {/* Right Side: Virality Sharing controls & CTA */}
         <div className="lg:col-span-6 space-y-8">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-pink-500/10 border border-pink-500/20 px-3 py-1 text-xs font-medium text-pink-400">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-3 py-1 text-xs font-medium text-primary">
               <Sparkles className="size-3 animate-pulse" />
               Startups go viral
             </span>
-            <h1 className="mt-4 font-display text-4xl font-black leading-tight sm:text-5xl">
+            <h1 className="mt-4 font-display text-4xl font-black leading-tight sm:text-5xl text-foreground">
               Share Your <span className="text-gradient">Venture Wrapped.</span>
             </h1>
-            <p className="mt-3 text-sm text-slate-400 max-w-lg">
+            <p className="mt-3 text-sm text-muted-foreground max-w-lg">
               Let the community know your score! Copy your custom link or share directly to your preferred platforms in one click.
             </p>
           </div>
-
+ 
           {/* Share Format Selector */}
           <div className="space-y-3">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Share Card Format</label>
+            <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Share Card Format</label>
             <div className="grid grid-cols-4 gap-2 max-w-md">
               {[
                 { id: "story", label: "IG Story" },
@@ -485,8 +485,8 @@ function ResultPage() {
                   onClick={() => setShareFormat(f.id as ShareFormat)}
                   className={`rounded-lg border px-3 py-2 text-xs font-semibold transition-colors ${
                     shareFormat === f.id
-                      ? "border-pink-500 bg-pink-500/15 text-pink-400"
-                      : "border-slate-800 bg-slate-900 text-slate-400 hover:border-slate-700"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-card text-muted-foreground hover:border-primary/50"
                   }`}
                 >
                   {f.label}
@@ -494,12 +494,13 @@ function ResultPage() {
               ))}
             </div>
           </div>
-
+ 
           {/* Viral CTA Buttons */}
           <div className="grid gap-3 max-w-md">
             <Button
               onClick={downloadCardAsImage}
-              className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:opacity-90 text-white font-bold py-6 text-sm shadow-lg shadow-pink-500/20"
+              variant="hero"
+              className="w-full font-bold py-6 text-sm shadow-soft"
             >
               <Download className="mr-2 size-4.5" /> Download Share Card (PNG)
             </Button>
@@ -507,41 +508,41 @@ function ResultPage() {
             <div className="grid grid-cols-2 gap-2">
               <Button
                 onClick={shareWhatsApp}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-5"
+                className="w-full bg-[#128C7E] hover:bg-[#075E54] text-white font-bold text-xs py-5"
               >
                 WhatsApp
               </Button>
               <Button
                 onClick={shareLinkedIn}
-                className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-5"
+                className="w-full bg-[#0A66C2] hover:bg-[#004182] text-white font-bold text-xs py-5"
               >
                 LinkedIn
               </Button>
             </div>
-
+ 
             <div className="grid grid-cols-2 gap-2">
               <Button
                 onClick={shareTwitter}
-                className="w-full bg-black hover:bg-slate-900 border border-slate-800 text-white font-bold text-xs py-5"
+                className="w-full bg-foreground hover:bg-foreground/90 text-background font-bold text-xs py-5"
               >
                 Twitter / X
               </Button>
               <Button
                 onClick={copyLink}
                 variant="outline"
-                className="w-full border-slate-800 bg-slate-900 text-slate-300 hover:text-white text-xs py-5"
+                className="w-full border-border bg-card text-muted-foreground hover:text-foreground text-xs py-5"
               >
                 <Copy className="mr-1.5 size-3.5" /> Copy Link
               </Button>
             </div>
           </div>
-
-          <div className="h-px bg-slate-900 max-w-md"></div>
-
+ 
+          <div className="h-px bg-border max-w-md"></div>
+ 
           {/* Assess Call-To-Action Loop */}
-          <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-950 p-6 max-w-md">
-            <h3 className="font-display font-semibold text-white">How does your venture measure up?</h3>
-            <p className="mt-1 text-xs text-slate-400 leading-relaxed">
+          <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-6 max-w-md shadow-sm">
+            <h3 className="font-display font-semibold text-foreground">How does your venture measure up?</h3>
+            <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
               Complete your assessment on Africa's Venture Valuation Network. Get your fundability score, unicorn potential, and a customized roadmap.
             </p>
             <Button variant="hero" className="mt-4 w-full" asChild>
