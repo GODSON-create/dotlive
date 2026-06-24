@@ -16,6 +16,7 @@ interface Profile {
   email: string | null;
   phone: string | null;
   avatar_url: string | null;
+  dot_id: string | null;
 }
 
 interface AuthContextValue {
@@ -42,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loadUserData = useCallback(async (uid: string) => {
     const [{ data: prof }, { data: roleRows }] = await Promise.all([
-      supabase.from("profiles").select("id, name, email, phone, avatar_url").eq("id", uid).maybeSingle(),
+      supabase.from("profiles").select("id, name, email, phone, avatar_url, dot_id").eq("id", uid).maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", uid),
     ]);
     setProfile((prof as Profile) ?? null);

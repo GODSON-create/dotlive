@@ -198,24 +198,21 @@ export function computeVantage(answers: VantageAnswers): VantageResult {
     .map((r) => NEXT_ACTION_MAP[r.key])
     .filter(Boolean);
 
-  // Valuation Engine Logic
-  const baseCurrentValuation = 3000000; // ₦3,000,000 base
-  const revenueFactor = (categoryScores.revenue ?? 0) * 150000;
-  const validationFactor = (categoryScores.validation ?? 0) * 120000;
-  const productFactor = (categoryScores.product ?? 0) * 80000;
-  const teamFounderFactor = ((categoryScores.team ?? 0) + (categoryScores.founder ?? 0)) * 50000;
-  
-  let currentValuation = Math.round((baseCurrentValuation + revenueFactor + validationFactor + productFactor + teamFounderFactor) / 100000) * 100000;
-  if (currentValuation > 150000000) currentValuation = 150000000; // Capped at ₦150M for early stage
+  // Valuation Engine Logic: Scales up to ₦5.0B at 940 score, and exponentially rises to ₦3.0T ($2.0B USD) at 1000 score
+  let currentValuation = 1500000;
+  if (vantagePoint >= 940) {
+    const factor = (vantagePoint - 940) / 60; // 0 to 1
+    currentValuation = 5000000000 + Math.pow(factor, 4) * 2995000000000;
+  } else {
+    const factor = (vantagePoint - 300) / 640; // 0 to 1
+    currentValuation = 1500000 + Math.pow(Math.max(0, factor), 3) * 4998500000;
+  }
+  currentValuation = Math.round(currentValuation / 100000) * 100000;
 
-  const basePotentialValuation = 100000000; // ₦100,000,000 base potential
-  const marketFactor = (categoryScores.market ?? 0) * 3000000;
-  const scalabilityFactor = (categoryScores.scalability ?? 0) * 2000000;
-  const potentialProductFactor = (categoryScores.product ?? 0) * 1500000;
-  const vantageBoost = vantagePoint * 100000;
-  
-  let potentialValuation = Math.round((basePotentialValuation + marketFactor + scalabilityFactor + potentialProductFactor + vantageBoost) / 1000000) * 1000000;
-  if (potentialValuation > 1000000000) potentialValuation = 1000000000; // Capped at ₦1B
+  // Potential valuation - scales up to 10 Trillion NGN maximum based on market reach score
+  const simMarketEquivalent = ((categoryScores.market ?? 0) / 100) * 2;
+  const rawPotential = currentValuation * (3 + (simMarketEquivalent * 1.5)) + 100000000;
+  let potentialValuation = Math.min(10000000000000, Math.max(50000000, Math.round(rawPotential / 10000000) * 10000000));
 
   const unicornPotential = Math.round(((categoryScores.scalability * 0.4 + categoryScores.market * 0.3 + categoryScores.product * 0.2 + categoryScores.team * 0.1) * (vantagePoint / 1000) / 12) * 10) / 10;
 

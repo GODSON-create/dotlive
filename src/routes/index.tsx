@@ -474,10 +474,10 @@ function LandingPage() {
                 {/* Mock Leaderboard rows */}
                 <div className="space-y-2">
                   {[
-                    { rank: 1, name: "University of Cape Town", score: 894, val: "₦1.2B", rate: "+4.2%" },
-                    { rank: 2, name: "University of Ibadan", score: 862, val: "₦850M", rate: "+12.8%" },
-                    { rank: 3, name: "Covenant University", score: 840, val: "₦720M", rate: "+8.5%" },
-                    { rank: 4, name: "Ashesi University", score: 795, val: "₦540M", rate: "+6.1%" },
+                    { rank: 1, name: "Wigwe University", score: 940, val: "₦5.0B", rate: "+18.4%" },
+                    { rank: 2, name: "University of Cape Town", score: 894, val: "₦1.2B", rate: "+4.2%" },
+                    { rank: 3, name: "University of Ibadan", score: 862, val: "₦850M", rate: "+12.8%" },
+                    { rank: 4, name: "Covenant University", score: 840, val: "₦720M", rate: "+8.5%" },
                   ].map((row) => (
                     <div key={row.rank} className="flex items-center justify-between p-3 rounded-xl bg-slate-900/20 border border-slate-900/60 hover:bg-slate-900/40 transition-colors">
                       <div className="flex items-center gap-3">

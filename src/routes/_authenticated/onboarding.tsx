@@ -19,7 +19,8 @@ import {
   Globe,
   Building,
   School,
-  MapPin
+  MapPin,
+  Download,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -257,6 +258,171 @@ function OnboardingPage() {
     }
     
     window.open(link, "_blank");
+  }
+
+  function downloadCardAsImage() {
+    if (!resultScore) return;
+    const canvas = document.createElement("canvas");
+    canvas.width = 1080;
+    canvas.height = 1920;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // 1. Background Gradient
+    ctx.fillStyle = "#020617"; // slate-950
+    ctx.fillRect(0, 0, 1080, 1920);
+
+    // 2. Neon Glow Circles
+    const pinkGlow = ctx.createRadialGradient(900, 200, 50, 900, 200, 600);
+    pinkGlow.addColorStop(0, "rgba(219, 39, 119, 0.15)");
+    pinkGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+    ctx.fillStyle = pinkGlow;
+    ctx.beginPath();
+    ctx.arc(900, 200, 600, 0, Math.PI * 2);
+    ctx.fill();
+
+    const indigoGlow = ctx.createRadialGradient(100, 1700, 50, 100, 1700, 600);
+    indigoGlow.addColorStop(0, "rgba(99, 102, 241, 0.12)");
+    indigoGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+    ctx.fillStyle = indigoGlow;
+    ctx.beginPath();
+    ctx.arc(100, 1700, 600, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 3. Grid overlay lines
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.02)";
+    ctx.lineWidth = 1;
+    for (let x = 120; x < 1080; x += 120) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, 1920);
+      ctx.stroke();
+    }
+    for (let y = 120; y < 1920; y += 120) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(1080, y);
+      ctx.stroke();
+    }
+
+    // 4. Header branding
+    ctx.fillStyle = "#64748b"; // slate-500
+    ctx.font = "bold 26px sans-serif";
+    ctx.letterSpacing = "6px";
+    ctx.fillText("DOT WRAPPED", 80, 150);
+
+    ctx.fillStyle = "#ec4899"; // pink-500
+    ctx.font = "bold 32px sans-serif";
+    ctx.textAlign = "right";
+    ctx.fillText(`#${profile?.dot_id || "FOUNDER"}`, 1000, 150);
+
+    // 5. Title info
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "800 68px sans-serif";
+    ctx.fillText(name || "Founder", 80, 340);
+
+    ctx.fillStyle = "#94a3b8"; // slate-400
+    ctx.font = "500 36px sans-serif";
+    ctx.fillText(`Building ${startupName || "Venture"} (${industry || "Tech"})`, 80, 400);
+
+    // Rounded rectangle helper
+    const drawRoundRect = (x: number, y: number, w: number, h: number, r: number, fill: string, stroke: string | null = null, strokeW = 1) => {
+      ctx.fillStyle = fill;
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, r);
+      ctx.fill();
+      if (stroke) {
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = strokeW;
+        ctx.stroke();
+      }
+    };
+
+    // SECTION 1: Archetype Card
+    drawRoundRect(80, 480, 920, 200, 28, "#0f172a", "rgba(219, 39, 119, 0.2)", 2);
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "600 24px sans-serif";
+    ctx.fillText("FOUNDER ARCHETYPE", 120, 545);
+
+    const archGrad = ctx.createLinearGradient(120, 0, 800, 0);
+    archGrad.addColorStop(0, "#ec4899"); // pink-500
+    archGrad.addColorStop(1, "#eab308"); // yellow-500
+    ctx.fillStyle = archGrad;
+    ctx.font = "bold 52px sans-serif";
+    ctx.fillText(resultScore.founderArchetype || "Founder", 120, 625);
+
+    // SECTION 2: Valuation Card
+    drawRoundRect(80, 720, 920, 260, 28, "#0f172a", "rgba(99, 102, 241, 0.2)", 2);
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "600 24px sans-serif";
+    ctx.fillText("ESTIMATED STARTUP VALUE", 120, 785);
+
+    const valGrad = ctx.createLinearGradient(120, 0, 800, 0);
+    valGrad.addColorStop(0, "#818cf8"); // indigo-400
+    valGrad.addColorStop(0.5, "#c084fc"); // purple-400
+    valGrad.addColorStop(1, "#f472b6"); // pink-400
+    ctx.fillStyle = valGrad;
+    ctx.font = "800 84px sans-serif";
+    ctx.fillText(formatNaira(resultScore.currentValuation), 120, 895);
+
+    // SECTION 3: Score & Potential
+    drawRoundRect(80, 1020, 440, 240, 28, "#0f172a", "rgba(255, 255, 255, 0.05)", 1.5);
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "600 24px sans-serif";
+    ctx.fillText("DOT SCORE", 120, 1080);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "800 76px sans-serif";
+    ctx.fillText(`${resultScore.vantagePoint}`, 120, 1180);
+    const scoreWidth = ctx.measureText(`${resultScore.vantagePoint}`).width;
+    ctx.fillStyle = "#475569"; // slate-600
+    ctx.font = "600 32px sans-serif";
+    ctx.fillText("/ 1000", 120 + scoreWidth + 10, 1180);
+
+    drawRoundRect(560, 1020, 440, 240, 28, "#0f172a", "rgba(255, 255, 255, 0.05)", 1.5);
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "600 24px sans-serif";
+    ctx.fillText("VALUATION POTENTIAL", 600, 1080);
+    ctx.fillStyle = "#e2e8f0";
+    ctx.font = "800 48px sans-serif";
+    ctx.fillText(formatNaira(resultScore.potentialValuation), 600, 1180);
+
+    // SECTION 4: Rank Badge
+    drawRoundRect(80, 1300, 920, 150, 28, "#1e1b4b", "rgba(99, 102, 241, 0.3)", 2);
+    ctx.fillStyle = "#eab308";
+    ctx.font = "bold 34px sans-serif";
+    ctx.fillText("🏆", 120, 1390);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 36px sans-serif";
+    ctx.fillText(`Top ${resultScore.rankPercent || 15}% of African Founders`, 190, 1390);
+
+    // SECTION 5: Scan Box
+    drawRoundRect(80, 1490, 920, 210, 28, "rgba(15, 23, 42, 0.6)", "rgba(255, 255, 255, 0.03)", 1.5);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 32px sans-serif";
+    ctx.fillText("Find out what your startup is worth.", 120, 1560);
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "500 26px sans-serif";
+    ctx.fillText("Discover your DOT Score and join the network at", 120, 1615);
+    ctx.fillStyle = "#ec4899";
+    ctx.font = "bold 30px sans-serif";
+    ctx.fillText("dotlive.cv", 120, 1665);
+
+    // 6. Footer branding
+    ctx.fillStyle = "#64748b";
+    ctx.font = "500 24px sans-serif";
+    ctx.fillText(`dotlive.cv/result/${resultScore.assessmentId}`, 80, 1830);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 32px sans-serif";
+    ctx.textAlign = "right";
+    ctx.fillText("DOT.", 1000, 1830);
+
+    // 7. Trigger download
+    const link = document.createElement("a");
+    link.download = `${(startupName || "venture").toLowerCase().replace(/[^a-z0-9]/g, "-")}-wrapped-card.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
   }
 
   if (loading) {
@@ -610,24 +776,32 @@ function OnboardingPage() {
             {/* Social Sharing buttons */}
             <div className="space-y-3">
               <p className="text-xs font-bold text-slate-400">Share your result & build competition:</p>
-              <div className="flex gap-2">
+              
+              <Button
+                onClick={downloadCardAsImage}
+                className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:opacity-90 text-white font-bold py-6 text-sm shadow-lg shadow-pink-500/20"
+              >
+                <Download className="mr-2 size-4.5" /> Download Share Card (PNG)
+              </Button>
+
+              <div className="grid grid-cols-3 gap-2">
                 <Button 
                   onClick={() => handleShare("linkedin")} 
-                  className="flex-1 bg-[#0077b5] text-white hover:bg-[#0077b5]/90 text-xs font-bold py-5"
+                  className="bg-[#0077b5] text-white hover:bg-[#0077b5]/90 text-xs font-bold py-4"
                 >
-                  <Linkedin className="size-4 mr-2" /> LinkedIn
+                  LinkedIn
                 </Button>
                 <Button 
                   onClick={() => handleShare("whatsapp")} 
-                  className="flex-1 bg-[#25d366] text-white hover:bg-[#25d366]/90 text-xs font-bold py-5"
+                  className="bg-[#25d366] text-white hover:bg-[#25d366]/90 text-xs font-bold py-4"
                 >
-                  <MessageSquare className="size-4 mr-2" /> WhatsApp
+                  WhatsApp
                 </Button>
                 <Button 
                   onClick={() => handleShare("twitter")} 
-                  className="flex-1 bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold py-5 border border-slate-800"
+                  className="bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold py-4 border border-slate-800"
                 >
-                  <Share2 className="size-4 mr-2" /> X / Twitter
+                  X / Twitter
                 </Button>
               </div>
 
