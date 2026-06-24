@@ -14,6 +14,7 @@ import {
   Shield,
   LogOut,
   Loader2,
+  Sparkles,
 } from "lucide-react";
 import { Logo } from "@/components/site/Logo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -38,6 +39,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Academy", to: "/academy", icon: BookOpen, roles: ["founder"] },
   { label: "Sessions", to: "/sessions", icon: CalendarCheck },
   { label: "Pitchathons", to: "/pitchathons", icon: Trophy, roles: ["founder"] },
+  { label: "Spotlight", to: "/spotlight", icon: Sparkles, roles: ["founder"] },
   { label: "DOT Demo", to: "/demo", icon: Building2 },
   { label: "Community", to: "/community", icon: Users, roles: ["community_leader"] },
   { label: "Investor Portal", to: "/investor", icon: Briefcase, roles: ["investor"] },

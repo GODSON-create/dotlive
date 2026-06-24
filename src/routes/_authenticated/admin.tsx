@@ -24,6 +24,10 @@ import {
   Wallet as WalletIcon,
   Building2,
   Sparkles,
+  MousePointerClick,
+  X,
+  Check,
+  Flame,
 } from "lucide-react";
 import { AppShell } from "@/components/app/AppShell";
 import { Button } from "@/components/ui/button";
@@ -44,6 +48,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { formatDot, formatNaira, ROLE_LABELS, type AppRole } from "@/lib/constants";
 import { elevateUser, revokeAdmin, claimSuperAdmin } from "@/lib/admin.functions";
+import { getAdminCampaigns, updateCampaignStatus } from "@/lib/spotlight.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -106,6 +111,7 @@ function AdminPage() {
           <TabsTrigger value="reserve">Reserve</TabsTrigger>
           <TabsTrigger value="payments">Payments</TabsTrigger>
           <TabsTrigger value="content">Content</TabsTrigger>
+          <TabsTrigger value="spotlight">Spotlight Control</TabsTrigger>
           {isSuperAdmin && <TabsTrigger value="roles">Roles & Audit</TabsTrigger>}
         </TabsList>
         <TabsContent value="overview"><OverviewTab /></TabsContent>
@@ -113,6 +119,7 @@ function AdminPage() {
         <TabsContent value="reserve"><ReserveTab /></TabsContent>
         <TabsContent value="payments"><PaymentsTab /></TabsContent>
         <TabsContent value="content"><ContentTab /></TabsContent>
+        <TabsContent value="spotlight"><SpotlightTab /></TabsContent>
         {isSuperAdmin && (
           <TabsContent value="roles"><RolesTab /></TabsContent>
         )}
@@ -1207,6 +1214,333 @@ function RecordManager({
               Save
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+/* ===================== Spotlight Control (Admin) ===================== */
+
+function SpotlightTab() {
+  const qc = useQueryClient();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
+  
+  const [status, setStatus] = useState<any>("pending");
+  const [assignedTeam, setAssignedTeam] = useState("");
+  const [publishedContent, setPublishedContent] = useState("");
+  const [impressions, setImpressions] = useState(0);
+  const [clicks, setClicks] = useState(0);
+  const [leads, setLeads] = useState(0);
+  const [saving, setSaving] = useState(false);
+
+  const updateFn = useServerFn(updateCampaignStatus);
+
+  const { data: campaigns = [], isLoading } = useQuery({
+    queryKey: ["admin-spotlight-campaigns"],
+    queryFn: async () => {
+      return getAdminCampaigns();
+    },
+  });
+
+  const filteredCampaigns = useMemo(() => {
+    return campaigns.filter((c: any) =>
+      c.venture_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (c.profiles?.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (c.profiles?.email || "").toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [campaigns, searchTerm]);
+
+  const metrics = useMemo(() => {
+    return campaigns.reduce(
+      (acc: any, c: any) => {
+        if (c.status !== "rejected") {
+          acc.revenue += Number(c.cost_dot) || 0;
+        }
+        if (c.status === "active" || c.status === "completed") {
+          acc.activeCount += 1;
+        }
+        acc.impressions += c.impressions || 0;
+        acc.clicks += c.clicks || 0;
+        acc.leads += c.leads_generated || 0;
+        return acc;
+      },
+      { revenue: 0, activeCount: 0, impressions: 0, clicks: 0, leads: 0 }
+    );
+  }, [campaigns]);
+
+  function openReview(c: any) {
+    setSelectedCampaign(c);
+    setStatus(c.status);
+    setAssignedTeam(c.assigned_team_member || "");
+    setPublishedContent(c.published_content || "");
+    setImpressions(c.impressions || 0);
+    setClicks(c.clicks || 0);
+    setLeads(c.leads_generated || 0);
+  }
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    if (!selectedCampaign) return;
+    setSaving(true);
+    try {
+      await updateFn({
+        data: {
+          campaignId: selectedCampaign.id,
+          status,
+          assignedTeamMember: assignedTeam.trim() || null,
+          publishedContent: publishedContent.trim() || null,
+          impressions,
+          clicks,
+          leadsGenerated: leads,
+        },
+      });
+      toast.success("Campaign updated successfully!");
+      setSelectedCampaign(null);
+      qc.invalidateQueries({ queryKey: ["admin-spotlight-campaigns"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update campaign");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="space-y-6 mt-6">
+      {/* Metrics Cards */}
+      <div className="grid gap-4 sm:grid-cols-5">
+        <div className="rounded-2xl border border-slate-900 bg-slate-950/40 p-4">
+          <span className="text-[10px] font-bold text-slate-500 uppercase">Spotlight Revenue</span>
+          <p className="mt-2 font-display text-lg font-black text-white">{formatDot(metrics.revenue)} DOT</p>
+        </div>
+        <div className="rounded-2xl border border-slate-900 bg-slate-950/40 p-4">
+          <span className="text-[10px] font-bold text-slate-500 uppercase">Featured Ventures</span>
+          <p className="mt-2 font-display text-lg font-black text-white">{metrics.activeCount}</p>
+        </div>
+        <div className="rounded-2xl border border-slate-900 bg-slate-950/40 p-4">
+          <span className="text-[10px] font-bold text-slate-500 uppercase">Total Impressions</span>
+          <p className="mt-2 font-display text-lg font-black text-white">{metrics.impressions.toLocaleString()}</p>
+        </div>
+        <div className="rounded-2xl border border-slate-900 bg-slate-950/40 p-4">
+          <span className="text-[10px] font-bold text-slate-500 uppercase">Total Clicks</span>
+          <p className="mt-2 font-display text-lg font-black text-white">{metrics.clicks.toLocaleString()}</p>
+        </div>
+        <div className="rounded-2xl border border-slate-900 bg-slate-950/40 p-4">
+          <span className="text-[10px] font-bold text-slate-500 uppercase">Leads Generated</span>
+          <p className="mt-2 font-display text-lg font-black text-white">{metrics.leads.toLocaleString()}</p>
+        </div>
+      </div>
+
+      {/* Search and Table */}
+      <div className="rounded-3xl border border-slate-900 bg-slate-950/40 p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <h3 className="font-display font-bold text-white text-base">Venture Spotlight Requests</h3>
+          <div className="relative max-w-xs w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+            <Input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Filter by venture or founder..."
+              className="pl-9 bg-slate-905 border-slate-800 text-white text-xs"
+            />
+          </div>
+        </div>
+
+        {isLoading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="size-8 animate-spin text-primary" />
+          </div>
+        ) : filteredCampaigns.length === 0 ? (
+          <p className="text-center text-xs text-slate-500 py-12">No spotlight campaigns found.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-slate-900 text-slate-500 font-bold uppercase tracking-wider pb-3">
+                  <th className="pb-3">Venture / Pitch</th>
+                  <th className="pb-3">Founder</th>
+                  <th className="pb-3">Package / Cost</th>
+                  <th className="pb-3 text-center">Status</th>
+                  <th className="pb-3 text-center">Metrics (V/C/L)</th>
+                  <th className="pb-3">Created At</th>
+                  <th className="pb-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-900/60">
+                {filteredCampaigns.map((c: any) => (
+                  <tr key={c.id} className="hover:bg-slate-900/10">
+                    <td className="py-4 pr-4">
+                      <div className="font-bold text-white mb-0.5">{c.venture_name}</div>
+                      <div className="text-[10px] text-slate-500 line-clamp-2 max-w-sm">{c.pitch}</div>
+                    </td>
+                    <td className="py-4">
+                      <div className="font-medium text-white">{c.profiles?.name || "Unknown"}</div>
+                      <div className="text-[10px] text-slate-500">{c.profiles?.email || ""}</div>
+                    </td>
+                    <td className="py-4">
+                      <div className="font-bold text-white">{c.package_type}</div>
+                      <div className="text-[10px] text-slate-500">{formatDot(c.cost_dot)} DOT</div>
+                    </td>
+                    <td className="py-4 text-center">
+                      <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded ${
+                        c.status === "active" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" :
+                        c.status === "completed" ? "bg-blue-500/10 text-blue-400 border border-blue-500/20" :
+                        c.status === "approved" ? "bg-purple-500/10 text-purple-400 border border-purple-500/20" :
+                        c.status === "rejected" ? "bg-red-500/10 text-red-400 border border-red-500/20" :
+                        "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
+                      }`}>
+                        {c.status}
+                      </span>
+                    </td>
+                    <td className="py-4 text-center">
+                      <div className="font-semibold text-white">{c.impressions} / {c.clicks} / {c.leads_generated}</div>
+                      <span className="text-[9px] text-slate-500">Target: {c.target_impressions}</span>
+                    </td>
+                    <td className="py-4 text-slate-400">
+                      {new Date(c.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="py-4 text-right">
+                      <Button
+                        onClick={() => openReview(c)}
+                        variant="outline"
+                        size="sm"
+                        className="border-slate-800 hover:bg-slate-900 text-xs font-bold"
+                      >
+                        Review
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Review Dialog */}
+      <Dialog open={!!selectedCampaign} onOpenChange={() => setSelectedCampaign(null)}>
+        <DialogContent className="bg-slate-950 border-slate-900 text-white max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="font-display font-bold text-white text-base">Review Spotlight Submission</DialogTitle>
+          </DialogHeader>
+          {selectedCampaign && (
+            <form onSubmit={handleSave} className="space-y-4 text-left">
+              <div className="bg-slate-900/40 border border-slate-900 p-4 rounded-2xl space-y-2 text-xs">
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Venture Name</span>
+                  <span className="font-bold text-white text-sm">{selectedCampaign.venture_name}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Founder's Pitch</span>
+                  <p className="text-slate-300 whitespace-pre-line mt-1">{selectedCampaign.pitch}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4 border-t border-slate-900/60 pt-2.5">
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase block">Package</span>
+                    <span className="font-semibold text-white">{selectedCampaign.package_type}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase block">Cost</span>
+                    <span className="font-semibold text-white">{formatDot(selectedCampaign.cost_dot)} DOT</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-slate-400">Campaign Status</Label>
+                  <select
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value as any)}
+                    className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="active">Active (Live)</option>
+                    <option value="completed">Completed</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="assignedTeam" className="text-xs font-bold text-slate-400">Assigned Team Agent</Label>
+                  <Input
+                    id="assignedTeam"
+                    value={assignedTeam}
+                    onChange={(e) => setAssignedTeam(e.target.value)}
+                    placeholder="e.g. Sandra Cole"
+                    className="bg-slate-900 border-slate-850 text-xs text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="pubContent" className="text-xs font-bold text-slate-400">Published content / Hook</Label>
+                <Textarea
+                  id="pubContent"
+                  value={publishedContent}
+                  onChange={(e) => setPublishedContent(e.target.value)}
+                  placeholder="The description or promo copy published for the spotlight features..."
+                  rows={3}
+                  className="bg-slate-900 border-slate-850 text-xs text-white resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-2.5">
+                <div className="space-y-1.5">
+                  <Label htmlFor="impr" className="text-xs font-bold text-slate-400">Impressions</Label>
+                  <Input
+                    id="impr"
+                    type="number"
+                    value={impressions}
+                    onChange={(e) => setImpressions(Number(e.target.value))}
+                    className="bg-slate-900 border-slate-850 text-xs text-white"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="clk" className="text-xs font-bold text-slate-400">Clicks</Label>
+                  <Input
+                    id="clk"
+                    type="number"
+                    value={clicks}
+                    onChange={(e) => setClicks(Number(e.target.value))}
+                    className="bg-slate-900 border-slate-850 text-xs text-white"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="ld" className="text-xs font-bold text-slate-400">Leads</Label>
+                  <Input
+                    id="ld"
+                    type="number"
+                    value={leads}
+                    onChange={(e) => setLeads(Number(e.target.value))}
+                    className="bg-slate-900 border-slate-850 text-xs text-white"
+                  />
+                </div>
+              </div>
+
+              <DialogFooter className="pt-3 border-t border-slate-900/60 mt-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setSelectedCampaign(null)}
+                  className="border-slate-800 text-xs font-bold"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="hero"
+                  disabled={saving}
+                  className="text-xs font-bold"
+                >
+                  {saving ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
+                  Save Changes
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
         </DialogContent>
       </Dialog>
     </div>

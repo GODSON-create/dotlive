@@ -24,6 +24,7 @@ import { Route as FounderDotIdRouteImport } from './routes/founder.$dotId'
 import { Route as AuthenticatedWorkRouteImport } from './routes/_authenticated/work'
 import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as AuthenticatedVantageRouteImport } from './routes/_authenticated/vantage'
+import { Route as AuthenticatedSpotlightRouteImport } from './routes/_authenticated/spotlight'
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
 import { Route as AuthenticatedPitchathonsRouteImport } from './routes/_authenticated/pitchathons'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
@@ -111,6 +112,11 @@ const AuthenticatedVantageRoute = AuthenticatedVantageRouteImport.update({
   path: '/vantage',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSpotlightRoute = AuthenticatedSpotlightRouteImport.update({
+  id: '/spotlight',
+  path: '/spotlight',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSessionsRoute = AuthenticatedSessionsRouteImport.update({
   id: '/sessions',
   path: '/sessions',
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pitchathons': typeof AuthenticatedPitchathonsRoute
   '/sessions': typeof AuthenticatedSessionsRoute
+  '/spotlight': typeof AuthenticatedSpotlightRoute
   '/vantage': typeof AuthenticatedVantageRoute
   '/wallet': typeof AuthenticatedWalletRoute
   '/work': typeof AuthenticatedWorkRoute
@@ -222,6 +229,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pitchathons': typeof AuthenticatedPitchathonsRoute
   '/sessions': typeof AuthenticatedSessionsRoute
+  '/spotlight': typeof AuthenticatedSpotlightRoute
   '/vantage': typeof AuthenticatedVantageRoute
   '/wallet': typeof AuthenticatedWalletRoute
   '/work': typeof AuthenticatedWorkRoute
@@ -252,6 +260,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/pitchathons': typeof AuthenticatedPitchathonsRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRoute
+  '/_authenticated/spotlight': typeof AuthenticatedSpotlightRoute
   '/_authenticated/vantage': typeof AuthenticatedVantageRoute
   '/_authenticated/wallet': typeof AuthenticatedWalletRoute
   '/_authenticated/work': typeof AuthenticatedWorkRoute
@@ -282,6 +291,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/pitchathons'
     | '/sessions'
+    | '/spotlight'
     | '/vantage'
     | '/wallet'
     | '/work'
@@ -310,6 +320,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/pitchathons'
     | '/sessions'
+    | '/spotlight'
     | '/vantage'
     | '/wallet'
     | '/work'
@@ -339,6 +350,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/_authenticated/pitchathons'
     | '/_authenticated/sessions'
+    | '/_authenticated/spotlight'
     | '/_authenticated/vantage'
     | '/_authenticated/wallet'
     | '/_authenticated/work'
@@ -472,6 +484,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVantageRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/spotlight': {
+      id: '/_authenticated/spotlight'
+      path: '/spotlight'
+      fullPath: '/spotlight'
+      preLoaderRoute: typeof AuthenticatedSpotlightRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/sessions': {
       id: '/_authenticated/sessions'
       path: '/sessions'
@@ -570,6 +589,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPitchathonsRoute: typeof AuthenticatedPitchathonsRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRoute
+  AuthenticatedSpotlightRoute: typeof AuthenticatedSpotlightRoute
   AuthenticatedVantageRoute: typeof AuthenticatedVantageRoute
   AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
   AuthenticatedWorkRoute: typeof AuthenticatedWorkRoute
@@ -587,6 +607,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPitchathonsRoute: AuthenticatedPitchathonsRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRoute,
+  AuthenticatedSpotlightRoute: AuthenticatedSpotlightRoute,
   AuthenticatedVantageRoute: AuthenticatedVantageRoute,
   AuthenticatedWalletRoute: AuthenticatedWalletRoute,
   AuthenticatedWorkRoute: AuthenticatedWorkRoute,
