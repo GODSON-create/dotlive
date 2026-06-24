@@ -23,7 +23,10 @@ const revokeInput = z.object({
  */
 export const elevateUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => elevateInput.parse(data))
+  .inputValidator((data: any) => {
+    const payload = data && typeof data === "object" && "data" in data ? data.data : data;
+    return elevateInput.parse(payload);
+  })
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("elevate_user_to_admin", {
       _target_user_id: data.targetUserId,
@@ -37,7 +40,10 @@ export const elevateUser = createServerFn({ method: "POST" })
 /** Revoke an admin role from a user. Super admins only; cannot revoke self. */
 export const revokeAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => revokeInput.parse(data))
+  .inputValidator((data: any) => {
+    const payload = data && typeof data === "object" && "data" in data ? data.data : data;
+    return revokeInput.parse(payload);
+  })
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("revoke_admin_role", {
       _target_user_id: data.targetUserId,
@@ -84,7 +90,10 @@ const adminUpdateUserInput = z.object({
 
 export const adminUpdateUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => adminUpdateUserInput.parse(data))
+  .inputValidator((data: any) => {
+    const payload = data && typeof data === "object" && "data" in data ? data.data : data;
+    return adminUpdateUserInput.parse(payload);
+  })
   .handler(async ({ data, context }) => {
     const callerId = context.userId;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

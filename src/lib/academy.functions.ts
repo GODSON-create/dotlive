@@ -14,7 +14,10 @@ const completeInput = z.object({ courseId: z.string().uuid() });
  */
 export const completeCourse = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => completeInput.parse(data))
+  .inputValidator((data: any) => {
+    const payload = data && typeof data === "object" && "data" in data ? data.data : data;
+    return completeInput.parse(payload);
+  })
   .handler(async ({ data, context }) => {
     const { userId } = context;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

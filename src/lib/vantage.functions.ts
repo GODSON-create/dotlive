@@ -13,7 +13,10 @@ const answersInput = z.record(z.string(), z.number());
  */
 export const submitAssessment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => answersInput.parse(data))
+  .inputValidator((data: any) => {
+    const payload = data && typeof data === "object" && "data" in data ? data.data : data;
+    return answersInput.parse(payload);
+  })
   .handler(async ({ data: answers, context }) => {
     const { userId } = context;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -90,11 +93,12 @@ export const submitAssessment = createServerFn({ method: "POST" })
 
 export const buyUpgrade = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => {
+  .inputValidator((data: any) => {
+    const payload = data && typeof data === "object" && "data" in data ? data.data : data;
     return z.object({
       upgradeType: z.string(),
       cost: z.number()
-    }).parse(data);
+    }).parse(payload);
   })
   .handler(async ({ data: { upgradeType, cost }, context }) => {
     const { userId } = context;

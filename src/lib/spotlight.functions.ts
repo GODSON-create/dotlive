@@ -20,7 +20,10 @@ const updateCampaignInput = z.object({
 
 export const submitSpotlightCampaign = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => submitCampaignInput.parse(data))
+  .inputValidator((data: any) => {
+    const payload = data && typeof data === "object" && "data" in data ? data.data : data;
+    return submitCampaignInput.parse(payload);
+  })
   .handler(async ({ data, context }) => {
     const { userId, supabase } = context;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -115,7 +118,10 @@ export const getAdminCampaigns = createServerFn({ method: "GET" })
 
 export const updateCampaignStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => updateCampaignInput.parse(data))
+  .inputValidator((data: any) => {
+    const payload = data && typeof data === "object" && "data" in data ? data.data : data;
+    return updateCampaignInput.parse(payload);
+  })
   .handler(async ({ data, context }) => {
     const { userId, supabase } = context;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

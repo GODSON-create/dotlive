@@ -8,7 +8,10 @@ const trackEventInput = z.object({
 });
 
 export const trackEventServer = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => trackEventInput.parse(data))
+  .inputValidator((data: any) => {
+    const payload = data && typeof data === "object" && "data" in data ? data.data : data;
+    return trackEventInput.parse(payload);
+  })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 

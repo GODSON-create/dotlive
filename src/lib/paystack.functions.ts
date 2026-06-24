@@ -27,7 +27,10 @@ function makeReference(userId: string): string {
  */
 export const initPaystackPayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => initInput.parse(data))
+  .inputValidator((data: any) => {
+    const payload = data && typeof data === "object" && "data" in data ? data.data : data;
+    return initInput.parse(payload);
+  })
   .handler(async ({ data, context }) => {
     const { userId, claims } = context;
     const secret = process.env.PAYSTACK_SECRET_KEY;
@@ -98,7 +101,10 @@ export const initPaystackPayment = createServerFn({ method: "POST" })
  */
 export const verifyPaystackPayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => verifyInput.parse(data))
+  .inputValidator((data: any) => {
+    const payload = data && typeof data === "object" && "data" in data ? data.data : data;
+    return verifyInput.parse(payload);
+  })
   .handler(async ({ data, context }) => {
     const { userId } = context;
     const secret = process.env.PAYSTACK_SECRET_KEY;
