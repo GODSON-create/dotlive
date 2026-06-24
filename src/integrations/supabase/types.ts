@@ -60,6 +60,10 @@ export type Database = {
           stage: string | null
           user_id: string
           vantage_point: number
+          current_valuation: number | null
+          potential_valuation: number | null
+          unicorn_potential: number | null
+          founder_archetype: string | null
         }
         Insert: {
           answers?: Json
@@ -73,6 +77,10 @@ export type Database = {
           stage?: string | null
           user_id: string
           vantage_point?: number
+          current_valuation?: number | null
+          potential_valuation?: number | null
+          unicorn_potential?: number | null
+          founder_archetype?: string | null
         }
         Update: {
           answers?: Json
@@ -86,6 +94,10 @@ export type Database = {
           stage?: string | null
           user_id?: string
           vantage_point?: number
+          current_valuation?: number | null
+          potential_valuation?: number | null
+          unicorn_potential?: number | null
+          founder_archetype?: string | null
         }
         Relationships: []
       }
@@ -346,6 +358,13 @@ export type Database = {
           vantage_point: number | null
           venture_name: string | null
           website: string | null
+          current_valuation: number | null
+          potential_valuation: number | null
+          unicorn_potential: number | null
+          founder_archetype: string | null
+          city: string | null
+          state: string | null
+          university: string | null
         }
         Insert: {
           bio?: string | null
@@ -363,6 +382,13 @@ export type Database = {
           vantage_point?: number | null
           venture_name?: string | null
           website?: string | null
+          current_valuation?: number | null
+          potential_valuation?: number | null
+          unicorn_potential?: number | null
+          founder_archetype?: string | null
+          city?: string | null
+          state?: string | null
+          university?: string | null
         }
         Update: {
           bio?: string | null
@@ -380,6 +406,13 @@ export type Database = {
           vantage_point?: number | null
           venture_name?: string | null
           website?: string | null
+          current_valuation?: number | null
+          potential_valuation?: number | null
+          unicorn_potential?: number | null
+          founder_archetype?: string | null
+          city?: string | null
+          state?: string | null
+          university?: string | null
         }
         Relationships: [
           {

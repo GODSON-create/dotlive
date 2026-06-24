@@ -18,12 +18,16 @@ import { Route as CommunitiesRouteImport } from './routes/communities'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VentureSlugRouteImport } from './routes/venture.$slug'
+import { Route as ResultIdRouteImport } from './routes/result.$id'
+import { Route as FounderDotIdRouteImport } from './routes/founder.$dotId'
 import { Route as AuthenticatedWorkRouteImport } from './routes/_authenticated/work'
 import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as AuthenticatedVantageRouteImport } from './routes/_authenticated/vantage'
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
 import { Route as AuthenticatedPitchathonsRouteImport } from './routes/_authenticated/pitchathons'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedLeaderboardsRouteImport } from './routes/_authenticated/leaderboards'
 import { Route as AuthenticatedInvestorRouteImport } from './routes/_authenticated/investor'
 import { Route as AuthenticatedDemoRouteImport } from './routes/_authenticated/demo'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -77,6 +81,21 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VentureSlugRoute = VentureSlugRouteImport.update({
+  id: '/venture/$slug',
+  path: '/venture/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResultIdRoute = ResultIdRouteImport.update({
+  id: '/result/$id',
+  path: '/result/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FounderDotIdRoute = FounderDotIdRouteImport.update({
+  id: '/founder/$dotId',
+  path: '/founder/$dotId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedWorkRoute = AuthenticatedWorkRouteImport.update({
   id: '/work',
   path: '/work',
@@ -108,6 +127,12 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedLeaderboardsRoute =
+  AuthenticatedLeaderboardsRouteImport.update({
+    id: '/leaderboards',
+    path: '/leaderboards',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedInvestorRoute = AuthenticatedInvestorRouteImport.update({
   id: '/investor',
   path: '/investor',
@@ -165,12 +190,16 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/demo': typeof AuthenticatedDemoRoute
   '/investor': typeof AuthenticatedInvestorRoute
+  '/leaderboards': typeof AuthenticatedLeaderboardsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pitchathons': typeof AuthenticatedPitchathonsRoute
   '/sessions': typeof AuthenticatedSessionsRoute
   '/vantage': typeof AuthenticatedVantageRoute
   '/wallet': typeof AuthenticatedWalletRoute
   '/work': typeof AuthenticatedWorkRoute
+  '/founder/$dotId': typeof FounderDotIdRoute
+  '/result/$id': typeof ResultIdRoute
+  '/venture/$slug': typeof VentureSlugRoute
   '/join/$code': typeof AuthenticatedJoinCodeRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
@@ -189,12 +218,16 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/demo': typeof AuthenticatedDemoRoute
   '/investor': typeof AuthenticatedInvestorRoute
+  '/leaderboards': typeof AuthenticatedLeaderboardsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pitchathons': typeof AuthenticatedPitchathonsRoute
   '/sessions': typeof AuthenticatedSessionsRoute
   '/vantage': typeof AuthenticatedVantageRoute
   '/wallet': typeof AuthenticatedWalletRoute
   '/work': typeof AuthenticatedWorkRoute
+  '/founder/$dotId': typeof FounderDotIdRoute
+  '/result/$id': typeof ResultIdRoute
+  '/venture/$slug': typeof VentureSlugRoute
   '/join/$code': typeof AuthenticatedJoinCodeRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
@@ -215,12 +248,16 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/demo': typeof AuthenticatedDemoRoute
   '/_authenticated/investor': typeof AuthenticatedInvestorRoute
+  '/_authenticated/leaderboards': typeof AuthenticatedLeaderboardsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/pitchathons': typeof AuthenticatedPitchathonsRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRoute
   '/_authenticated/vantage': typeof AuthenticatedVantageRoute
   '/_authenticated/wallet': typeof AuthenticatedWalletRoute
   '/_authenticated/work': typeof AuthenticatedWorkRoute
+  '/founder/$dotId': typeof FounderDotIdRoute
+  '/result/$id': typeof ResultIdRoute
+  '/venture/$slug': typeof VentureSlugRoute
   '/_authenticated/join/$code': typeof AuthenticatedJoinCodeRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
@@ -241,12 +278,16 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/demo'
     | '/investor'
+    | '/leaderboards'
     | '/onboarding'
     | '/pitchathons'
     | '/sessions'
     | '/vantage'
     | '/wallet'
     | '/work'
+    | '/founder/$dotId'
+    | '/result/$id'
+    | '/venture/$slug'
     | '/join/$code'
     | '/api/public/webhooks/paystack'
   fileRoutesByTo: FileRoutesByTo
@@ -265,12 +306,16 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/demo'
     | '/investor'
+    | '/leaderboards'
     | '/onboarding'
     | '/pitchathons'
     | '/sessions'
     | '/vantage'
     | '/wallet'
     | '/work'
+    | '/founder/$dotId'
+    | '/result/$id'
+    | '/venture/$slug'
     | '/join/$code'
     | '/api/public/webhooks/paystack'
   id:
@@ -290,12 +335,16 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/demo'
     | '/_authenticated/investor'
+    | '/_authenticated/leaderboards'
     | '/_authenticated/onboarding'
     | '/_authenticated/pitchathons'
     | '/_authenticated/sessions'
     | '/_authenticated/vantage'
     | '/_authenticated/wallet'
     | '/_authenticated/work'
+    | '/founder/$dotId'
+    | '/result/$id'
+    | '/venture/$slug'
     | '/_authenticated/join/$code'
     | '/api/public/webhooks/paystack'
   fileRoutesById: FileRoutesById
@@ -310,6 +359,9 @@ export interface RootRouteChildren {
   PlatformRoute: typeof PlatformRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  FounderDotIdRoute: typeof FounderDotIdRoute
+  ResultIdRoute: typeof ResultIdRoute
+  VentureSlugRoute: typeof VentureSlugRoute
   ApiPublicWebhooksPaystackRoute: typeof ApiPublicWebhooksPaystackRoute
 }
 
@@ -378,6 +430,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/venture/$slug': {
+      id: '/venture/$slug'
+      path: '/venture/$slug'
+      fullPath: '/venture/$slug'
+      preLoaderRoute: typeof VentureSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/result/$id': {
+      id: '/result/$id'
+      path: '/result/$id'
+      fullPath: '/result/$id'
+      preLoaderRoute: typeof ResultIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/founder/$dotId': {
+      id: '/founder/$dotId'
+      path: '/founder/$dotId'
+      fullPath: '/founder/$dotId'
+      preLoaderRoute: typeof FounderDotIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/work': {
       id: '/_authenticated/work'
       path: '/work'
@@ -418,6 +491,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/leaderboards': {
+      id: '/_authenticated/leaderboards'
+      path: '/leaderboards'
+      fullPath: '/leaderboards'
+      preLoaderRoute: typeof AuthenticatedLeaderboardsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/investor': {
@@ -486,6 +566,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDemoRoute: typeof AuthenticatedDemoRoute
   AuthenticatedInvestorRoute: typeof AuthenticatedInvestorRoute
+  AuthenticatedLeaderboardsRoute: typeof AuthenticatedLeaderboardsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPitchathonsRoute: typeof AuthenticatedPitchathonsRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRoute
@@ -502,6 +583,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDemoRoute: AuthenticatedDemoRoute,
   AuthenticatedInvestorRoute: AuthenticatedInvestorRoute,
+  AuthenticatedLeaderboardsRoute: AuthenticatedLeaderboardsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPitchathonsRoute: AuthenticatedPitchathonsRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRoute,
@@ -524,8 +606,21 @@ const rootRouteChildren: RootRouteChildren = {
   PlatformRoute: PlatformRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  FounderDotIdRoute: FounderDotIdRoute,
+  ResultIdRoute: ResultIdRoute,
+  VentureSlugRoute: VentureSlugRoute,
   ApiPublicWebhooksPaystackRoute: ApiPublicWebhooksPaystackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

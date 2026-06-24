@@ -48,6 +48,8 @@ const TYPE_META: Record<string, { icon: typeof Plus; tone: string }> = {
   "Admin Credit": { icon: Settings2, tone: "text-primary" },
 };
 
+type Currency = "DOT" | "NGN" | "USD" | "BTC";
+
 function WalletPage() {
   const qc = useQueryClient();
   const navigate = useNavigate();
@@ -60,6 +62,9 @@ function WalletPage() {
   const [copied, setCopied] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [receipt, setReceipt] = useState<{ dot: number; naira: number; reference: string } | null>(null);
+  
+  // Currency Toggle state
+  const [currency, setCurrency] = useState<Currency>("DOT");
 
   const dotId = profile?.dot_id ?? null;
 
@@ -79,7 +84,6 @@ function WalletPage() {
     qc.invalidateQueries({ queryKey: ["transactions"] });
   }, [qc]);
 
-  // Handle return from Paystack hosted checkout (?reference=... &trxref=...)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const reference = params.get("reference") || params.get("trxref");
@@ -90,10 +94,10 @@ function WalletPage() {
       .then((res) => {
         if (res.status === "success") {
           setReceipt({ dot: res.dotAmount, naira: dotToNaira(res.dotAmount), reference });
-          toast.success(`Wallet funded with ${formatDot(res.dotAmount)} DOT`);
+          toast.success(`Access activated successfully!`);
           refresh();
         } else {
-          toast.error("Payment was not completed. You were not charged any DOT.");
+          toast.error("Activation could not be completed.");
         }
       })
       .catch((e) => toast.error(e instanceof Error ? e.message : "Verification failed"))
@@ -101,12 +105,11 @@ function WalletPage() {
         setVerifying(false);
         navigate({ to: "/wallet", replace: true });
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function handleDeposit() {
     if (amount < MIN_DEPOSIT_DOT) {
-      toast.error(`Minimum deposit is ${formatDot(MIN_DEPOSIT_DOT)} DOT`);
+      toast.error(`Minimum activation commit is ${formatDot(MIN_DEPOSIT_DOT)} DOT`);
       return;
     }
     setBusy(true);
@@ -116,21 +119,59 @@ function WalletPage() {
       });
       window.location.href = authorizationUrl;
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Could not start payment");
+      toast.error(e instanceof Error ? e.message : "Could not initialize activation");
       setBusy(false);
     }
   }
 
+  // Currency Formatter Layer
+  const formatValue = useCallback((amountDOT: number, displayCurrency: Currency) => {
+    const ngn = amountDOT * 15;
+    const usd = ngn / 1500;
+    const btc = usd / 60000;
+
+    switch (displayCurrency) {
+      case "NGN":
+        return formatNaira(ngn);
+      case "USD":
+        return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(usd);
+      case "BTC":
+        return `${btc.toFixed(6)} BTC`;
+      default:
+        return `${formatDot(amountDOT)} DOT`;
+    }
+  }, []);
+
   return (
     <AppShell>
-      <h1 className="font-display text-3xl font-bold">DOT Wallet</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Your internal ecosystem credits · 1 DOT = {formatNaira(DOT_RATE_NGN)}
-      </p>
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div>
+          <h1 className="font-display text-3xl font-bold">DOT Wallet</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Activate access, receive awards and transition between currencies.
+          </p>
+        </div>
+        
+        {/* Multi-Currency toggle tabs */}
+        <div className="flex rounded-lg border border-border bg-card p-1 text-xs font-semibold">
+          {(["DOT", "NGN", "USD", "BTC"] as Currency[]).map((cur) => (
+            <button
+              key={cur}
+              onClick={() => setCurrency(cur)}
+              className={cn(
+                "rounded px-3 py-1.5 transition-colors",
+                currency === cur ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {cur}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {verifying && (
         <div className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-card p-4 text-sm">
-          <Loader2 className="size-4 animate-spin text-primary" /> Verifying your payment…
+          <Loader2 className="size-4 animate-spin text-primary" /> Activating founder access tier…
         </div>
       )}
 
@@ -138,12 +179,14 @@ function WalletPage() {
         <div className="rounded-2xl border border-border bg-card p-6 sm:col-span-2 [background-image:var(--gradient-primary)]">
           <div className="flex items-center gap-2 text-primary-foreground/80">
             <Wallet className="size-5" />
-            <span className="text-sm font-medium">Available balance</span>
+            <span className="text-sm font-medium">Available balance ({currency})</span>
           </div>
-          <p className="mt-4 font-display text-5xl font-bold text-primary-foreground">
-            {formatDot(balance)} <span className="text-2xl font-medium">DOT</span>
+          <p className="mt-4 font-display text-4xl font-black text-primary-foreground">
+            {formatValue(balance, currency)}
           </p>
-          <p className="mt-1 text-sm text-primary-foreground/80">≈ {formatNaira(dotToNaira(balance))}</p>
+          {currency !== "DOT" && (
+            <p className="mt-1 text-sm text-primary-foreground/80">≈ {formatValue(balance, "DOT")}</p>
+          )}
           {dotId && (
             <button
               onClick={copyDotId}
@@ -158,19 +201,19 @@ function WalletPage() {
         <div className="flex flex-col justify-center gap-3 rounded-2xl border border-border bg-card p-6">
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button variant="hero" className="w-full">
-                <ArrowDownToLine className="size-4" /> Deposit DOT
+              <Button variant="hero" className="w-full bg-gradient-to-r from-pink-500 to-indigo-500 hover:from-pink-600 hover:to-indigo-600 text-white font-semibold">
+                <ArrowDownToLine className="size-4" /> Activate Founder Access
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Deposit DOT</DialogTitle>
+                <DialogTitle>Activate Founder Access & Scholarship</DialogTitle>
                 <DialogDescription>
-                  Minimum {formatDot(MIN_DEPOSIT_DOT)} DOT. 1 DOT = {formatNaira(DOT_RATE_NGN)}.
+                  Choose a support tier commit to become fundable on DOT.
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-3">
-                <Label htmlFor="amount">Amount (DOT)</Label>
+                <Label htmlFor="amount">Commitment Amount (DOT)</Label>
                 <Input
                   id="amount"
                   type="number"
@@ -180,7 +223,7 @@ function WalletPage() {
                   onChange={(e) => setAmount(Number(e.target.value))}
                 />
                 <p className="text-sm text-muted-foreground">
-                  You'll pay {formatNaira(dotToNaira(amount || 0))}
+                  Scholarship activation deposit: <span className="font-semibold text-white">{formatNaira(dotToNaira(amount || 0))}</span>
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {[2000, 5000, 10000, 20000].map((v) => (
@@ -188,26 +231,26 @@ function WalletPage() {
                       key={v}
                       onClick={() => setAmount(v)}
                       className={cn(
-                        "rounded-full border px-3 py-1 text-sm",
-                        amount === v ? "border-primary bg-primary/10 text-primary" : "border-border",
+                        "rounded-full border px-3 py-1 text-sm font-semibold transition-colors",
+                        amount === v ? "border-primary bg-primary/10 text-primary" : "border-border text-slate-400 hover:border-slate-600",
                       )}
                     >
-                      {formatDot(v)}
+                      {v === 2000 ? "Activate Access" : v === 5000 ? "Join Cohort" : v === 10000 ? "Become Fundable" : "Accelerate"} ({formatDot(v)} DOT)
                     </button>
                   ))}
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="hero" onClick={handleDeposit} disabled={busy}>
+                <Button variant="hero" className="w-full" onClick={handleDeposit} disabled={busy}>
                   {busy && <Loader2 className="size-4 animate-spin" />}
-                  Pay with Paystack
+                  Submit Commitment via Paystack
                 </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
           <TransferDialog balance={balance} myDotId={dotId} />
           <p className="text-center text-xs text-muted-foreground">
-            Send instantly by DOT ID · fund via Paystack
+            Send instantly by DOT ID · apply for cohort activations
           </p>
         </div>
       </div>
@@ -227,14 +270,14 @@ function WalletPage() {
                     <meta.icon className="size-4" />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{t.description || t.type}</p>
+                    <p className="truncate text-sm font-medium text-white">{t.description || t.type}</p>
                     <p className="text-xs text-muted-foreground">
-                      {t.type} · {new Date(t.created_at).toLocaleString()}
+                      {t.type === "Deposit" ? "Scholarship Activation" : t.type} · {new Date(t.created_at).toLocaleString()}
                     </p>
                   </div>
                   <span className={cn("font-display text-sm font-semibold", positive ? "text-primary" : "text-destructive")}>
                     {positive ? "+" : ""}
-                    {formatDot(Number(t.amount))} DOT
+                    {formatValue(Number(t.amount), currency)}
                   </span>
                 </li>
               );
@@ -249,13 +292,13 @@ function WalletPage() {
             <div className="mx-auto mb-2 flex size-12 items-center justify-center rounded-full bg-primary/10">
               <CheckCircle2 className="size-6 text-primary" />
             </div>
-            <DialogTitle className="text-center">Payment receipt</DialogTitle>
-            <DialogDescription className="text-center">Your DOT wallet has been funded.</DialogDescription>
+            <DialogTitle className="text-center">Activation Receipt</DialogTitle>
+            <DialogDescription className="text-center">Your founder access has been successfully activated.</DialogDescription>
           </DialogHeader>
           {receipt && (
             <div className="space-y-2 rounded-xl border border-border bg-muted/40 p-4 text-sm">
-              <Row label="DOT credited" value={`${formatDot(receipt.dot)} DOT`} />
-              <Row label="Amount paid" value={formatNaira(receipt.naira)} />
+              <Row label="Tier credits activated" value={`${formatDot(receipt.dot)} DOT`} />
+              <Row label="Commitment paid" value={formatNaira(receipt.naira)} />
               <Row label="Reference" value={receipt.reference} mono />
               <Row label="Date" value={new Date().toLocaleString()} />
             </div>

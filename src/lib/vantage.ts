@@ -113,6 +113,10 @@ export interface VantageResult {
   fundability: number; // 0..100
   investmentReadiness: number; // 0..100
   stage: JourneyStage;
+  currentValuation: number;
+  potentialValuation: number;
+  unicornPotential: number;
+  founderArchetype: string;
   report: {
     strengths: { label: string; score: number }[];
     weaknesses: { label: string; score: number }[];
@@ -194,6 +198,39 @@ export function computeVantage(answers: VantageAnswers): VantageResult {
     .map((r) => NEXT_ACTION_MAP[r.key])
     .filter(Boolean);
 
+  // Valuation Engine Logic
+  const baseCurrentValuation = 3000000; // ₦3,000,000 base
+  const revenueFactor = (categoryScores.revenue ?? 0) * 150000;
+  const validationFactor = (categoryScores.validation ?? 0) * 120000;
+  const productFactor = (categoryScores.product ?? 0) * 80000;
+  const teamFounderFactor = ((categoryScores.team ?? 0) + (categoryScores.founder ?? 0)) * 50000;
+  
+  let currentValuation = Math.round((baseCurrentValuation + revenueFactor + validationFactor + productFactor + teamFounderFactor) / 100000) * 100000;
+  if (currentValuation > 150000000) currentValuation = 150000000; // Capped at ₦150M for early stage
+
+  const basePotentialValuation = 100000000; // ₦100,000,000 base potential
+  const marketFactor = (categoryScores.market ?? 0) * 3000000;
+  const scalabilityFactor = (categoryScores.scalability ?? 0) * 2000000;
+  const potentialProductFactor = (categoryScores.product ?? 0) * 1500000;
+  const vantageBoost = vantagePoint * 100000;
+  
+  let potentialValuation = Math.round((basePotentialValuation + marketFactor + scalabilityFactor + potentialProductFactor + vantageBoost) / 1000000) * 1000000;
+  if (potentialValuation > 1000000000) potentialValuation = 1000000000; // Capped at ₦1B
+
+  const unicornPotential = Math.round(((categoryScores.scalability * 0.4 + categoryScores.market * 0.3 + categoryScores.product * 0.2 + categoryScores.team * 0.1) * (vantagePoint / 1000) / 12) * 10) / 10;
+
+  const topCategory = ranked[0]?.key;
+  let founderArchetype = "Venture Builder";
+  if (topCategory === "founder" || topCategory === "team") {
+    founderArchetype = "Human Capitalist";
+  } else if (topCategory === "product" || topCategory === "scalability") {
+    founderArchetype = "Tech Pioneer";
+  } else if (topCategory === "market" || topCategory === "problem") {
+    founderArchetype = "Visionary Navigator";
+  } else if (topCategory === "validation" || topCategory === "revenue" || topCategory === "investment_readiness") {
+    founderArchetype = "Commercial Hustler";
+  }
+
   return {
     categoryScores,
     score,
@@ -201,6 +238,10 @@ export function computeVantage(answers: VantageAnswers): VantageResult {
     fundability,
     investmentReadiness,
     stage: stageFor(score),
+    currentValuation,
+    potentialValuation,
+    unicornPotential,
+    founderArchetype,
     report: { strengths, weaknesses, nextActions },
   };
 }

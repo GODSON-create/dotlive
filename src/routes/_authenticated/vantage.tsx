@@ -34,7 +34,7 @@ import {
   computeVantage,
   type VantageAnswers,
 } from "@/lib/vantage";
-import { formatDot } from "@/lib/constants";
+import { formatDot, formatNaira } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -107,6 +107,10 @@ function VantagePage() {
         investment_readiness: result.investmentReadiness,
         stage: result.stage,
         report: result.report,
+        current_valuation: result.currentValuation,
+        potential_valuation: result.potentialValuation,
+        unicorn_potential: result.unicornPotential,
+        founder_archetype: result.founderArchetype,
       });
       if (error) throw error;
 
@@ -117,6 +121,10 @@ function VantagePage() {
           fundability: result.fundability,
           investment_readiness: result.investmentReadiness,
           stage: result.stage,
+          current_valuation: result.currentValuation,
+          potential_valuation: result.potentialValuation,
+          unicorn_potential: result.unicornPotential,
+          founder_archetype: result.founderArchetype,
         })
         .eq("user_id", user.id);
 
@@ -236,6 +244,43 @@ function VantagePage() {
             <ScoreCard label="Fundability" value={`${latest.fundability}%`} icon={TrendingUp} pct={latest.fundability} />
             <ScoreCard label="Investment Ready" value={`${latest.investment_readiness}%`} icon={Target} pct={latest.investment_readiness} />
           </div>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-2xl border border-border bg-card p-5">
+              <span className="text-sm text-muted-foreground">Estimated Startup Valuation</span>
+              <p className="mt-3 font-display text-2xl font-bold text-gradient">
+                {formatNaira(latest.current_valuation ?? 0)}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-5">
+              <span className="text-sm text-muted-foreground">Potential Valuation</span>
+              <p className="mt-3 font-display text-2xl font-bold text-foreground">
+                {formatNaira(latest.potential_valuation ?? 0)}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-5">
+              <span className="text-sm text-muted-foreground">Unicorn Potential</span>
+              <p className="mt-3 font-display text-2xl font-bold text-primary">
+                {typeof latest.unicorn_potential === 'number' ? latest.unicorn_potential.toFixed(1) : '0.0'}%
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-5">
+              <span className="text-sm text-muted-foreground">Founder Archetype</span>
+              <p className="mt-3 font-display text-2xl font-bold text-gold">
+                {latest.founder_archetype ?? "Venture Builder"}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-6 flex flex-col gap-4 sm:flex-row">
+            <Button variant="hero" asChild className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:to-indigo-600 text-white font-semibold shadow-md">
+              <Link to={`/result/${latest.id}`}>
+                <Sparkles className="mr-2 size-4 animate-pulse" />
+                View my DOT Wrapped Recap
+              </Link>
+            </Button>
+          </div>
+
 
           {history.length > 1 && (
             <div className="mt-6 rounded-2xl border border-border bg-card p-6">

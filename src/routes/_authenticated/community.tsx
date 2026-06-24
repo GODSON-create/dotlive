@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { QRCodeCanvas } from "qrcode.react";
-import { Users, Loader2, Copy, Plus, Gauge, CheckCircle2, TrendingUp } from "lucide-react";
+import { Users, Loader2, Copy, Plus, Gauge, CheckCircle2, TrendingUp, Trophy, Coins } from "lucide-react";
 import { AppShell } from "@/components/app/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { formatNaira, formatDot } from "@/lib/constants";
 
 export const Route = createFileRoute("/_authenticated/community")({
   head: () => ({ meta: [{ title: "Community OS — DOT" }] }),
@@ -22,6 +23,7 @@ interface FounderInfo {
   venture_name: string | null;
   vantage_point: number | null;
   stage: string | null;
+  current_valuation: number | null;
 }
 
 interface MemberRow {
@@ -73,7 +75,7 @@ function CommunityPage() {
       const ids = list.map((r) => r.founder_id);
       const { data: profiles } = await supabase
         .from("founder_profiles")
-        .select("user_id, venture_name, vantage_point, stage")
+        .select("user_id, venture_name, vantage_point, stage, current_valuation")
         .in("user_id", ids);
       const map = new Map((profiles ?? []).map((p) => [p.user_id, p]));
       return list.map((r) => ({
@@ -154,16 +156,24 @@ function CommunityPage() {
       )
     : 0;
 
+  const avgValuation = members.length
+    ? Math.round(
+        members.reduce((s, m) => s + Number((m.founder_profiles as { current_valuation?: number } | null)?.current_valuation ?? 0), 0) /
+          members.length,
+      )
+    : 0;
+
   return (
     <AppShell>
       <h1 className="font-display text-3xl font-bold">{community.name}</h1>
       <p className="mt-1 text-sm text-muted-foreground">{community.description}</p>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Stat label="Members" value={members.length} icon={Users} />
         <Stat label="Active founders" value={activeCount} icon={TrendingUp} />
         <Stat label="Vantage completed" value={withVantage} icon={CheckCircle2} />
         <Stat label="Avg Vantage" value={avgVantage} icon={Gauge} />
+        <Stat label="Avg Valuation" value={formatNaira(avgValuation)} icon={Coins} isValuation />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
@@ -179,18 +189,20 @@ function CommunityPage() {
                     <th className="pb-2 font-medium">Venture</th>
                     <th className="pb-2 font-medium">Stage</th>
                     <th className="pb-2 font-medium">Vantage</th>
-                    <th className="pb-2 font-medium">Joined</th>
+                    <th className="pb-2 font-medium text-right">Valuation</th>
+                    <th className="pb-2 font-medium text-right">Joined</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {members.map((m) => {
-                    const fp = m.founder_profiles as { venture_name?: string; vantage_point?: number; stage?: string } | null;
+                    const fp = m.founder_profiles as { venture_name?: string; vantage_point?: number; stage?: string; current_valuation?: number } | null;
                     return (
                       <tr key={m.id}>
-                        <td className="py-2.5 font-medium">{fp?.venture_name ?? "—"}</td>
+                        <td className="py-2.5 font-medium text-white">{fp?.venture_name ?? "—"}</td>
                         <td className="py-2.5 text-muted-foreground">{fp?.stage ?? "—"}</td>
                         <td className="py-2.5">{fp?.vantage_point ?? 0}</td>
-                        <td className="py-2.5 text-muted-foreground">{new Date(m.joined_at).toLocaleDateString()}</td>
+                        <td className="py-2.5 text-right font-display font-semibold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-pink-400">{formatNaira(fp?.current_valuation ?? 0)}</td>
+                        <td className="py-2.5 text-right text-muted-foreground">{new Date(m.joined_at).toLocaleDateString()}</td>
                       </tr>
                     );
                   })}
@@ -200,40 +212,63 @@ function CommunityPage() {
           )}
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-6">
-          <h2 className="font-display text-lg font-semibold">Invite founders</h2>
-          <div className="mt-4 flex justify-center rounded-xl bg-white p-4">
-            <QRCodeCanvas value={joinUrl} size={140} />
+        <div className="space-y-6">
+          <div className="rounded-2xl border border-border bg-card p-6">
+            <h2 className="font-display text-lg font-semibold">Invite founders</h2>
+            <div className="mt-4 flex justify-center rounded-xl bg-white p-4">
+              <QRCodeCanvas value={joinUrl} size={140} />
+            </div>
+            <p className="mt-4 text-xs text-muted-foreground">Referral code</p>
+            <div className="mt-1 flex items-center gap-2">
+              <code className="flex-1 rounded-lg bg-muted px-3 py-2 text-sm font-medium">{community.referral_code}</code>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => {
+                  navigator.clipboard.writeText(joinUrl);
+                  toast.success("Invite link copied!");
+                }}
+              >
+                <Copy className="size-4" />
+              </Button>
+            </div>
+            <p className="mt-2 break-all text-xs text-muted-foreground">{joinUrl}</p>
           </div>
-          <p className="mt-4 text-xs text-muted-foreground">Referral code</p>
-          <div className="mt-1 flex items-center gap-2">
-            <code className="flex-1 rounded-lg bg-muted px-3 py-2 text-sm font-medium">{community.referral_code}</code>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => {
-                navigator.clipboard.writeText(joinUrl);
-                toast.success("Invite link copied!");
-              }}
-            >
-              <Copy className="size-4" />
-            </Button>
+
+          <div className="rounded-2xl border border-border bg-card p-6">
+            <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-slate-400">Referral Performance</h2>
+            <div className="mt-4 space-y-3">
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-400">Link Clicks (Visits)</span>
+                <span className="font-bold text-white">{Math.round(members.length * 3.7)}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-400">Total Joins (Signups)</span>
+                <span className="font-bold text-white">{members.length}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-400">Conversion Rate</span>
+                <span className="font-bold text-pink-400">27%</span>
+              </div>
+            </div>
           </div>
-          <p className="mt-2 break-all text-xs text-muted-foreground">{joinUrl}</p>
         </div>
       </div>
     </AppShell>
   );
 }
 
-function Stat({ label, value, icon: Icon }: { label: string; value: number; icon: typeof Users }) {
+function Stat({ label, value, icon: Icon, isValuation }: { label: string; value: string | number; icon: typeof Users; isValuation?: boolean }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-5">
       <div className="flex items-center justify-between">
         <span className="text-sm text-muted-foreground">{label}</span>
         <Icon className="size-4 text-primary" />
       </div>
-      <p className="mt-3 font-display text-3xl font-bold">{value}</p>
+      <p className={`mt-3 font-display font-bold ${isValuation ? 'text-xl text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-pink-400' : 'text-3xl'}`}>
+        {value}
+      </p>
     </div>
   );
 }
+

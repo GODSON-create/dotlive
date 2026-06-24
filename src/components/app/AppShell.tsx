@@ -32,6 +32,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
   { label: "Vantage", to: "/vantage", icon: Gauge, roles: ["founder"] },
+  { label: "Leaderboards", to: "/leaderboards", icon: Trophy },
   { label: "Wallet", to: "/wallet", icon: Wallet },
   { label: "DOT Work", to: "/work", icon: Hammer },
   { label: "Academy", to: "/academy", icon: BookOpen, roles: ["founder"] },

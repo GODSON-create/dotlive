@@ -23,6 +23,7 @@ import {
   TrendingUp,
   Wallet as WalletIcon,
   Building2,
+  Sparkles,
 } from "lucide-react";
 import { AppShell } from "@/components/app/AppShell";
 import { Button } from "@/components/ui/button";
@@ -124,7 +125,7 @@ function AdminPage() {
 
 interface Overview {
   users: { total: number; new_today: number; new_week: number };
-  founders: { total: number; completed_vantage: number; avg_vantage: number; fundable: number };
+  founders: { total: number; completed_vantage: number; avg_vantage: number; fundable: number; total_valuation: number };
   communities: { total: number; leaders: number; members: number };
   academy: { enrollments: number; completed: number };
   financial: {
@@ -136,6 +137,7 @@ interface Overview {
   };
   marketplace: { orders_completed: number; builder_revenue: number; active_services: number };
   investors: { registered: number; saves: number; meetings: number };
+  virality: { total_assessments: number; shares_generated: number; profile_views: number; wrapped_shares: number };
 }
 
 function OverviewTab() {
@@ -158,10 +160,11 @@ function OverviewTab() {
         <Stat label="New this week" value={String(data.users.new_week)} />
       </MetricGroup>
 
-      <MetricGroup title="Founders" icon={TrendingUp}>
+      <MetricGroup title="Founders & Valuation" icon={TrendingUp}>
         <Stat label="Total founders" value={String(data.founders.total)} />
         <Stat label="Completed Vantage" value={String(data.founders.completed_vantage)} />
         <Stat label="Avg Vantage" value={String(data.founders.avg_vantage)} />
+        <Stat label="Ecosystem Valuation" value={formatNaira(data.founders.total_valuation ?? 0)} />
         <Stat label="Fundable ventures" value={String(data.founders.fundable)} />
       </MetricGroup>
 
@@ -182,6 +185,13 @@ function OverviewTab() {
         <Stat label="DOT spent" value={formatDot(data.financial.total_dot_spent)} />
         <Stat label="Wallet balances" value={`${formatDot(data.financial.wallet_balances)} DOT`} />
         <Stat label="Reserve balance" value={`${formatDot(data.financial.reserve_balance)} DOT`} />
+      </MetricGroup>
+
+      <MetricGroup title="Virality & Sharing" icon={Sparkles}>
+        <Stat label="Assessments Done" value={String(data.virality?.total_assessments ?? 0)} />
+        <Stat label="Shares Generated" value={String(data.virality?.shares_generated ?? 0)} />
+        <Stat label="Profile Views" value={String(data.virality?.profile_views ?? 0)} />
+        <Stat label="Wrapped Shared" value={String(data.virality?.wrapped_shares ?? 0)} />
       </MetricGroup>
 
       <MetricGroup title="Marketplace" icon={Building2}>
