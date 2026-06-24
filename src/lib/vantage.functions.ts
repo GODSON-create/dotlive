@@ -18,6 +18,27 @@ export const submitAssessment = createServerFn({ method: "POST" })
     const { userId } = context;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+    // Check assessment count to see if we need to charge
+    const { count, error: countErr } = await supabaseAdmin
+      .from("assessments")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId);
+
+    if (countErr) throw new Error(countErr.message);
+
+    if (count !== null && count >= 2) {
+      const { data: charged, error: chargeErr } = await (supabaseAdmin as any)
+        .rpc("charge_revaluation_fee", {
+          _user_id: userId,
+          _fee: 100,
+        });
+
+      if (chargeErr) throw new Error(chargeErr.message);
+      if (!charged) {
+        throw new Error("INSUFFICIENT_FUNDS");
+      }
+    }
+
     // Calculate scores server-side
     const result = computeVantage(answers);
 
@@ -65,4 +86,30 @@ export const submitAssessment = createServerFn({ method: "POST" })
       assessmentId: assessmentData.id,
       ...result
     };
+  });
+
+export const buyUpgrade = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => {
+    return z.object({
+      upgradeType: z.string(),
+      cost: z.number()
+    }).parse(data);
+  })
+  .handler(async ({ data: { upgradeType, cost }, context }) => {
+    const { userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: charged, error: chargeErr } = await (supabaseAdmin as any)
+      .rpc("charge_revaluation_fee", {
+        _user_id: userId,
+        _fee: cost,
+      });
+
+    if (chargeErr) throw new Error(chargeErr.message);
+    if (!charged) {
+      throw new Error("INSUFFICIENT_FUNDS");
+    }
+
+    return { success: true };
   });

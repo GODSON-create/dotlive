@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   Gauge,
   BookOpen,
@@ -14,6 +15,8 @@ import {
   Shield,
   MessageSquare,
   Clock,
+  MapPin,
+  Loader2,
 } from "lucide-react";
 import { AppShell } from "@/components/app/AppShell";
 import { Button } from "@/components/ui/button";
@@ -27,8 +30,11 @@ import {
 } from "@/hooks/use-dot-data";
 import { JOURNEY_STAGES, dotToNaira, formatDot, formatNaira } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { buyUpgrade } from "@/lib/vantage.functions";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -41,12 +47,48 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function Dashboard() {
-  const { profile, primaryRole, roles } = useAuth();
+  const { profile, primaryRole, roles, user } = useAuth();
   const { data: balance = 0 } = useWallet();
   const { data: founder } = useFounderProfile();
   const { data: assessments = [] } = useAssessments();
   const { data: enrollments = [] } = useMyEnrollments();
   const { data: membership } = useMyMembership();
+  
+  const qc = useQueryClient();
+  const buyUpgradeFn = useServerFn(buyUpgrade);
+  const [buying, setBuying] = useState<string | null>(null);
+
+  // Dynamic ranking metrics query
+  const { data: rankings } = useQuery({
+    queryKey: ["founder-rankings", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await (supabase as any).rpc("get_founder_rankings", {
+        _user_id: user?.id,
+      });
+      if (error) throw error;
+      return data as any;
+    },
+  });
+
+  async function handleBuyUpgrade(type: string, cost: number, label: string) {
+    setBuying(type);
+    try {
+      await buyUpgradeFn({ data: { upgradeType: type, cost } });
+      toast.success(`Success! You have purchased the ${label}.`);
+      qc.invalidateQueries({ queryKey: ["wallet_balance", user?.id] });
+      qc.invalidateQueries({ queryKey: ["transactions", user?.id] });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("INSUFFICIENT_FUNDS")) {
+        toast.error(`Insufficient credit. The ${label} requires ${cost} DOT. Please fund your wallet.`);
+      } else {
+        toast.error(msg || "Could not complete purchase");
+      }
+    } finally {
+      setBuying(null);
+    }
+  }
 
   const isFounder = roles.includes("founder");
   const latest = assessments[assessments.length - 1];
@@ -99,6 +141,26 @@ function Dashboard() {
             {isFounder ? <>Stage: <span className="text-foreground">{stage}</span></> : primaryRole}
             {membership?.communities ? ` · ${(membership.communities as { name: string }).name}` : ""}
           </p>
+          
+          {isFounder && rankings && !rankings.error && (
+            <div className="flex flex-wrap gap-2 mt-3">
+              {rankings.country?.rank && (
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-slate-900 border border-slate-800 text-slate-400 px-3 py-1 rounded-full">
+                  <MapPin className="size-3 text-primary" /> #{rankings.country.rank} in {rankings.country.name}
+                </span>
+              )}
+              {rankings.industry?.rank && (
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-slate-900 border border-slate-800 text-slate-400 px-3 py-1 rounded-full">
+                  <TrendingUp className="size-3 text-indigo-400" /> #{rankings.industry.rank} in {rankings.industry.name}
+                </span>
+              )}
+              {rankings.university?.rank && (
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-slate-900 border border-slate-800 text-slate-400 px-3 py-1 rounded-full">
+                  <Trophy className="size-3 text-yellow-400" /> #{rankings.university.rank} in {rankings.university.name}
+                </span>
+              )}
+            </div>
+          )}
         </div>
         {isFounder && (
           <div className="flex items-center gap-2">
@@ -276,6 +338,46 @@ function Dashboard() {
                     View full challenge rankings
                   </Link>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* DOT Upgrades Widget */}
+          {isFounder && (
+            <div className="rounded-2xl border border-border bg-card p-6">
+              <h2 className="font-display text-lg font-semibold flex items-center gap-2">
+                <Coins className="size-5 text-gold animate-pulse" />
+                DOT Upgrades
+              </h2>
+              <p className="text-xs text-muted-foreground mt-1">Unlock premium analysis and roadmaps using your DOT credits</p>
+              
+              <div className="mt-4 space-y-4">
+                {[
+                  { key: "report", label: "Detailed Startup Report", cost: 250, desc: "Granular breakdown of your metrics" },
+                  { key: "roadmap", label: "Growth Roadmap", cost: 500, desc: "Step-by-step cohort milestones" },
+                  { key: "analysis", label: "Premium Founder Analysis", cost: 1000, desc: "Ecosystem reviews and audits" },
+                ].map((up) => (
+                  <div key={up.key} className="p-3 rounded-xl bg-slate-900/30 border border-border/60 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="text-xs font-bold text-white">{up.label}</h4>
+                        <p className="text-[10px] text-slate-400 mt-0.5">{up.desc}</p>
+                      </div>
+                      <span className="text-[10px] bg-slate-800 border border-slate-700 px-2 py-0.5 rounded font-bold text-gold shrink-0">
+                        {up.cost} DOT
+                      </span>
+                    </div>
+                    <Button 
+                      onClick={() => handleBuyUpgrade(up.key, up.cost, up.label)} 
+                      disabled={buying === up.key}
+                      variant="outline" 
+                      className="w-full text-[10px] py-1 h-7 border-slate-800 hover:bg-slate-900"
+                    >
+                      {buying === up.key ? <Loader2 className="size-3 animate-spin mr-1" /> : <Sparkles className="size-3 mr-1" />}
+                      Purchase Upgrade
+                    </Button>
+                  </div>
+                ))}
               </div>
             </div>
           )}

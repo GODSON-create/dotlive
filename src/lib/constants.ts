@@ -1,7 +1,7 @@
 // DOT platform constants
 
 export const DOT_RATE_NGN = 15; // 1 DOT = ₦15
-export const MIN_DEPOSIT_DOT = 2000; // minimum deposit
+export const MIN_DEPOSIT_DOT = 3000; // minimum deposit
 
 export function dotToNaira(dot: number): number {
   return Math.round(dot * DOT_RATE_NGN);

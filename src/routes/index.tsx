@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -14,277 +15,455 @@ import {
   Wallet,
   ShieldCheck,
   TrendingUp,
+  Sliders,
+  CheckCircle2,
+  Sparkle,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Button } from "@/components/ui/button";
+import { formatDot, formatNaira } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import heroImg from "@/assets/hero-dot.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "DOT — Africa's Venture Progression Network" },
+      { title: "DOT — Africa's Venture Valuation Network" },
       {
         name: "description",
-        content:
-          "DOT helps African founders Assess, Learn, Improve, Validate, Pitch, Fund and Scale. Venture intelligence, education, sessions, pitchathons and capital — in one network.",
+        content: "What is your idea worth? Discover your Startup Value, DOT Score and founder rank in minutes.",
       },
-      { property: "og:title", content: "DOT — Africa's Venture Progression Network" },
-      {
-        property: "og:description",
-        content: "Move your venture from idea to funded — measurably.",
-      },
-      { property: "og:image", content: heroImg },
-      { name: "twitter:image", content: heroImg },
     ],
   }),
   component: LandingPage,
 });
 
-const journey = [
-  { label: "Assess", icon: Gauge, desc: "Measure venture readiness with Vantage." },
-  { label: "Learn", icon: BookOpen, desc: "Founder education via DOT Academy." },
-  { label: "Improve", icon: TrendingUp, desc: "Act on AI-driven recommendations." },
-  { label: "Validate", icon: ShieldCheck, desc: "Prove the market and traction." },
-  { label: "Pitch", icon: Trophy, desc: "Compete and earn selection." },
-  { label: "Fund", icon: Wallet, desc: "Discover capital on DOT Demo." },
-  { label: "Scale", icon: TrendingUp, desc: "Grow with community distribution." },
-];
-
-const pillars = [
-  {
-    name: "Vantage",
-    tagline: "Venture intelligence engine",
-    desc: "A 0–1000 Vantage Point measuring quality, founder readiness, market strength and fundability.",
-    icon: BarChart3,
+const COPY_OPTIONS = {
+  A: {
+    title: "Your Idea Has A Value. Find Out How Much.",
+    subtext: "Take the DOT test and discover your startup value, score, and growth potential in minutes.",
+    cta: "Find My Startup Value",
   },
-  {
-    name: "DOT Academy",
-    tagline: "Founder education",
-    desc: "Progression-based learning paths — powered by Whop, tracked and scored by DOT.",
-    icon: GraduationCap,
+  B: {
+    title: "Could Your Idea Become A Million Dollar Company?",
+    subtext: "Every big company started as an idea. See where yours stands in the ecosystem.",
+    cta: "Check My Score",
   },
-  {
-    name: "Founder Sessions",
-    tagline: "Live access",
-    desc: "Sessions with entrepreneurs, investors, operators and industry experts.",
-    icon: CalendarCheck,
+  C: {
+    title: "Rate Your Startup Before The World Does.",
+    subtext: "Get your startup valuation, founder score, and roadmap immediately.",
+    cta: "Get My Score",
   },
-  {
-    name: "Pitchathons",
-    tagline: "Selection & evaluation",
-    desc: "Applications, judge portals, scoring and leaderboards to surface the best.",
-    icon: Trophy,
+  D: {
+    title: "Your Next Big Idea Starts Here.",
+    subtext: "Discover your startup value, benchmark, and what it takes to grow it.",
+    cta: "Test My Idea",
   },
-  {
-    name: "DOT Demo",
-    tagline: "Capital discovery",
-    desc: "An investor marketplace connecting fundable ventures with capital partners.",
-    icon: Building2,
-  },
-  {
-    name: "Community OS",
-    tagline: "Community-led growth",
-    desc: "Referral links, dashboards and DOT rewards that power founder acquisition.",
-    icon: Network,
-  },
-];
-
-const pilotStats = [
-  { value: "10,000", label: "Founders" },
-  { value: "100", label: "Communities" },
-  { value: "100", label: "Community Leaders" },
-  { value: "$200K", label: "Capital target" },
-];
-
-const audiences = [
-  {
-    title: "Founders",
-    points: ["Complete Vantage", "Access Academy", "Enter Pitchathons", "Reach capital"],
-    icon: Sparkles,
-  },
-  {
-    title: "Community Leaders",
-    points: ["Build communities", "Recruit founders", "Track progress", "Earn DOT rewards"],
-    icon: Users,
-  },
-  {
-    title: "Investors",
-    points: ["Browse ventures", "Filter by Vantage", "Request meetings", "Join DOT Demo"],
-    icon: Building2,
-  },
-];
+};
 
 function LandingPage() {
+  const [copyOption, setCopyOption] = useState<"A" | "B" | "C" | "D">("A");
+  
+  // Interactive Simulator State
+  const [simVenture, setSimVenture] = useState("Nova AI");
+  const [simTraction, setSimTraction] = useState(250000); // ₦250k/mo
+  const [simTeam, setSimTeam] = useState(2); // 2 members
+  const [simProduct, setSimProduct] = useState(1); // 1: Prototype, 2: MVP, 3: Launch
+  const [simMarket, setSimMarket] = useState(1); // 1: Regional, 2: Global
+
+  // Dynamic calculations for preview card
+  const stats = useMemo(() => {
+    // Score range 300 - 1000
+    const scoreBase = 380;
+    const tractionBonus = Math.min(220, Math.round((simTraction / 2000000) * 220));
+    const teamBonus = Math.min(120, simTeam * 40);
+    const productBonus = simProduct * 90; // 0: Idea(0), 1: Proto(90), 2: MVP(180), 3: Launch(270)
+    const marketBonus = simMarket * 70; // 0: Local(0), 1: Regional(70), 2: Global(140)
+    
+    const dotScore = Math.min(1000, scoreBase + tractionBonus + teamBonus + productBonus + marketBonus);
+    
+    // Valuation math: grows exponentially with score + traction
+    const rawVal = 1200000 * Math.pow(dotScore / 320, 2.7) + (simTraction * 15);
+    const valuation = Math.min(150000000, Math.max(1500000, Math.round(rawVal / 50000) * 50000));
+    
+    // Potential valuation
+    const rawPotential = valuation * (6 + (simMarket * 3)) + 50000000;
+    const potential = Math.min(850000000, Math.max(10000000, Math.round(rawPotential / 1000000) * 1000000));
+
+    // Rank percentage: better score -> lower percentage (top X%)
+    const rankPercent = Math.max(1, Math.min(99, Math.round(100 - ((dotScore - 300) / 700) * 98)));
+
+    let status = "Idea Explorer 💡";
+    if (dotScore >= 750) status = "Unicorn Candidate 🦄";
+    else if (dotScore >= 600) status = "Rising Founder 🚀";
+    else if (dotScore >= 450) status = "Cohort Builder 🛠️";
+
+    return {
+      dotScore,
+      valuation,
+      potential,
+      rankPercent,
+      status,
+    };
+  }, [simTraction, simTeam, simProduct, simMarket]);
+
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
       <SiteHeader />
       <main className="flex-1">
-        {/* Hero */}
-        <section className="relative overflow-hidden">
-          <div className="absolute inset-0 -z-10">
-            <img
-              src={heroImg}
-              alt=""
-              width={1920}
-              height={1080}
-              className="h-full w-full object-cover opacity-90 dark:opacity-100"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/30" />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-          </div>
+        {/* Hero Section */}
+        <section className="relative min-h-[90vh] flex items-center py-20 lg:py-28 overflow-hidden">
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/25 via-background to-background" />
+          
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full">
+            <div className="grid gap-12 lg:grid-cols-12 lg:items-center">
+              
+              {/* Left copy column */}
+              <div className="lg:col-span-6 space-y-6">
+                {/* A/B Copy Variation Tester */}
+                <div className="flex items-center gap-1.5 rounded-full bg-slate-900/60 border border-slate-800 p-1 text-xs backdrop-blur w-fit">
+                  <span className="text-[9px] text-slate-500 px-2 font-bold uppercase tracking-wider">A/B Testing:</span>
+                  {(["A", "B", "C", "D"] as const).map((opt) => (
+                    <button
+                      key={opt}
+                      onClick={() => setCopyOption(opt)}
+                      className={cn(
+                        "px-2.5 py-1 rounded-full font-bold transition-all text-[11px]",
+                        copyOption === opt 
+                          ? "bg-primary text-primary-foreground shadow-sm" 
+                          : "text-slate-400 hover:text-white"
+                      )}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
 
-          <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-36">
-            <div className="max-w-2xl">
-              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur">
-                <span className="size-1.5 rounded-full bg-primary" />
-                Africa's Venture Progression Network
-              </span>
-              <h1 className="mt-6 font-display text-4xl font-bold leading-[1.05] sm:text-6xl lg:text-7xl">
-                From idea to funded.{" "}
-                <span className="text-gradient">Measurably.</span>
-              </h1>
-              <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-                DOT moves founders through a single, measurable journey — Assess, Learn, Improve,
-                Validate, Pitch, Fund and Scale — combining venture intelligence, education and
-                capital access.
-              </p>
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                <Button variant="hero" size="lg" asChild>
-                  <Link to="/auth">
-                    Start your assessment
-                    <ArrowRight />
-                  </Link>
-                </Button>
-                <Button variant="outline" size="lg" asChild>
-                  <Link to="/platform">Explore the platform</Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
+                <span className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/85 px-3 py-1 text-xs font-semibold text-primary backdrop-blur">
+                  <span className="size-1.5 rounded-full bg-primary animate-ping" />
+                  Africa's Venture Valuation Network
+                </span>
 
-        {/* Journey */}
-        <section className="border-y border-border/60 bg-card/30">
-          <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-            <div className="max-w-2xl">
-              <h2 className="font-display text-3xl font-bold sm:text-4xl">
-                One progression. Seven measurable stages.
-              </h2>
-              <p className="mt-4 text-muted-foreground">
-                Every founder follows the same path — and DOT measures movement at every step.
-              </p>
-            </div>
-            <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-7">
-              {journey.map((step, i) => (
-                <div
-                  key={step.label}
-                  className="group relative rounded-2xl border border-border bg-card p-5 transition-all hover:-translate-y-1 hover:shadow-soft"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <step.icon className="size-4.5" />
+                <h1 className="font-display text-4xl font-black leading-[1.05] sm:text-6xl lg:text-7xl tracking-tight">
+                  {COPY_OPTIONS[copyOption].title.split("Find Out").map((text, i) => (
+                    <span key={i}>
+                      {text}
+                      {i === 0 && COPY_OPTIONS[copyOption].title.includes("Find Out") && (
+                        <span className="text-gradient block mt-1">Find Out.</span>
+                      )}
                     </span>
-                    <span className="font-display text-sm font-semibold text-muted-foreground">
-                      {String(i + 1).padStart(2, "0")}
+                  ))}
+                  {!COPY_OPTIONS[copyOption].title.includes("Find Out") && (
+                    <span className="text-gradient block mt-1">Find Out.</span>
+                  )}
+                </h1>
+
+                <p className="max-w-lg text-base sm:text-lg text-muted-foreground leading-relaxed">
+                  {COPY_OPTIONS[copyOption].subtext}
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                  <Button variant="hero" size="lg" className="px-8 font-bold text-base shadow-lg shadow-primary/20" asChild>
+                    <Link to="/auth">
+                      {COPY_OPTIONS[copyOption].cta}
+                      <ArrowRight className="size-5 ml-1" />
+                    </Link>
+                  </Button>
+                  <Button variant="outline" size="lg" className="border-slate-800 text-slate-300 hover:bg-slate-900" asChild>
+                    <Link to="/auth">Check Leaderboard</Link>
+                  </Button>
+                </div>
+              </div>
+
+              {/* Right scorecard column */}
+              <div className="lg:col-span-6 flex flex-col items-center">
+                {/* Scorecard mockup wrapper */}
+                <div className="relative w-full max-w-md rounded-3xl border border-slate-800 bg-slate-950/80 p-6 shadow-2xl backdrop-blur-md overflow-hidden">
+                  <div className="absolute top-0 right-0 size-32 rounded-full bg-primary/10 blur-3xl -z-10" />
+                  <div className="absolute bottom-0 left-0 size-32 rounded-full bg-indigo-500/10 blur-3xl -z-10" />
+
+                  {/* Header */}
+                  <div className="flex items-center justify-between border-b border-slate-900 pb-4">
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase">STARTUP REPORT</span>
+                      <input 
+                        type="text"
+                        value={simVenture}
+                        onChange={(e) => setSimVenture(e.target.value)}
+                        className="block bg-transparent text-lg font-bold text-white focus:outline-none focus:border-primary/50 border-b border-transparent w-full"
+                        placeholder="Venture Name"
+                      />
+                    </div>
+                    <span className="text-xs font-semibold px-2 py-1 bg-slate-900 text-slate-400 rounded-full border border-slate-800">
+                      Rank: Top {stats.rankPercent}%
                     </span>
                   </div>
-                  <h3 className="mt-4 font-display text-base font-semibold">{step.label}</h3>
-                  <p className="mt-1 text-xs text-muted-foreground">{step.desc}</p>
+
+                  {/* Scores Grid */}
+                  <div className="mt-5 grid grid-cols-2 gap-4">
+                    <div className="rounded-2xl bg-slate-900/30 border border-slate-900 p-4">
+                      <span className="text-[10px] font-semibold text-slate-400">Estimated Value</span>
+                      <p className="mt-1.5 font-display text-xl sm:text-2xl font-black text-white text-gradient">
+                        {formatNaira(stats.valuation)}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl bg-slate-900/30 border border-slate-900 p-4">
+                      <span className="text-[10px] font-semibold text-slate-400">DOT Score</span>
+                      <div className="flex items-baseline gap-1 mt-1">
+                        <span className="font-display text-2xl font-black text-white">{stats.dotScore}</span>
+                        <span className="text-xs text-slate-500">/1000</span>
+                      </div>
+                    </div>
+                    <div className="rounded-2xl bg-slate-900/30 border border-slate-900 p-4">
+                      <span className="text-[10px] font-semibold text-slate-400">Potential</span>
+                      <p className="mt-1.5 font-display text-lg font-bold text-slate-300">
+                        {formatNaira(stats.potential)}+
+                      </p>
+                    </div>
+                    <div className="rounded-2xl bg-slate-900/30 border border-slate-900 p-4">
+                      <span className="text-[10px] font-semibold text-slate-400">Status</span>
+                      <p className="mt-1.5 text-xs font-bold text-primary flex items-center gap-1">
+                        {stats.status}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Simulator Sliders Panel */}
+                  <div className="mt-6 border-t border-slate-900 pt-5 space-y-4">
+                    <div className="flex items-center justify-between text-xs font-semibold text-slate-400 mb-1">
+                      <span className="flex items-center gap-1"><Sliders className="size-3 text-primary" /> Venture Simulator</span>
+                      <span className="text-[10px] text-slate-500">Drag to change value</span>
+                    </div>
+
+                    {/* Traction slider */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-slate-400">Monthly Revenue / Traction</span>
+                        <span className="font-bold text-white">{formatNaira(simTraction)}</span>
+                      </div>
+                      <input 
+                        type="range" 
+                        min="0" 
+                        max="2000000" 
+                        step="50000"
+                        value={simTraction}
+                        onChange={(e) => setSimTraction(Number(e.target.value))}
+                        className="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-primary"
+                      />
+                    </div>
+
+                    {/* Product Stage selector */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-slate-400">Product Development</span>
+                        <span className="font-bold text-white">
+                          {simProduct === 0 ? "Idea stage" : simProduct === 1 ? "Prototype ready" : simProduct === 2 ? "MVP launched" : "Market growth"}
+                        </span>
+                      </div>
+                      <input 
+                        type="range" 
+                        min="0" 
+                        max="3" 
+                        step="1"
+                        value={simProduct}
+                        onChange={(e) => setSimProduct(Number(e.target.value))}
+                        className="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-primary"
+                      />
+                    </div>
+
+                    {/* Team Size */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-slate-400">Team Size & Commitment</span>
+                        <span className="font-bold text-white">{simTeam} Fulltime Members</span>
+                      </div>
+                      <input 
+                        type="range" 
+                        min="1" 
+                        max="5" 
+                        step="1"
+                        value={simTeam}
+                        onChange={(e) => setSimTeam(Number(e.target.value))}
+                        className="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-primary"
+                      />
+                    </div>
+                  </div>
+
+                  {/* CTA inside card */}
+                  <Button variant="hero" className="w-full mt-6 text-sm py-5 font-bold" asChild>
+                    <Link to="/auth">Get My Startup Score</Link>
+                  </Button>
                 </div>
-              ))}
+              </div>
+
             </div>
           </div>
         </section>
 
-        {/* Pillars */}
-        <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-          <div className="max-w-2xl">
-            <span className="text-sm font-semibold text-primary">Six pillars, one ecosystem</span>
-            <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">
-              Everything a venture needs to progress
-            </h2>
-          </div>
-          <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {pillars.map((p) => (
-              <div
-                key={p.name}
-                className="group rounded-2xl border border-border bg-card p-7 transition-all hover:border-primary/40 hover:shadow-soft"
-              >
-                <span className="flex size-12 items-center justify-center rounded-xl [background-image:var(--gradient-primary)] text-primary-foreground shadow-glow">
-                  <p.icon className="size-6" />
-                </span>
-                <h3 className="mt-5 font-display text-xl font-semibold">{p.name}</h3>
-                <p className="mt-1 text-sm font-medium text-primary">{p.tagline}</p>
-                <p className="mt-3 text-sm text-muted-foreground">{p.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* How It Works Section */}
+        <section className="border-t border-slate-900 bg-slate-950/20 py-24">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <span className="text-xs font-bold text-primary uppercase tracking-widest">3-STEP WORKFLOW</span>
+              <h2 className="mt-3 font-display text-4xl font-black tracking-tight text-white sm:text-5xl">
+                Turn Your Idea Into A Score
+              </h2>
+              <p className="mt-4 text-slate-400 text-lg">
+                Stop guessing. Run your concept through the network, benchmark your metrics, and level up.
+              </p>
+            </div>
 
-        {/* Pilot stats */}
-        <section className="border-y border-border/60 bg-grid">
-          <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-            <div className="rounded-3xl border border-border bg-card/80 p-8 shadow-soft backdrop-blur sm:p-12">
-              <div className="max-w-2xl">
-                <span className="text-sm font-semibold text-gold">Pilot program</span>
-                <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">
-                  Built to scale from 10K to 10M founders
-                </h2>
-                <p className="mt-4 text-muted-foreground">
-                  A modular, multi-tenant architecture designed to grow across four phases without a
-                  redesign.
+            <div className="grid gap-8 md:grid-cols-3">
+              {/* Step 1 */}
+              <div className="relative rounded-2xl border border-slate-900 bg-slate-950/40 p-6 space-y-4 hover:border-slate-800 transition-all">
+                <span className="absolute top-4 right-4 text-3xl font-black text-slate-905 opacity-10">01</span>
+                <span className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Sliders className="size-5" />
+                </span>
+                <h3 className="font-display text-xl font-bold text-white">1. Tell Us About Your Idea</h3>
+                <p className="text-sm text-slate-400 leading-relaxed">
+                  Answer straightforward questions covering your **Problem**, **Solution**, **Market Size**, **Customer Archetypes**, and **Team Strengths**.
                 </p>
               </div>
-              <div className="mt-10 grid grid-cols-2 gap-6 lg:grid-cols-4">
-                {pilotStats.map((s) => (
-                  <div key={s.label}>
-                    <p className="font-display text-4xl font-bold text-gradient">{s.value}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">{s.label}</p>
-                  </div>
-                ))}
+
+              {/* Step 2 */}
+              <div className="relative rounded-2xl border border-slate-900 bg-slate-950/40 p-6 space-y-4 hover:border-slate-800 transition-all">
+                <span className="absolute top-4 right-4 text-3xl font-black text-slate-905 opacity-10">02</span>
+                <span className="flex size-12 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
+                  <BarChart3 className="size-5" />
+                </span>
+                <h3 className="font-display text-xl font-bold text-white">2. Get Your Startup Report</h3>
+                <p className="text-sm text-slate-400 leading-relaxed">
+                  Instantly receive your interactive **Startup Valuation**, **DOT Score**, **Fundability Indicator**, **Growth Level**, and **Unicorn Potential** calculation.
+                </p>
+              </div>
+
+              {/* Step 3 */}
+              <div className="relative rounded-2xl border border-slate-900 bg-slate-950/40 p-6 space-y-4 hover:border-slate-800 transition-all">
+                <span className="absolute top-4 right-4 text-3xl font-black text-slate-905 opacity-10">03</span>
+                <span className="flex size-12 items-center justify-center rounded-xl bg-yellow-500/10 text-yellow-400">
+                  <Trophy className="size-5" />
+                </span>
+                <h3 className="font-display text-xl font-bold text-white">3. Level Up</h3>
+                <p className="text-sm text-slate-400 leading-relaxed">
+                  Unlock dynamic roadmap actions. Gain access to the global **Founder Community**, **Learning Paths**, **Cohort Sessions**, and visibility to **Ecosystem Investors**.
+                </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Audiences */}
-        <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-          <h2 className="font-display text-3xl font-bold sm:text-4xl">Built for the whole network</h2>
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {audiences.map((a) => (
-              <div key={a.title} className="rounded-2xl border border-border bg-card p-7">
-                <span className="flex size-11 items-center justify-center rounded-xl bg-accent text-accent-foreground">
-                  <a.icon className="size-5" />
-                </span>
-                <h3 className="mt-5 font-display text-xl font-semibold">{a.title}</h3>
-                <ul className="mt-4 space-y-2">
-                  {a.points.map((pt) => (
-                    <li key={pt} className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span className="size-1.5 rounded-full bg-primary" />
-                      {pt}
-                    </li>
+        {/* Gamified Competition / Leaderboard Preview Section */}
+        <section className="py-24 border-t border-slate-900 relative">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-12 lg:grid-cols-12 lg:items-center">
+              
+              <div className="lg:col-span-5 space-y-6">
+                <span className="text-xs font-bold text-yellow-400 uppercase tracking-widest">ECOSYSTEM RANKINGS</span>
+                <h2 className="font-display text-3xl font-black text-white sm:text-4xl">
+                  Compete with Founders Across Africa
+                </h2>
+                <p className="text-slate-400 leading-relaxed">
+                  Ecosystem rankings keep you motivated. Compete for the top position by improving your DOT Score and venture metrics. Filter and compete by:
+                </p>
+                <div className="space-y-3">
+                  {[
+                    "Highest Startup Value & DOT Score",
+                    "Most Improved Founder & Fastest Growing Venture",
+                    "Top Universities, Industries, and Regional Communities",
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-3 text-sm text-slate-300">
+                      <CheckCircle2 className="size-5 text-primary shrink-0" />
+                      <span>{item}</span>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
-            ))}
+
+              <div className="lg:col-span-7 bg-slate-950/80 border border-slate-900 rounded-3xl p-6 shadow-xl relative overflow-hidden">
+                <div className="flex items-center justify-between border-b border-slate-900 pb-4 mb-4">
+                  <h3 className="font-display font-bold text-white flex items-center gap-2">
+                    <Trophy className="size-4.5 text-yellow-400" /> Top Universities Leaderboard
+                  </h3>
+                  <span className="text-[10px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded font-bold uppercase">LIVE</span>
+                </div>
+                
+                {/* Mock Leaderboard rows */}
+                <div className="space-y-2">
+                  {[
+                    { rank: 1, name: "University of Cape Town", score: 894, val: "₦1.2B", rate: "+4.2%" },
+                    { rank: 2, name: "University of Ibadan", score: 862, val: "₦850M", rate: "+12.8%" },
+                    { rank: 3, name: "Covenant University", score: 840, val: "₦720M", rate: "+8.5%" },
+                    { rank: 4, name: "Ashesi University", score: 795, val: "₦540M", rate: "+6.1%" },
+                  ].map((row) => (
+                    <div key={row.rank} className="flex items-center justify-between p-3 rounded-xl bg-slate-900/20 border border-slate-900/60 hover:bg-slate-900/40 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <span className={cn(
+                          "flex size-6 items-center justify-center rounded-full text-xs font-black",
+                          row.rank === 1 ? "bg-yellow-400/20 text-yellow-400" :
+                          row.rank === 2 ? "bg-slate-300/20 text-slate-300" :
+                          row.rank === 3 ? "bg-amber-600/20 text-amber-500" : "text-slate-500"
+                        )}>
+                          #{row.rank}
+                        </span>
+                        <span className="text-sm font-bold text-white">{row.name}</span>
+                      </div>
+                      <div className="flex items-center gap-4 text-xs font-semibold">
+                        <span className="text-slate-400">Score: {row.score}</span>
+                        <span className="text-gradient">{row.val}</span>
+                        <span className="text-primary">{row.rate}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* DOT Wrapped Loop / Share Section */}
+        <section className="py-20 border-t border-slate-900 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-pink-900/10 via-transparent to-transparent">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center max-w-3xl">
+            <Sparkle className="size-8 text-pink-400 mx-auto animate-pulse" />
+            <h2 className="mt-4 font-display text-3xl font-black text-white sm:text-5xl">
+              Show The World What You're Building
+            </h2>
+            <p className="mt-4 text-slate-400 text-base sm:text-lg">
+              Get an instantly shareable, personalized **DOT Wrapped** card optimized for Instagram Stories, WhatsApp Statuses, LinkedIn, and X.
+            </p>
+            
+            <div className="mt-10 mx-auto max-w-md rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-950 to-slate-900 p-6 text-left relative overflow-hidden shadow-elegant">
+              <span className="text-[9px] font-bold tracking-widest text-slate-500 uppercase">DOT WRAPPED PREVIEW</span>
+              <p className="mt-4 text-xl font-bold text-white leading-relaxed">
+                "I just discovered my startup could become a <span className="text-gradient font-black">₦500M</span> company 🚀"
+              </p>
+              <div className="mt-6 flex justify-between items-center text-xs border-t border-slate-900 pt-4">
+                <div>
+                  <p className="font-semibold text-slate-400">DOT Score: <span className="text-white font-bold">742</span></p>
+                  <p className="text-[10px] text-slate-500">Founder Rank: Top 10%</p>
+                </div>
+                <span className="text-sm font-black text-white">DOT.</span>
+              </div>
+            </div>
           </div>
         </section>
 
         {/* CTA */}
-        <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
-          <div className="relative overflow-hidden rounded-3xl border border-border [background-image:var(--gradient-primary)] p-10 text-center shadow-elegant sm:p-16">
-            <h2 className="font-display text-3xl font-bold text-primary-foreground sm:text-5xl">
-              Ready to move your venture forward?
+        <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8 border-t border-slate-900 pt-20">
+          <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10 p-10 text-center shadow-elegant sm:p-16">
+            <h2 className="font-display text-3xl font-black text-white sm:text-5xl">
+              Ready to find your Startup Score?
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-primary-foreground/90">
-              Join the pilot. Complete your Vantage assessment and unlock your founder roadmap.
+            <p className="mx-auto mt-4 max-w-xl text-slate-400">
+              Join the ecosystem today. First two revaluations are completely free.
             </p>
             <div className="mt-8 flex justify-center">
-              <Button variant="gold" size="lg" asChild>
+              <Button variant="hero" size="lg" className="px-8 py-6 font-bold text-base" asChild>
                 <Link to="/auth">
-                  Get started free
-                  <ArrowRight />
+                  Get My Startup Score
+                  <ArrowRight className="size-5 ml-1" />
                 </Link>
               </Button>
             </div>

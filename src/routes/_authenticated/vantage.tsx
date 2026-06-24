@@ -108,7 +108,14 @@ function VantagePage() {
       setIdx(0);
       setAnswers({});
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not save assessment");
+      const errMsg = err instanceof Error ? err.message : "";
+      if (errMsg.includes("INSUFFICIENT_FUNDS")) {
+        toast.error("You have used your 2 free attempts! Please fund your DOT Wallet with at least 100 DOT to perform a revaluation.", {
+          duration: 6000
+        });
+      } else {
+        toast.error(errMsg || "Could not save assessment");
+      }
     } finally {
       setBusy(false);
     }
