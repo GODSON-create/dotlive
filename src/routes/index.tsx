@@ -62,40 +62,49 @@ const COPY_OPTIONS = {
   },
 };
 
+const CURRENCIES = {
+  NGN: { symbol: "₦", rate: 1 },
+  USD: { symbol: "$", rate: 1500 },
+  ZAR: { symbol: "R", rate: 81 },
+  EUR: { symbol: "€", rate: 1620 },
+  BTC: { symbol: "₿", rate: 90000000 },
+};
+
 function LandingPage() {
   const [copyOption, setCopyOption] = useState<"A" | "B" | "C" | "D">("A");
+  const [currency, setCurrency] = useState<"NGN" | "USD" | "ZAR" | "EUR" | "BTC">("NGN");
   
-  // Interactive Simulator State
-  const [simVenture, setSimVenture] = useState("Nova AI");
-  const [simTraction, setSimTraction] = useState(250000); // ₦250k/mo
-  const [simTeam, setSimTeam] = useState(2); // 2 members
-  const [simProduct, setSimProduct] = useState(1); // 1: Prototype, 2: MVP, 3: Launch
-  const [simMarket, setSimMarket] = useState(1); // 1: Regional, 2: Global
+  // Interactive Simulator State - Set defaults high to show 5B valuation for DOT OS
+  const [simVenture, setSimVenture] = useState("DOT OS");
+  const [simTraction, setSimTraction] = useState(3800000); // ₦3.8M/mo
+  const [simTeam, setSimTeam] = useState(5); // 5 members
+  const [simProduct, setSimProduct] = useState(3); // 3: Launch
+  const [simMarket, setSimMarket] = useState(2); // 2: Global
 
   // Dynamic calculations for preview card
   const stats = useMemo(() => {
     // Score range 300 - 1000
     const scoreBase = 380;
-    const tractionBonus = Math.min(220, Math.round((simTraction / 2000000) * 220));
-    const teamBonus = Math.min(120, simTeam * 40);
+    const tractionBonus = Math.min(220, Math.round((simTraction / 5000000) * 220));
+    const teamBonus = Math.min(120, simTeam * 24);
     const productBonus = simProduct * 90; // 0: Idea(0), 1: Proto(90), 2: MVP(180), 3: Launch(270)
     const marketBonus = simMarket * 70; // 0: Local(0), 1: Regional(70), 2: Global(140)
     
     const dotScore = Math.min(1000, scoreBase + tractionBonus + teamBonus + productBonus + marketBonus);
     
-    // Valuation math: grows exponentially with score + traction
-    const rawVal = 1200000 * Math.pow(dotScore / 320, 2.7) + (simTraction * 15);
-    const valuation = Math.min(150000000, Math.max(1500000, Math.round(rawVal / 50000) * 50000));
+    // Valuation math: scales up to exactly 5 Billion NGN (₦5,000,000,000) at high/max stats
+    const rawVal = 25000000 * Math.pow(dotScore / 320, 3.9) + (simTraction * 1000);
+    const valuation = Math.min(5000000000, Math.max(5000000, Math.round(rawVal / 1000000) * 1000000));
     
     // Potential valuation
-    const rawPotential = valuation * (6 + (simMarket * 3)) + 50000000;
-    const potential = Math.min(850000000, Math.max(10000000, Math.round(rawPotential / 1000000) * 1000000));
+    const rawPotential = valuation * (3 + (simMarket * 2.5)) + 100000000;
+    const potential = Math.min(15000000000, Math.max(50000000, Math.round(rawPotential / 10000000) * 10000000));
 
     // Rank percentage: better score -> lower percentage (top X%)
-    const rankPercent = Math.max(1, Math.min(99, Math.round(100 - ((dotScore - 300) / 700) * 98)));
+    const rankPercent = Math.max(1, Math.min(99, Math.round(100 - ((dotScore - 300) / 700) * 99)));
 
     let status = "Idea Explorer 💡";
-    if (dotScore >= 750) status = "Unicorn Candidate 🦄";
+    if (dotScore >= 800) status = "Unicorn Candidate 🦄";
     else if (dotScore >= 600) status = "Rising Founder 🚀";
     else if (dotScore >= 450) status = "Cohort Builder 🛠️";
 
@@ -107,6 +116,26 @@ function LandingPage() {
       status,
     };
   }, [simTraction, simTeam, simProduct, simMarket]);
+
+  function formatVal(amountNaira: number, code: string): string {
+    const rate = CURRENCIES[code as keyof typeof CURRENCIES]?.rate || 1;
+    const symbol = CURRENCIES[code as keyof typeof CURRENCIES]?.symbol || "";
+    const value = amountNaira / rate;
+    
+    if (code === "BTC") {
+      return `₿${value.toFixed(4)}`;
+    }
+    
+    if (value >= 1000000000) {
+      return `${symbol}${(value / 1000000000).toFixed(1)}B`;
+    }
+    
+    if (value >= 1000000) {
+      return `${symbol}${(value / 1000000).toFixed(1)}M`;
+    }
+    
+    return `${symbol}${Math.round(value).toLocaleString()}`;
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
@@ -184,20 +213,44 @@ function LandingPage() {
                   <div className="absolute bottom-0 left-0 size-32 rounded-full bg-indigo-500/10 blur-3xl -z-10" />
 
                   {/* Header */}
-                  <div className="flex items-center justify-between border-b border-slate-900 pb-4">
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase">STARTUP REPORT</span>
-                      <input 
-                        type="text"
-                        value={simVenture}
-                        onChange={(e) => setSimVenture(e.target.value)}
-                        className="block bg-transparent text-lg font-bold text-white focus:outline-none focus:border-primary/50 border-b border-transparent w-full"
-                        placeholder="Venture Name"
-                      />
+                  <div className="flex flex-col border-b border-slate-900 pb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 mr-2">
+                        <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase block">STARTUP REPORT</span>
+                        <input 
+                          type="text"
+                          value={simVenture}
+                          onChange={(e) => setSimVenture(e.target.value)}
+                          className="block bg-transparent text-lg font-bold text-white focus:outline-none focus:border-primary/50 border-b border-transparent w-full"
+                          placeholder="Venture Name"
+                        />
+                      </div>
+                      <span className="text-xs font-semibold px-2.5 py-1 bg-slate-900 text-slate-400 rounded-full border border-slate-800 shrink-0">
+                        Rank: Top {stats.rankPercent}%
+                      </span>
                     </div>
-                    <span className="text-xs font-semibold px-2 py-1 bg-slate-900 text-slate-400 rounded-full border border-slate-800">
-                      Rank: Top {stats.rankPercent}%
-                    </span>
+
+                    {/* Currency switcher tabs */}
+                    <div className="mt-3 flex items-center justify-between bg-slate-900/40 border border-slate-900/60 p-0.5 rounded-lg text-[9px] w-full">
+                      <span className="text-slate-500 font-bold px-2 uppercase tracking-wide">Currency:</span>
+                      <div className="flex gap-0.5">
+                        {(["NGN", "USD", "ZAR", "EUR", "BTC"] as const).map((curr) => (
+                          <button
+                            key={curr}
+                            type="button"
+                            onClick={() => setCurrency(curr)}
+                            className={cn(
+                              "px-2 py-0.5 rounded font-bold transition-all",
+                              currency === curr 
+                                ? "bg-slate-800 text-white border border-slate-700/60" 
+                                : "text-slate-400 hover:text-white"
+                            )}
+                          >
+                            {curr}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Scores Grid */}
@@ -205,7 +258,7 @@ function LandingPage() {
                     <div className="rounded-2xl bg-slate-900/30 border border-slate-900 p-4">
                       <span className="text-[10px] font-semibold text-slate-400">Estimated Value</span>
                       <p className="mt-1.5 font-display text-xl sm:text-2xl font-black text-white text-gradient">
-                        {formatNaira(stats.valuation)}
+                        {formatVal(stats.valuation, currency)}
                       </p>
                     </div>
                     <div className="rounded-2xl bg-slate-900/30 border border-slate-900 p-4">
@@ -218,7 +271,7 @@ function LandingPage() {
                     <div className="rounded-2xl bg-slate-900/30 border border-slate-900 p-4">
                       <span className="text-[10px] font-semibold text-slate-400">Potential</span>
                       <p className="mt-1.5 font-display text-lg font-bold text-slate-300">
-                        {formatNaira(stats.potential)}+
+                        {formatVal(stats.potential, currency)}+
                       </p>
                     </div>
                     <div className="rounded-2xl bg-slate-900/30 border border-slate-900 p-4">
@@ -240,13 +293,13 @@ function LandingPage() {
                     <div className="space-y-1">
                       <div className="flex justify-between text-[11px]">
                         <span className="text-slate-400">Monthly Revenue / Traction</span>
-                        <span className="font-bold text-white">{formatNaira(simTraction)}</span>
+                        <span className="font-bold text-white">{formatVal(simTraction, currency)}</span>
                       </div>
                       <input 
                         type="range" 
                         min="0" 
-                        max="2000000" 
-                        step="50000"
+                        max="5000000" 
+                        step="100000"
                         value={simTraction}
                         onChange={(e) => setSimTraction(Number(e.target.value))}
                         className="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-primary"
