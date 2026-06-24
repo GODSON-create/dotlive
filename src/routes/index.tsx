@@ -83,22 +83,28 @@ function LandingPage() {
 
   // Dynamic calculations for preview card
   const stats = useMemo(() => {
-    // Score range 300 - 1000
-    const scoreBase = 380;
-    const tractionBonus = Math.min(220, Math.round((simTraction / 5000000) * 220));
-    const teamBonus = Math.min(120, simTeam * 24);
-    const productBonus = simProduct * 90; // 0: Idea(0), 1: Proto(90), 2: MVP(180), 3: Launch(270)
-    const marketBonus = simMarket * 70; // 0: Local(0), 1: Regional(70), 2: Global(140)
+    // Score range 300 - 1000, summing up to exactly 1000 at absolute maximums
+    const scoreBase = 300;
+    const tractionBonus = Math.min(250, Math.round((simTraction / 5000000) * 250));
+    const teamBonus = Math.min(150, simTeam * 30);
+    const productBonus = simProduct * 50; // 0: Idea(0), 1: Proto(50), 2: MVP(100), 3: Launch(150)
+    const marketBonus = simMarket * 75; // 0: Local(0), 1: Regional(75), 2: Global(150)
     
     const dotScore = Math.min(1000, scoreBase + tractionBonus + teamBonus + productBonus + marketBonus);
     
-    // Valuation math: scales up to exactly 5 Billion NGN (₦5,000,000,000) at high/max stats
-    const rawVal = 25000000 * Math.pow(dotScore / 320, 3.9) + (simTraction * 1000);
-    const valuation = Math.min(5000000000, Math.max(5000000, Math.round(rawVal / 1000000) * 1000000));
+    // Valuation math: scales up to exactly 5 Billion NGN at 940 score, and exponentially rises to 3 Trillion NGN ($2B USD) at 1000 score
+    let valuation = 1500000;
+    if (dotScore >= 940) {
+      const factor = (dotScore - 940) / 60; // 0 to 1
+      valuation = 5000000000 + Math.pow(factor, 4) * 2995000000000;
+    } else {
+      const factor = (dotScore - 300) / 640; // 0 to 1
+      valuation = 1500000 + Math.pow(Math.max(0, factor), 3) * 4998500000;
+    }
     
-    // Potential valuation
-    const rawPotential = valuation * (3 + (simMarket * 2.5)) + 100000000;
-    const potential = Math.min(15000000000, Math.max(50000000, Math.round(rawPotential / 10000000) * 10000000));
+    // Potential valuation - scales up to 10 Trillion NGN maximum
+    const rawPotential = valuation * (3 + (simMarket * 1.5)) + 100000000;
+    const potential = Math.min(10000000000000, Math.max(50000000, Math.round(rawPotential / 10000000) * 10000000));
 
     // Rank percentage: better score -> lower percentage (top X%)
     const rankPercent = Math.max(1, Math.min(99, Math.round(100 - ((dotScore - 300) / 700) * 99)));
@@ -124,6 +130,10 @@ function LandingPage() {
     
     if (code === "BTC") {
       return `₿${value.toFixed(4)}`;
+    }
+    
+    if (value >= 1000000000000) {
+      return `${symbol}${(value / 1000000000000).toFixed(1)}T`;
     }
     
     if (value >= 1000000000) {
@@ -338,6 +348,25 @@ function LandingPage() {
                         step="1"
                         value={simTeam}
                         onChange={(e) => setSimTeam(Number(e.target.value))}
+                        className="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-primary"
+                      />
+                    </div>
+
+                    {/* Market Reach */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-slate-400">Market Reach / Size</span>
+                        <span className="font-bold text-white">
+                          {simMarket === 0 ? "Local Market" : simMarket === 1 ? "Regional Market" : "Global Market"}
+                        </span>
+                      </div>
+                      <input 
+                        type="range" 
+                        min="0" 
+                        max="2" 
+                        step="1"
+                        value={simMarket}
+                        onChange={(e) => setSimMarket(Number(e.target.value))}
                         className="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-primary"
                       />
                     </div>
