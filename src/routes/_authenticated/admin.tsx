@@ -468,6 +468,15 @@ function ReserveTab() {
     },
   });
 
+  const { data: pools = [] } = useQuery({
+    queryKey: ["treasury-pools"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("treasury_pools").select("*").order("pool_name");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
   const { data: allocations = [] } = useQuery({
     queryKey: ["reserve-allocations"],
     queryFn: async () => {
@@ -519,6 +528,7 @@ function ReserveTab() {
       if (error) throw error;
       toast.success(`Allocated ${formatDot(amount)} DOT to ${recipient}`);
       qc.invalidateQueries({ queryKey: ["reserve-wallet"] });
+      qc.invalidateQueries({ queryKey: ["treasury-pools"] });
       qc.invalidateQueries({ queryKey: ["reserve-allocations"] });
       qc.invalidateQueries({ queryKey: ["admin-audit"] });
       qc.invalidateQueries({ queryKey: ["admin-wallets"] });
@@ -544,6 +554,25 @@ function ReserveTab() {
           Funds scholarships, rewards, grants and ecosystem growth. Every allocation is logged.
         </p>
       </div>
+
+      {pools.length > 0 && (
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
+          {pools.map((p: any) => (
+            <div key={p.pool_name} className="rounded-xl border border-border bg-card p-4 space-y-1">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block truncate">
+                {p.pool_name === "scholarship" ? "Scholarship Pool" :
+                 p.pool_name === "growth" ? "Growth Pool" :
+                 p.pool_name === "work" ? "Work Pool" :
+                 p.pool_name === "community" ? "Community Pool" :
+                 p.pool_name === "reward" ? "Reward Pool" :
+                 p.pool_name === "partner" ? "Partner Pool" : "Withdrawal Pool"}
+              </span>
+              <p className="font-display font-black text-white text-sm">{formatDot(Number(p.balance))} DOT</p>
+              <p className="text-[9px] text-muted-foreground">Used: {formatDot(Number(p.total_allocated))}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="rounded-2xl border border-border bg-card p-5">
         <h3 className="font-display font-semibold">Allocate from reserve</h3>

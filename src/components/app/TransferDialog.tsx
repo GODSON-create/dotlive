@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Send, Loader2, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Send, Loader2, ArrowRight, CheckCircle2, User, UserPlus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -15,12 +16,19 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { formatDot, dotToNaira, formatNaira } from "@/lib/constants";
+import { useTransactions } from "@/hooks/use-dot-data";
 import { toast } from "sonner";
 
 type Step = "details" | "confirm" | "done";
 
+interface SavedRecipient {
+  dotId: string;
+  name: string;
+}
+
 export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?: string | null }) {
   const qc = useQueryClient();
+  const { data: transactions = [] } = useTransactions();
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("details");
   const [recipientId, setRecipientId] = useState("");
@@ -28,6 +36,28 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
   const [amount, setAmount] = useState<number>(0);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
+  const [saveContact, setSaveContact] = useState(true);
+
+  // Load saved recipients from localStorage
+  const [savedRecipients, setSavedRecipients] = useState<SavedRecipient[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const data = localStorage.getItem("dot-saved-recipients");
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Calculate total sent via Transfer today for limits enforcement
+  const todaySent = transactions
+    .filter((t) => {
+      if (t.type !== "Transfer" || t.amount >= 0) return false;
+      const tDate = new Date(t.created_at).toDateString();
+      const todayDate = new Date().toDateString();
+      return tDate === todayDate;
+    })
+    .reduce((sum, t) => sum + Math.abs(Number(t.amount)), 0);
 
   function reset() {
     setStep("details");
@@ -36,11 +66,20 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
     setAmount(0);
     setNote("");
     setBusy(false);
+    setSaveContact(true);
   }
 
   function close(o: boolean) {
     setOpen(o);
     if (!o) setTimeout(reset, 200);
+  }
+
+  function deleteContact(dotIdToDelete: string, e: React.MouseEvent) {
+    e.stopPropagation();
+    const updated = savedRecipients.filter((r) => r.dotId !== dotIdToDelete);
+    setSavedRecipients(updated);
+    localStorage.setItem("dot-saved-recipients", JSON.stringify(updated));
+    toast.success("Recipient removed");
   }
 
   async function handleLookup() {
@@ -61,6 +100,17 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
       toast.error("Amount exceeds your balance");
       return;
     }
+
+    // Limit Enforcements
+    if (amount > 100000) {
+      toast.error("Single transfer limit is 100,000 DOT");
+      return;
+    }
+    if (todaySent + amount > 250000) {
+      toast.error(`Daily transfer limit is 250,000 DOT. You have already transferred ${formatDot(todaySent)} DOT today.`);
+      return;
+    }
+
     setBusy(true);
     try {
       const { data, error } = await supabase.rpc("lookup_dot_id", { _dot_id: code });
@@ -79,14 +129,26 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
   }
 
   async function handleTransfer() {
+    const code = recipientId.trim().toUpperCase();
     setBusy(true);
     try {
       const { error } = await supabase.rpc("transfer_dot", {
-        _recipient_dot_id: recipientId.trim().toUpperCase(),
+        _recipient_dot_id: code,
         _amount: Math.floor(amount),
         _note: note.trim() || undefined,
       });
       if (error) throw error;
+
+      // Save contact if selected
+      if (saveContact) {
+        setSavedRecipients((prev) => {
+          if (prev.some((r) => r.dotId.toUpperCase() === code)) return prev;
+          const updated = [...prev, { dotId: code, name: recipientName ?? code }];
+          localStorage.setItem("dot-saved-recipients", JSON.stringify(updated));
+          return updated;
+        });
+      }
+
       qc.invalidateQueries({ queryKey: ["wallet"] });
       qc.invalidateQueries({ queryKey: ["transactions"] });
       setStep("done");
@@ -105,7 +167,7 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
           <Send className="size-4" /> Send DOT
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-md">
         {step === "details" && (
           <>
             <DialogHeader>
@@ -114,7 +176,7 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
                 Transfer credits instantly to another user by their DOT ID.
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="recipient">Recipient DOT ID</Label>
                 <Input
@@ -126,6 +188,33 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
                   maxLength={20}
                 />
               </div>
+
+              {/* Saved Recipients selector */}
+              {savedRecipients.length > 0 && (
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">Saved Contacts</Label>
+                  <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto rounded-lg border border-border bg-muted/40 p-2">
+                    {savedRecipients.map((contact) => (
+                      <div
+                        key={contact.dotId}
+                        onClick={() => setRecipientId(contact.dotId)}
+                        className="flex items-center gap-1.5 cursor-pointer rounded-full bg-slate-900 border border-slate-800 px-2.5 py-1 text-xs hover:border-primary/50 transition-colors"
+                      >
+                        <User className="size-3 text-slate-400" />
+                        <span className="text-white font-medium">{contact.name}</span>
+                        <span className="text-[10px] text-slate-500 font-mono">({contact.dotId})</span>
+                        <button
+                          onClick={(e) => deleteContact(contact.dotId, e)}
+                          className="text-slate-500 hover:text-destructive transition-colors pl-1"
+                        >
+                          <Trash2 className="size-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-1.5">
                 <Label htmlFor="t-amount">Amount (DOT)</Label>
                 <Input
@@ -136,9 +225,10 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
                   value={amount || ""}
                   onChange={(e) => setAmount(Number(e.target.value))}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Available: {formatDot(balance)} DOT · ≈ {formatNaira(dotToNaira(amount || 0))}
-                </p>
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Available: {formatDot(balance)} DOT · ≈ {formatNaira(dotToNaira(amount || 0))}</span>
+                  <span>Daily limit: 250K DOT</span>
+                </div>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="t-note">Note (optional)</Label>
@@ -166,11 +256,27 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
               <DialogTitle>Confirm transfer</DialogTitle>
               <DialogDescription>Please review before sending. This cannot be undone.</DialogDescription>
             </DialogHeader>
-            <div className="space-y-2 rounded-xl border border-border bg-muted/40 p-4 text-sm">
-              <Row label="To" value={recipientName ?? recipientId} />
-              <Row label="DOT ID" value={recipientId.toUpperCase()} mono />
-              <Row label="Amount" value={`${formatDot(amount)} DOT`} />
-              {note.trim() && <Row label="Note" value={note.trim()} />}
+            <div className="space-y-4">
+              <div className="space-y-2 rounded-xl border border-border bg-muted/40 p-4 text-sm">
+                <Row label="To" value={recipientName ?? recipientId} />
+                <Row label="DOT ID" value={recipientId.toUpperCase()} mono />
+                <Row label="Amount" value={`${formatDot(amount)} DOT`} />
+                {note.trim() && <Row label="Note" value={note.trim()} />}
+              </div>
+
+              {/* Save contact checkbox */}
+              {!savedRecipients.some((r) => r.dotId.toUpperCase() === recipientId.trim().toUpperCase()) && (
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="save-contact"
+                    checked={saveContact}
+                    onCheckedChange={(checked) => setSaveContact(!!checked)}
+                  />
+                  <Label htmlFor="save-contact" className="text-xs text-muted-foreground flex items-center gap-1 cursor-pointer">
+                    <UserPlus className="size-3.5" /> Save contact for future transfers
+                  </Label>
+                </div>
+              )}
             </div>
             <DialogFooter className="gap-2 sm:gap-0">
               <Button variant="outline" onClick={() => setStep("details")} disabled={busy}>

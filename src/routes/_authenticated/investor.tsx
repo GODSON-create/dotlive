@@ -35,7 +35,8 @@ function InvestorPage() {
   const [stage, setStage] = useState("all");
   const [minVantage, setMinVantage] = useState(0);
   const [savedOnly, setSavedOnly] = useState(false);
-
+  const [sortBy, setSortBy] = useState<"vantage" | "fundability" | "industry" | "stage">("vantage");
+ 
   const { data: ventures = [], isLoading } = useQuery({
     queryKey: ["showcase"],
     queryFn: async () => {
@@ -48,7 +49,7 @@ function InvestorPage() {
       return (data ?? []) as FounderShowcase[];
     },
   });
-
+ 
   const { data: saves = [] } = useQuery({
     queryKey: ["investor-saves", user?.id],
     enabled: !!user,
@@ -59,19 +60,33 @@ function InvestorPage() {
     },
   });
   const saved = new Set(saves.map((s) => s.founder_id));
-
+ 
   const filtered = useMemo(
-    () =>
-      ventures.filter((v) => {
+    () => {
+      const res = ventures.filter((v) => {
         if (industry !== "all" && v.industry !== industry) return false;
         if (stage !== "all" && v.stage !== stage) return false;
         if ((v.vantage_point ?? 0) < minVantage) return false;
         if (savedOnly && !saved.has(v.user_id)) return false;
         return true;
-      }),
-    [ventures, industry, stage, minVantage, savedOnly, saved],
-  );
+      });
 
+      return [...res].sort((a, b) => {
+        if (sortBy === "vantage") {
+          return (b.vantage_point ?? 0) - (a.vantage_point ?? 0);
+        } else if (sortBy === "fundability") {
+          return (b.fundability ?? 0) - (a.fundability ?? 0);
+        } else if (sortBy === "industry") {
+          return (a.industry ?? "").localeCompare(b.industry ?? "");
+        } else if (sortBy === "stage") {
+          return (a.stage ?? "").localeCompare(b.stage ?? "");
+        }
+        return 0;
+      });
+    },
+    [ventures, industry, stage, minVantage, savedOnly, saved, sortBy],
+  );
+ 
   async function toggleSave(founderId: string) {
     if (!user) return;
     try {
@@ -85,7 +100,7 @@ function InvestorPage() {
       toast.error(err instanceof Error ? err.message : "Could not update");
     }
   }
-
+ 
   async function requestMeeting(founderId: string) {
     if (!user) return;
     try {
@@ -100,19 +115,19 @@ function InvestorPage() {
       toast.error(err instanceof Error ? err.message : "Could not send request");
     }
   }
-
+ 
   return (
     <AppShell>
       <h1 className="font-display text-3xl font-bold">Investor Portal</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Discover and connect with vetted African ventures.
       </p>
-
+ 
       <div className="mt-6 rounded-2xl border border-border bg-card p-5">
         <div className="flex items-center gap-2 text-sm font-medium">
           <Filter className="size-4 text-primary" /> Filters
         </div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <div>
             <label className="text-xs text-muted-foreground">Industry</label>
             <Select value={industry} onValueChange={setIndustry}>
@@ -134,13 +149,25 @@ function InvestorPage() {
             </Select>
           </div>
           <div>
+            <label className="text-xs text-muted-foreground">Sort By</label>
+            <Select value={sortBy} onValueChange={(val: any) => setSortBy(val)}>
+              <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="vantage">Vantage Score</SelectItem>
+                <SelectItem value="fundability">Fundability Score</SelectItem>
+                <SelectItem value="industry">Industry</SelectItem>
+                <SelectItem value="stage">Stage</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
             <label className="text-xs text-muted-foreground">Min Vantage: {minVantage}</label>
             <Slider className="mt-3" value={[minVantage]} onValueChange={([v]) => setMinVantage(v)} max={1000} step={50} />
           </div>
           <div className="flex items-end">
             <button
               onClick={() => setSavedOnly((s) => !s)}
-              className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm ${savedOnly ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"}`}
+              className={`w-full flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm ${savedOnly ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"}`}
             >
               <Bookmark className="size-4" /> Saved only
             </button>

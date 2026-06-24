@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ScholarshipRouteImport } from './routes/scholarship'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PlatformRouteImport } from './routes/platform'
 import { Route as JourneyRouteImport } from './routes/journey'
@@ -24,6 +25,7 @@ import { Route as FounderDotIdRouteImport } from './routes/founder.$dotId'
 import { Route as AuthenticatedWorkRouteImport } from './routes/_authenticated/work'
 import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as AuthenticatedVantageRouteImport } from './routes/_authenticated/vantage'
+import { Route as AuthenticatedStoreRouteImport } from './routes/_authenticated/store'
 import { Route as AuthenticatedSpotlightRouteImport } from './routes/_authenticated/spotlight'
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
 import { Route as AuthenticatedPitchathonsRouteImport } from './routes/_authenticated/pitchathons'
@@ -33,6 +35,7 @@ import { Route as AuthenticatedInvestorRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedDemoRouteImport } from './routes/_authenticated/demo'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCommunityRouteImport } from './routes/_authenticated/community'
+import { Route as AuthenticatedCapitalPartnerRouteImport } from './routes/_authenticated/capital-partner'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAcademyRouteImport } from './routes/_authenticated/academy'
 import { Route as AuthenticatedJoinCodeRouteImport } from './routes/_authenticated/join.$code'
@@ -41,6 +44,11 @@ import { Route as ApiPublicWebhooksPaystackRouteImport } from './routes/api/publ
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScholarshipRoute = ScholarshipRouteImport.update({
+  id: '/scholarship',
+  path: '/scholarship',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -112,6 +120,11 @@ const AuthenticatedVantageRoute = AuthenticatedVantageRouteImport.update({
   path: '/vantage',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedStoreRoute = AuthenticatedStoreRouteImport.update({
+  id: '/store',
+  path: '/store',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSpotlightRoute = AuthenticatedSpotlightRouteImport.update({
   id: '/spotlight',
   path: '/spotlight',
@@ -159,6 +172,12 @@ const AuthenticatedCommunityRoute = AuthenticatedCommunityRouteImport.update({
   path: '/community',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCapitalPartnerRoute =
+  AuthenticatedCapitalPartnerRouteImport.update({
+    id: '/capital-partner',
+    path: '/capital-partner',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -189,9 +208,11 @@ export interface FileRoutesByFullPath {
   '/journey': typeof JourneyRoute
   '/platform': typeof PlatformRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/scholarship': typeof ScholarshipRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/academy': typeof AuthenticatedAcademyRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/capital-partner': typeof AuthenticatedCapitalPartnerRoute
   '/community': typeof AuthenticatedCommunityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/demo': typeof AuthenticatedDemoRoute
@@ -201,6 +222,7 @@ export interface FileRoutesByFullPath {
   '/pitchathons': typeof AuthenticatedPitchathonsRoute
   '/sessions': typeof AuthenticatedSessionsRoute
   '/spotlight': typeof AuthenticatedSpotlightRoute
+  '/store': typeof AuthenticatedStoreRoute
   '/vantage': typeof AuthenticatedVantageRoute
   '/wallet': typeof AuthenticatedWalletRoute
   '/work': typeof AuthenticatedWorkRoute
@@ -218,9 +240,11 @@ export interface FileRoutesByTo {
   '/journey': typeof JourneyRoute
   '/platform': typeof PlatformRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/scholarship': typeof ScholarshipRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/academy': typeof AuthenticatedAcademyRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/capital-partner': typeof AuthenticatedCapitalPartnerRoute
   '/community': typeof AuthenticatedCommunityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/demo': typeof AuthenticatedDemoRoute
@@ -230,6 +254,7 @@ export interface FileRoutesByTo {
   '/pitchathons': typeof AuthenticatedPitchathonsRoute
   '/sessions': typeof AuthenticatedSessionsRoute
   '/spotlight': typeof AuthenticatedSpotlightRoute
+  '/store': typeof AuthenticatedStoreRoute
   '/vantage': typeof AuthenticatedVantageRoute
   '/wallet': typeof AuthenticatedWalletRoute
   '/work': typeof AuthenticatedWorkRoute
@@ -249,9 +274,11 @@ export interface FileRoutesById {
   '/journey': typeof JourneyRoute
   '/platform': typeof PlatformRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/scholarship': typeof ScholarshipRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/academy': typeof AuthenticatedAcademyRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/capital-partner': typeof AuthenticatedCapitalPartnerRoute
   '/_authenticated/community': typeof AuthenticatedCommunityRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/demo': typeof AuthenticatedDemoRoute
@@ -261,6 +288,7 @@ export interface FileRoutesById {
   '/_authenticated/pitchathons': typeof AuthenticatedPitchathonsRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRoute
   '/_authenticated/spotlight': typeof AuthenticatedSpotlightRoute
+  '/_authenticated/store': typeof AuthenticatedStoreRoute
   '/_authenticated/vantage': typeof AuthenticatedVantageRoute
   '/_authenticated/wallet': typeof AuthenticatedWalletRoute
   '/_authenticated/work': typeof AuthenticatedWorkRoute
@@ -280,9 +308,11 @@ export interface FileRouteTypes {
     | '/journey'
     | '/platform'
     | '/reset-password'
+    | '/scholarship'
     | '/sitemap.xml'
     | '/academy'
     | '/admin'
+    | '/capital-partner'
     | '/community'
     | '/dashboard'
     | '/demo'
@@ -292,6 +322,7 @@ export interface FileRouteTypes {
     | '/pitchathons'
     | '/sessions'
     | '/spotlight'
+    | '/store'
     | '/vantage'
     | '/wallet'
     | '/work'
@@ -309,9 +340,11 @@ export interface FileRouteTypes {
     | '/journey'
     | '/platform'
     | '/reset-password'
+    | '/scholarship'
     | '/sitemap.xml'
     | '/academy'
     | '/admin'
+    | '/capital-partner'
     | '/community'
     | '/dashboard'
     | '/demo'
@@ -321,6 +354,7 @@ export interface FileRouteTypes {
     | '/pitchathons'
     | '/sessions'
     | '/spotlight'
+    | '/store'
     | '/vantage'
     | '/wallet'
     | '/work'
@@ -339,9 +373,11 @@ export interface FileRouteTypes {
     | '/journey'
     | '/platform'
     | '/reset-password'
+    | '/scholarship'
     | '/sitemap.xml'
     | '/_authenticated/academy'
     | '/_authenticated/admin'
+    | '/_authenticated/capital-partner'
     | '/_authenticated/community'
     | '/_authenticated/dashboard'
     | '/_authenticated/demo'
@@ -351,6 +387,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pitchathons'
     | '/_authenticated/sessions'
     | '/_authenticated/spotlight'
+    | '/_authenticated/store'
     | '/_authenticated/vantage'
     | '/_authenticated/wallet'
     | '/_authenticated/work'
@@ -370,6 +407,7 @@ export interface RootRouteChildren {
   JourneyRoute: typeof JourneyRoute
   PlatformRoute: typeof PlatformRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ScholarshipRoute: typeof ScholarshipRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   FounderDotIdRoute: typeof FounderDotIdRoute
   ResultIdRoute: typeof ResultIdRoute
@@ -384,6 +422,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scholarship': {
+      id: '/scholarship'
+      path: '/scholarship'
+      fullPath: '/scholarship'
+      preLoaderRoute: typeof ScholarshipRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -484,6 +529,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVantageRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/store': {
+      id: '/_authenticated/store'
+      path: '/store'
+      fullPath: '/store'
+      preLoaderRoute: typeof AuthenticatedStoreRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/spotlight': {
       id: '/_authenticated/spotlight'
       path: '/spotlight'
@@ -547,6 +599,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCommunityRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/capital-partner': {
+      id: '/_authenticated/capital-partner'
+      path: '/capital-partner'
+      fullPath: '/capital-partner'
+      preLoaderRoute: typeof AuthenticatedCapitalPartnerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -581,6 +640,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAcademyRoute: typeof AuthenticatedAcademyRoute
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedCapitalPartnerRoute: typeof AuthenticatedCapitalPartnerRoute
   AuthenticatedCommunityRoute: typeof AuthenticatedCommunityRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDemoRoute: typeof AuthenticatedDemoRoute
@@ -590,6 +650,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPitchathonsRoute: typeof AuthenticatedPitchathonsRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRoute
   AuthenticatedSpotlightRoute: typeof AuthenticatedSpotlightRoute
+  AuthenticatedStoreRoute: typeof AuthenticatedStoreRoute
   AuthenticatedVantageRoute: typeof AuthenticatedVantageRoute
   AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
   AuthenticatedWorkRoute: typeof AuthenticatedWorkRoute
@@ -599,6 +660,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAcademyRoute: AuthenticatedAcademyRoute,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedCapitalPartnerRoute: AuthenticatedCapitalPartnerRoute,
   AuthenticatedCommunityRoute: AuthenticatedCommunityRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDemoRoute: AuthenticatedDemoRoute,
@@ -608,6 +670,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPitchathonsRoute: AuthenticatedPitchathonsRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRoute,
   AuthenticatedSpotlightRoute: AuthenticatedSpotlightRoute,
+  AuthenticatedStoreRoute: AuthenticatedStoreRoute,
   AuthenticatedVantageRoute: AuthenticatedVantageRoute,
   AuthenticatedWalletRoute: AuthenticatedWalletRoute,
   AuthenticatedWorkRoute: AuthenticatedWorkRoute,
@@ -626,6 +689,7 @@ const rootRouteChildren: RootRouteChildren = {
   JourneyRoute: JourneyRoute,
   PlatformRoute: PlatformRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ScholarshipRoute: ScholarshipRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   FounderDotIdRoute: FounderDotIdRoute,
   ResultIdRoute: ResultIdRoute,

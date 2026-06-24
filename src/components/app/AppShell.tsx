@@ -61,6 +61,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Vantage", to: "/vantage", icon: Gauge, roles: ["founder"] },
   { label: "Leaderboards", to: "/leaderboards", icon: Trophy },
   { label: "Wallet", to: "/wallet", icon: Wallet },
+  { label: "DOT Store", to: "/store", icon: Store },
   { label: "DOT Work", to: "/work", icon: Hammer },
   { label: "Academy", to: "/academy", icon: BookOpen, roles: ["founder"] },
   { label: "Sessions", to: "/sessions", icon: CalendarCheck },
@@ -69,6 +70,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "DOT Demo", to: "/demo", icon: Building2 },
   { label: "Community", to: "/community", icon: Users, roles: ["community_leader"] },
   { label: "Investor Portal", to: "/investor", icon: Briefcase, roles: ["investor"] },
+  { label: "Capital Partner", to: "/capital-partner", icon: Building2, roles: ["capital_partner"] },
   { label: "Admin", to: "/admin", icon: Shield, roles: ["admin", "super_admin"] },
 ];
 

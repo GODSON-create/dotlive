@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const DOT_RATE_NGN = 15;
-const MIN_DEPOSIT_DOT = 2000;
+const MIN_DEPOSIT_DOT = 200;
 const PAYSTACK_BASE = "https://api.paystack.co";
 
 const initInput = z.object({
