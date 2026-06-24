@@ -41,7 +41,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "DOT Demo", to: "/demo", icon: Building2 },
   { label: "Community", to: "/community", icon: Users, roles: ["community_leader"] },
   { label: "Investor Portal", to: "/investor", icon: Briefcase, roles: ["investor"] },
-  { label: "Admin", to: "/admin", icon: Shield, roles: ["admin"] },
+  { label: "Admin", to: "/admin", icon: Shield, roles: ["admin", "super_admin"] },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {

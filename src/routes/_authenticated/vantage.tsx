@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Gauge,
   Loader2,
@@ -37,6 +37,8 @@ import {
 import { formatDot, formatNaira } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { submitAssessment } from "@/lib/vantage.functions";
 
 export const Route = createFileRoute("/_authenticated/vantage")({
   head: () => ({
@@ -63,6 +65,7 @@ const FLAT_QUESTIONS = VANTAGE_CATEGORIES.flatMap((c) =>
 function VantagePage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const submitAssessmentFn = useServerFn(submitAssessment);
   const { data: assessments = [], isLoading } = useAssessments();
   const [taking, setTaking] = useState(false);
   const [idx, setIdx] = useState(0);
@@ -96,37 +99,7 @@ function VantagePage() {
     if (!user || !answeredAll) return;
     setBusy(true);
     try {
-      const result = computeVantage(answers);
-      const { error } = await supabase.from("assessments").insert({
-        user_id: user.id,
-        answers,
-        category_scores: result.categoryScores,
-        score: result.score,
-        vantage_point: result.vantagePoint,
-        fundability: result.fundability,
-        investment_readiness: result.investmentReadiness,
-        stage: result.stage,
-        report: result.report,
-        current_valuation: result.currentValuation,
-        potential_valuation: result.potentialValuation,
-        unicorn_potential: result.unicornPotential,
-        founder_archetype: result.founderArchetype,
-      });
-      if (error) throw error;
-
-      await supabase
-        .from("founder_profiles")
-        .update({
-          vantage_point: result.vantagePoint,
-          fundability: result.fundability,
-          investment_readiness: result.investmentReadiness,
-          stage: result.stage,
-          current_valuation: result.currentValuation,
-          potential_valuation: result.potentialValuation,
-          unicorn_potential: result.unicornPotential,
-          founder_archetype: result.founderArchetype,
-        })
-        .eq("user_id", user.id);
+      const result = await submitAssessmentFn({ data: answers });
 
       toast.success(`Vantage complete! You scored ${result.vantagePoint} points.`);
       qc.invalidateQueries({ queryKey: ["assessments", user.id] });
@@ -274,7 +247,7 @@ function VantagePage() {
 
           <div className="mt-6 flex flex-col gap-4 sm:flex-row">
             <Button variant="hero" asChild className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:to-indigo-600 text-white font-semibold shadow-md">
-              <Link to={`/result/${latest.id}`}>
+              <Link to="/result/$id" params={{ id: latest.id }}>
                 <Sparkles className="mr-2 size-4 animate-pulse" />
                 View my DOT Wrapped Recap
               </Link>

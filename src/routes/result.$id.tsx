@@ -53,7 +53,7 @@ function ResultPage() {
         .maybeSingle();
 
       if (error) throw error;
-      return data;
+      return data as any;
     },
   });
 
@@ -64,7 +64,7 @@ function ResultPage() {
       const { data, error } = await supabase
         .from("founder_profiles")
         .select("*, communities(*)")
-        .eq("user_id", assessment.user_id)
+        .eq("user_id", assessment?.user_id)
         .maybeSingle();
       if (error) throw error;
       return data;

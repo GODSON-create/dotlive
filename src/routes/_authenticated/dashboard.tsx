@@ -67,7 +67,7 @@ function Dashboard() {
   const { data: runwayVentures = [] } = useQuery({
     queryKey: ["dashboard-runway-ventures"],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_runway_challenges", {
+      const { data, error } = await (supabase as any).rpc("get_runway_challenges", {
         _type: "runway",
       });
       if (error) throw error;
@@ -104,7 +104,7 @@ function Dashboard() {
           <div className="flex items-center gap-2">
             {latest && (
               <Button variant="outline" asChild className="border-pink-500/25 bg-pink-500/10 text-pink-400 hover:bg-pink-500/20">
-                <Link to={`/result/${latest.id}`}>
+                <Link to="/result/$id" params={{ id: latest.id }}>
                   <Sparkles className="size-4" />
                   View Wrapped
                 </Link>
@@ -294,7 +294,7 @@ function Dashboard() {
                       <p className="font-semibold text-white">{new Date(a.created_at).toLocaleDateString()}</p>
                       <p className="text-[10px] text-slate-500">Score: {a.vantage_point}</p>
                     </div>
-                    <Link to={`/result/${a.id}`} className="text-indigo-400 hover:underline">
+                    <Link to="/result/$id" params={{ id: a.id }} className="text-indigo-400 hover:underline">
                       Wrapped →
                     </Link>
                   </div>

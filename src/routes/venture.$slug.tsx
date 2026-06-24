@@ -54,7 +54,7 @@ function PublicVentureProfile() {
         .maybeSingle();
 
       if (error) throw error;
-      return data;
+      return data as any;
     },
   });
 
@@ -226,7 +226,7 @@ function PublicVentureProfile() {
 
             <div className="mt-6 border-t border-slate-800/60 pt-4 text-center">
               <Button variant="link" className="text-indigo-400 text-xs" asChild>
-                <Link to={`/founder/${founder.profiles?.dot_id || founder.user_id}`}>
+                <Link to="/founder/$dotId" params={{ dotId: founder.profiles?.dot_id || founder.user_id }}>
                   View Founder Profile <ArrowUpRight className="size-3" />
                 </Link>
               </Button>

@@ -35,7 +35,7 @@ function LeaderboardsPage() {
   const { data: rows = [], isLoading } = useQuery({
     queryKey: ["community-leaderboard", activeCategory],
     queryFn: async (): Promise<LeaderboardRow[]> => {
-      const { data, error } = await supabase.rpc("get_community_leaderboard", {
+      const { data, error } = await (supabase as any).rpc("get_community_leaderboard", {
         _type: activeCategory,
       });
       if (error) throw error;
