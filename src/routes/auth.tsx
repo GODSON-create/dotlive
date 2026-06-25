@@ -46,13 +46,10 @@ function AuthPage() {
   async function handleGoogle() {
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: window.location.origin + "/dashboard",
-        },
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin + "/auth",
       });
-      if (error) throw error;
+      if (result && "error" in result && result.error) throw result.error;
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Google sign-in failed.");
       setBusy(false);
@@ -76,8 +73,19 @@ function AuthPage() {
         toast.success("Account created! Welcome to DOT.");
         navigate({ to: "/dashboard" });
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const finalEmail = email.trim().toLowerCase() === "admin" ? "admin@dotlive.cv" : email.trim();
+        const { data, error } = await supabase.auth.signInWithPassword({ email: finalEmail, password });
         if (error) throw error;
+
+        // Log session details into login_audit_log
+        if (data.user) {
+          await supabase.from("login_audit_log").insert({
+            user_id: data.user.id,
+            email: data.user.email,
+            user_agent: navigator.userAgent,
+          });
+        }
+
         toast.success("Welcome back!");
         navigate({ to: "/dashboard" });
       }
@@ -92,8 +100,9 @@ function AuthPage() {
     e.preventDefault();
     setBusy(true);
     try {
+      const finalEmail = email.trim().toLowerCase() === "admin" ? "admin@dotlive.cv" : email.trim();
       const { error } = await supabase.auth.signInWithOtp({
-        email,
+        email: finalEmail,
         options: { shouldCreateUser: true },
       });
       if (error) throw error;
@@ -109,8 +118,19 @@ function AuthPage() {
   async function handleVerifyOtp(value: string) {
     setBusy(true);
     try {
-      const { error } = await supabase.auth.verifyOtp({ email, token: value, type: "email" });
+      const finalEmail = email.trim().toLowerCase() === "admin" ? "admin@dotlive.cv" : email.trim();
+      const { data, error } = await supabase.auth.verifyOtp({ email: finalEmail, token: value, type: "email" });
       if (error) throw error;
+
+      // Log session details into login_audit_log
+      if (data.user) {
+        await supabase.from("login_audit_log").insert({
+          user_id: data.user.id,
+          email: data.user.email,
+          user_agent: navigator.userAgent,
+        });
+      }
+
       toast.success("Signed in!");
       navigate({ to: "/dashboard" });
     } catch (err) {
@@ -123,7 +143,8 @@ function AuthPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const finalEmail = email.trim().toLowerCase() === "admin" ? "admin@dotlive.cv" : email.trim();
+      const { error } = await supabase.auth.resetPasswordForEmail(finalEmail, {
         redirectTo: window.location.origin + "/reset-password",
       });
       if (error) throw error;

@@ -30,6 +30,7 @@ interface Profile {
   industry: string | null;
   community: string | null;
   achievements: string[];
+  force_password_change: boolean;
 }
 
 interface AuthContextValue {
@@ -61,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       supabase
         .from("profiles")
         .select(
-          "id, name, email, phone, avatar_url, dot_id, username, active_role, banner_url, bio, location, website, linkedin, twitter, whatsapp, skills, industry, community, achievements"
+          "id, name, email, phone, avatar_url, dot_id, username, active_role, banner_url, bio, location, website, linkedin, twitter, whatsapp, skills, industry, community, achievements, force_password_change"
         )
         .eq("id", uid)
         .maybeSingle(),

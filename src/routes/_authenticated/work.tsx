@@ -37,7 +37,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import {
   useServices,
@@ -96,6 +96,7 @@ function WorkPage() {
           <TabsTrigger value="browse">Browse</TabsTrigger>
           <TabsTrigger value="orders">My Orders</TabsTrigger>
           <TabsTrigger value="sell">Sell</TabsTrigger>
+          <TabsTrigger value="jobs">Jobs Board</TabsTrigger>
         </TabsList>
         <TabsContent value="browse">
           <BrowseTab />
@@ -105,6 +106,9 @@ function WorkPage() {
         </TabsContent>
         <TabsContent value="sell">
           <SellTab />
+        </TabsContent>
+        <TabsContent value="jobs">
+          <JobsTab />
         </TabsContent>
       </Tabs>
     </AppShell>
@@ -734,5 +738,426 @@ function Empty({ icon: Icon, text }: { icon: typeof Store; text: string }) {
       <Icon className="size-7 text-muted-foreground" />
       <p className="text-sm text-muted-foreground">{text}</p>
     </div>
+  );
+}
+
+/* ----------------------------- Jobs Board ----------------------------- */
+function JobsTab() {
+  const { user, roles } = useAuth();
+  const qc = useQueryClient();
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("");
+  const [showPostDialog, setShowPostDialog] = useState(false);
+  const [editingJob, setEditingJob] = useState<any | null>(null);
+
+  const canPost = roles.some((r) =>
+    ["founder", "builder", "admin", "super_admin", "moderator"].includes(r)
+  );
+
+  const { data: jobs = [], isLoading } = useQuery({
+    queryKey: ["jobs-list"],
+    queryFn: async () => {
+      const { data: jobRows, error } = await supabase
+        .from("jobs" as any)
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      const posterIds = Array.from(new Set((jobRows ?? []).map((j: any) => j.poster_id)));
+      if (posterIds.length === 0) return [];
+
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, name, email, username")
+        .in("id", posterIds);
+
+      const pmap = new Map((profiles ?? []).map((p) => [p.id, p]));
+      return (jobRows ?? []).map((j: any) => ({
+        ...j,
+        poster: pmap.get(j.poster_id),
+      }));
+    },
+  });
+
+  const filteredJobs = useMemo(() => {
+    return jobs.filter((j: any) => {
+      const matchesSearch =
+        j.title.toLowerCase().includes(search.toLowerCase()) ||
+        j.description.toLowerCase().includes(search.toLowerCase());
+      const matchesCategory = category ? j.category === category : true;
+      return matchesSearch && matchesCategory;
+    });
+  }, [jobs, search, category]);
+
+  const categories = [
+    "Graphic Design",
+    "Website Development",
+    "Social Media Management",
+    "Content Creation",
+    "Sales",
+    "Customer Support",
+  ];
+
+  async function toggleJobStatus(id: string, currentStatus: boolean) {
+    try {
+      const { error } = await supabase
+        .from("jobs" as any)
+        .update({ is_active: !currentStatus })
+        .eq("id", id);
+
+      if (error) throw error;
+      toast.success("Job status updated successfully");
+      qc.invalidateQueries({ queryKey: ["jobs-list"] });
+    } catch (err) {
+      toast.error("Failed to update job status");
+    }
+  }
+
+  async function deleteJob(id: string) {
+    if (!confirm("Are you sure you want to delete this job listing?")) return;
+    try {
+      const { error } = await supabase.from("jobs" as any).delete().eq("id", id);
+      if (error) throw error;
+      toast.success("Job listing deleted");
+      qc.invalidateQueries({ queryKey: ["jobs-list"] });
+    } catch (err) {
+      toast.error("Failed to delete job listing");
+    }
+  }
+
+  function handleApply(job: any) {
+    let dest = job.application_destination;
+    if (job.application_type === "whatsapp") {
+      let phone = dest.replace(/[^0-9]/g, "");
+      if (!phone.startsWith("234") && phone.startsWith("0")) {
+        phone = "234" + phone.slice(1);
+      }
+      const text = encodeURIComponent(
+        `Hello, I am applying for your job listing: "${job.title}" on DOT.`
+      );
+      window.open(`https://wa.me/${phone}?text=${text}`, "_blank");
+    } else if (job.application_type === "email") {
+      window.open(`mailto:${dest}?subject=${encodeURIComponent("Job Application: " + job.title)}`, "_blank");
+    } else {
+      let url = dest;
+      if (!/^https?:\/\//i.test(url)) {
+        url = "https://" + url;
+      }
+      window.open(url, "_blank");
+    }
+  }
+
+  return (
+    <div className="mt-4 space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-1 gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search jobs..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9 bg-background border-border text-foreground"
+            />
+          </div>
+          <Select value={category || "all"} onValueChange={(v) => setCategory(v === "all" ? "" : v)}>
+            <SelectTrigger className="w-48 sm:w-56 bg-background border-border text-foreground">
+              <SelectValue placeholder="All Categories" />
+            </SelectTrigger>
+            <SelectContent className="bg-popover border-border">
+              <SelectItem value="all">All Categories</SelectItem>
+              {categories.map((c) => (
+                <SelectItem key={c} value={c}>
+                  {c}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        {canPost && (
+          <Button variant="hero" onClick={() => setShowPostDialog(true)}>
+            <Plus className="size-4 mr-1.5" /> Post a Job
+          </Button>
+        )}
+      </div>
+
+      {isLoading ? (
+        <div className="flex justify-center py-8">
+          <Loader2 className="size-8 animate-spin text-primary" />
+        </div>
+      ) : filteredJobs.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-border bg-card p-12 text-center">
+          <p className="text-muted-foreground">No jobs posted yet. Be the first to share an opportunity!</p>
+        </div>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {filteredJobs.map((job: any) => {
+            const isOwner = user?.id === job.poster_id;
+            return (
+              <div
+                key={job.id}
+                className={cn(
+                  "rounded-2xl border bg-card p-6 flex flex-col justify-between transition hover:shadow-md",
+                  job.is_active ? "border-border" : "border-border/40 opacity-70"
+                )}
+              >
+                <div>
+                  <div className="flex items-start justify-between">
+                    <Badge variant="outline" className="text-xs uppercase bg-muted/50 border-border text-muted-foreground">
+                      {job.category}
+                    </Badge>
+                    <span className="font-display font-bold text-primary">
+                      {formatDot(job.budget_dot)} DOT
+                    </span>
+                  </div>
+
+                  <h3 className="mt-3 font-display text-lg font-bold text-foreground line-clamp-1">{job.title}</h3>
+                  <p className="mt-1.5 text-sm text-muted-foreground line-clamp-4 min-h-[5rem]">{job.description}</p>
+                  
+                  <div className="mt-4 border-t border-border/40 pt-4 flex flex-col gap-1.5 text-xs text-muted-foreground">
+                    <div>
+                      Posted by: <span className="font-medium text-foreground">{job.poster?.name || "Anonymous"}</span>
+                    </div>
+                    <div>
+                      Application via: <span className="font-medium uppercase text-foreground">{job.application_type}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex items-center justify-between gap-2 border-t border-border/40 pt-4">
+                  {isOwner ? (
+                    <div className="flex gap-2 w-full justify-between">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => toggleJobStatus(job.id, job.is_active)}
+                        className="text-xs border-border text-foreground hover:bg-muted"
+                      >
+                        {job.is_active ? "Deactivate" : "Activate"}
+                      </Button>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => {
+                            setEditingJob(job);
+                            setShowPostDialog(true);
+                          }}
+                          className="size-8 border-border text-foreground hover:bg-muted"
+                        >
+                          <Pencil className="size-3.5" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => deleteJob(job.id)}
+                          className="size-8 border-border text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="size-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button
+                      variant={job.is_active ? "hero" : "outline"}
+                      className="w-full text-sm font-semibold"
+                      disabled={!job.is_active}
+                      onClick={() => handleApply(job)}
+                    >
+                      {job.is_active ? "Apply Now" : "Inactive"}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {showPostDialog && (
+        <JobFormDialog
+          job={editingJob}
+          onClose={() => {
+            setShowPostDialog(false);
+            setEditingJob(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function JobFormDialog({ job, onClose }: { job: any | null; onClose: () => void }) {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const [title, setTitle] = useState(job?.title ?? "");
+  const [description, setDescription] = useState(job?.description ?? "");
+  const [category, setCategory] = useState(job?.category ?? "Graphic Design");
+  const [budget, setBudget] = useState(job?.budget_dot ?? 1000);
+  const [appType, setAppType] = useState(job?.application_type ?? "whatsapp");
+  const [appDest, setAppDest] = useState(job?.application_destination ?? "");
+  const [busy, setBusy] = useState(false);
+
+  const categories = [
+    "Graphic Design",
+    "Website Development",
+    "Social Media Management",
+    "Content Creation",
+    "Sales",
+    "Customer Support",
+  ];
+
+  async function handleSave() {
+    if (!user) return;
+    if (!title.trim() || !description.trim() || !appDest.trim()) {
+      toast.error("All fields are required.");
+      return;
+    }
+    if (budget <= 0) {
+      toast.error("Budget must be a positive number.");
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const payload = {
+        poster_id: user.id,
+        title: title.trim(),
+        description: description.trim(),
+        category,
+        budget_dot: Math.floor(budget),
+        application_type: appType,
+        application_destination: appDest.trim(),
+        is_active: job ? job.is_active : true,
+      };
+
+      const { error } = job
+        ? await supabase.from("jobs" as any).update(payload).eq("id", job.id)
+        : await supabase.from("jobs" as any).insert(payload);
+
+      if (error) throw error;
+      toast.success(job ? "Job listing updated" : "Job listing posted");
+      qc.invalidateQueries({ queryKey: ["jobs-list"] });
+      onClose();
+    } catch (err) {
+      toast.error("Failed to save job listing");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="bg-popover border-border text-foreground max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{job ? "Edit Job Listing" : "Post a New Job"}</DialogTitle>
+          <DialogDescription className="text-muted-foreground">
+            List an open contract or project. Founders, builders and admins can view and apply.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="job-title">Job Title</Label>
+            <Input
+              id="job-title"
+              placeholder="e.g. Design Pitch Deck for Seed Round"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="bg-background border-border text-foreground"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="job-desc">Description</Label>
+            <Textarea
+              id="job-desc"
+              placeholder="Describe the scope of work, timeline, and requirements..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="bg-background border-border text-foreground min-h-[100px]"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label>Category</Label>
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger className="bg-background border-border text-foreground">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border-border">
+                  {categories.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="job-budget">Budget (DOT)</Label>
+              <Input
+                id="job-budget"
+                type="number"
+                min={1}
+                value={budget}
+                onChange={(e) => setBudget(Number(e.target.value))}
+                className="bg-background border-border text-foreground"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label>Receive Applications via</Label>
+              <Select value={appType} onValueChange={setAppType}>
+                <SelectTrigger className="bg-background border-border text-foreground">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border-border">
+                  <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                  <SelectItem value="email">Email</SelectItem>
+                  <SelectItem value="website">Website URL</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="job-dest">
+                {appType === "whatsapp" && "Phone Number (e.g. +234...)"}
+                {appType === "email" && "Email Address"}
+                {appType === "website" && "Link Destination"}
+              </Label>
+              <Input
+                id="job-dest"
+                placeholder={
+                  appType === "whatsapp"
+                    ? "+2348012345678"
+                    : appType === "email"
+                    ? "hiring@venture.co"
+                    : "https://venture.co/careers"
+                }
+                value={appDest}
+                onChange={(e) => setAppDest(e.target.value)}
+                className="bg-background border-border text-foreground"
+              />
+            </div>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose} disabled={busy} className="border-border text-foreground">
+            Cancel
+          </Button>
+          <Button variant="hero" onClick={handleSave} disabled={busy}>
+            {busy && <Loader2 className="size-4 animate-spin mr-1" />}
+            {job ? "Update Listing" : "Publish Listing"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

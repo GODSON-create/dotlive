@@ -71,7 +71,7 @@ function ResultPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("founder_profiles")
-        .select("*, communities(*)")
+        .select("*")
         .eq("user_id", assessment?.user_id)
         .maybeSingle();
       if (error) throw error;

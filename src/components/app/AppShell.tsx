@@ -28,9 +28,10 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import { ROLE_LABELS, SELF_ASSIGNABLE_ROLES, type AppRole } from "@/lib/constants";
+import { ROLE_LABELS, SELF_ASSIGNABLE_ROLES, type AppRole, formatDot } from "@/lib/constants";
 import { updateUserRoles } from "@/lib/user.functions";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,9 +46,17 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 interface NavItem {
   label: string;
@@ -82,6 +91,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [showRoleDialog, setShowRoleDialog] = useState(false);
   const [tempRoles, setTempRoles] = useState<AppRole[]>([]);
   const [savingRoles, setSavingRoles] = useState(false);
+  const [showProfileDrawer, setShowProfileDrawer] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [updatingPassword, setUpdatingPassword] = useState(false);
 
   const updateRolesFn = useServerFn(updateUserRoles);
 
@@ -180,9 +192,13 @@ export function AppShell({ children }: { children: ReactNode }) {
               </DropdownMenu>
             )}
 
-            <span className="flex size-9 items-center justify-center rounded-full [background-image:var(--gradient-primary)] text-sm font-semibold text-primary-foreground">
+            <button
+              onClick={() => setShowProfileDrawer(true)}
+              className="flex size-9 items-center justify-center rounded-full [background-image:var(--gradient-primary)] text-sm font-semibold text-primary-foreground hover:opacity-90 cursor-pointer"
+              aria-label="View Profile"
+            >
               {initial}
-            </span>
+            </button>
             <button
               onClick={handleSignOut}
               className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground cursor-pointer"
@@ -317,6 +333,310 @@ export function AppShell({ children }: { children: ReactNode }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Force Password Change Dialog */}
+      <Dialog open={profile?.force_password_change === true}>
+        <DialogContent className="bg-card border border-border text-foreground max-w-md" onInteractOutside={(e) => e.preventDefault()}>
+          <DialogHeader>
+            <DialogTitle className="font-display font-bold text-foreground text-base">
+              Update Temporary Password
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 my-2 text-left">
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              This account was seeded with a temporary password. For security, you must set a new strong password before continuing.
+            </p>
+            <div className="space-y-1.5">
+              <Label htmlFor="mandatory-password">New Password</Label>
+              <Input
+                id="mandatory-password"
+                type="password"
+                required
+                minLength={6}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="••••••••"
+                className="bg-background border-border text-foreground"
+              />
+            </div>
+          </div>
+          <DialogFooter className="pt-3 border-t border-border">
+            <Button
+              variant="hero"
+              disabled={updatingPassword || newPassword.length < 6}
+              onClick={async () => {
+                setUpdatingPassword(true);
+                try {
+                  const { error: authErr } = await supabase.auth.updateUser({ password: newPassword });
+                  if (authErr) throw authErr;
+                  const { error: profileErr } = await supabase
+                    .from("profiles")
+                    .update({ force_password_change: false })
+                    .eq("id", user?.id);
+                  if (profileErr) throw profileErr;
+                  toast.success("Password updated successfully!");
+                  await refresh();
+                } catch (err) {
+                  toast.error(err instanceof Error ? err.message : "Failed to update password");
+                } finally {
+                  setUpdatingPassword(false);
+                }
+              }}
+              className="text-xs font-bold w-full"
+            >
+              {updatingPassword ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
+              Update Password & Continue
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Profile Drawer */}
+      <Sheet open={showProfileDrawer} onOpenChange={setShowProfileDrawer}>
+        <SheetContent side="right" className="w-full sm:max-w-xl bg-card border-l border-border text-foreground p-6 overflow-y-auto max-h-screen">
+          <SheetHeader className="border-b border-border/40 pb-4">
+            <div className="flex items-center gap-3">
+              <span className="flex size-12 items-center justify-center rounded-full [background-image:var(--gradient-primary)] text-lg font-bold text-primary-foreground">
+                {initial}
+              </span>
+              <div>
+                <SheetTitle className="font-display font-black text-xl text-foreground">
+                  {profile?.name || "User Profile"}
+                </SheetTitle>
+                <p className="text-xs text-muted-foreground">{profile?.email}</p>
+              </div>
+            </div>
+          </SheetHeader>
+
+          <div className="mt-6 space-y-6 text-left">
+            {/* Personal Information */}
+            <div className="space-y-2 bg-muted/20 border border-border/60 p-4 rounded-2xl">
+              <h3 className="font-display font-bold text-xs uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-1">Personal Details</h3>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                <div><span className="text-muted-foreground">DOT ID:</span> <span className="font-mono">{profile?.dot_id || "—"}</span></div>
+                <div><span className="text-muted-foreground">Username:</span> <span>@{profile?.username || "—"}</span></div>
+                <div><span className="text-muted-foreground">Location:</span> <span>{profile?.location || "—"}</span></div>
+                <div><span className="text-muted-foreground">Active Role:</span> <span className="font-semibold text-primary">{profile?.active_role ? ROLE_LABELS[profile.active_role as AppRole] : "—"}</span></div>
+                {profile?.phone && <div className="col-span-2"><span className="text-muted-foreground">Phone:</span> <span>{profile.phone}</span></div>}
+                {profile?.bio && <div className="col-span-2"><span className="text-muted-foreground">Bio:</span> <p className="mt-0.5 text-foreground/90">{profile.bio}</p></div>}
+              </div>
+            </div>
+
+            {/* Venture Information */}
+            {activeRole === "founder" && (
+              <VentureDrawerSection userId={user?.id} />
+            )}
+
+            {/* Vantage History */}
+            <VantageHistorySection userId={user?.id} />
+
+            {/* Wallet Activity */}
+            <WalletActivitySection userId={user?.id} />
+
+            {/* Academy Progress */}
+            <AcademyProgressSection userId={user?.id} />
+
+            {/* Referrals & Rewards */}
+            <ReferralsSection userId={user?.id} dotId={profile?.dot_id} />
+            
+            {/* Skills & Certifications */}
+            {profile?.skills && profile.skills.length > 0 && (
+              <div className="space-y-2 bg-muted/20 border border-border/60 p-4 rounded-2xl">
+                <h3 className="font-display font-bold text-xs uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-1">Skills & Certifications</h3>
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {profile.skills.map((s) => (
+                    <Badge key={s} variant="secondary" className="text-[10px]">{s}</Badge>
+                  ))}
+                  {profile?.achievements && profile.achievements.map((a) => (
+                    <Badge key={a} variant="outline" className="text-[10px] border-primary/40 text-primary bg-primary/5">{a}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}
+
+/* ================= Drawer Helper Sub-sections ================= */
+function VentureDrawerSection({ userId }: { userId?: string }) {
+  const { data: founder } = useQuery({
+    queryKey: ["drawer-founder-profile", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("founder_profiles")
+        .select("*, communities(*)")
+        .eq("user_id", userId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  if (!founder) return null;
+  return (
+    <div className="space-y-2 bg-muted/20 border border-border/60 p-4 rounded-2xl">
+      <h3 className="font-display font-bold text-xs uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-1">Venture Information</h3>
+      <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+        <div><span className="text-muted-foreground">Startup:</span> <span className="font-semibold">{founder.venture_name || "—"}</span></div>
+        <div><span className="text-muted-foreground">Industry:</span> <span>{founder.industry || "—"}</span></div>
+        <div><span className="text-muted-foreground">Stage:</span> <span>{founder.stage || "Idea"}</span></div>
+        <div><span className="text-muted-foreground">Country:</span> <span>{founder.country || "—"}</span></div>
+        <div><span className="text-muted-foreground">Vantage Score:</span> <span className="font-black text-primary">{founder.vantage_point || 0} pts</span></div>
+        {founder.website && <div className="col-span-2"><span className="text-muted-foreground">Website:</span> <a href={founder.website} target="_blank" rel="noreferrer" className="text-primary hover:underline font-semibold ml-1">{founder.website}</a></div>}
+      </div>
+    </div>
+  );
+}
+
+function VantageHistorySection({ userId }: { userId?: string }) {
+  const { data: history = [] } = useQuery({
+    queryKey: ["drawer-vantage-history", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("assessments")
+        .select("id, vantage_point, created_at, founder_archetype")
+        .eq("user_id", userId!)
+        .order("created_at", { ascending: false });
+      return data || [];
+    }
+  });
+
+  if (history.length === 0) return null;
+  return (
+    <div className="space-y-2 bg-muted/20 border border-border/60 p-4 rounded-2xl">
+      <h3 className="font-display font-bold text-xs uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-1">Vantage Assessment History</h3>
+      <div className="divide-y divide-border/40 max-h-36 overflow-y-auto pr-1">
+        {history.map((h: any) => (
+          <div key={h.id} className="flex justify-between items-center py-2 text-xs">
+            <div>
+              <p className="font-semibold text-foreground">{h.founder_archetype || "Baseline Assessment"}</p>
+              <p className="text-[10px] text-muted-foreground">{new Date(h.created_at).toLocaleDateString()}</p>
+            </div>
+            <Badge variant="hero" className="font-bold text-[10px]">{h.vantage_point} pts</Badge>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function WalletActivitySection({ userId }: { userId?: string }) {
+  const { data: activity = [] } = useQuery({
+    queryKey: ["drawer-wallet-activity", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("transactions")
+        .select("id, amount, type, description, created_at")
+        .eq("user_id", userId!)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      return data || [];
+    }
+  });
+
+  if (activity.length === 0) return null;
+  return (
+    <div className="space-y-2 bg-muted/20 border border-border/60 p-4 rounded-2xl">
+      <h3 className="font-display font-bold text-xs uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-1">Recent Wallet Transactions</h3>
+      <div className="divide-y divide-border/40 max-h-40 overflow-y-auto pr-1">
+        {activity.map((a: any) => {
+          const isCredit = a.amount > 0;
+          return (
+            <div key={a.id} className="flex justify-between items-start py-2 text-xs">
+              <div className="flex-1 pr-4">
+                <p className="font-medium text-foreground">{a.description}</p>
+                <p className="text-[9px] text-muted-foreground">{new Date(a.created_at).toLocaleString()}</p>
+              </div>
+              <span className={cn("font-bold text-[11px] shrink-0", isCredit ? "text-primary" : "text-destructive")}>
+                {isCredit ? "+" : ""}{formatDot(a.amount)} DOT
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function AcademyProgressSection({ userId }: { userId?: string }) {
+  const { data: enrolls = [] } = useQuery({
+    queryKey: ["drawer-academy-progress", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("course_enrollments")
+        .select("*, courses(*)")
+        .eq("user_id", userId!)
+        .order("updated_at", { ascending: false });
+      return data || [];
+    }
+  });
+
+  if (enrolls.length === 0) return null;
+  return (
+    <div className="space-y-2 bg-muted/20 border border-border/60 p-4 rounded-2xl">
+      <h3 className="font-display font-bold text-xs uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-1">Academy Progress</h3>
+      <div className="divide-y divide-border/40 max-h-36 overflow-y-auto pr-1">
+        {enrolls.map((e: any) => (
+          <div key={e.id} className="flex justify-between items-center py-2 text-xs">
+            <span className="font-medium truncate max-w-[280px]">{e.courses?.title || "Course"}</span>
+            <Badge variant={e.status === "completed" ? "default" : "secondary"} className="text-[9px]">
+              {e.status === "completed" ? "Completed" : "In Progress"}
+            </Badge>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ReferralsSection({ userId, dotId }: { userId?: string; dotId?: string | null }) {
+  const { data: referredCount = 0 } = useQuery({
+    queryKey: ["drawer-referred-count", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("profiles")
+        .select("id", { count: "exact", head: true })
+        .eq("referred_by_id", userId!);
+      return count || 0;
+    }
+  });
+
+  return (
+    <div className="space-y-2 bg-muted/20 border border-border/60 p-4 rounded-2xl">
+      <h3 className="font-display font-bold text-xs uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-1">Referral Link & Rewards</h3>
+      <div className="text-xs space-y-2.5 pt-1">
+        <div className="flex justify-between items-center bg-background border border-border p-2.5 rounded-xl">
+          <div>
+            <p className="text-[9px] text-muted-foreground uppercase font-bold">Your Referral Code</p>
+            <p className="font-mono font-bold text-primary mt-0.5">{dotId || "—"}</p>
+          </div>
+          <Button 
+            size="sm" 
+            variant="outline" 
+            className="h-7 text-[10px] font-bold" 
+            onClick={() => {
+              if (dotId) {
+                navigator.clipboard.writeText(dotId);
+                toast.success("Referral code copied to clipboard!");
+              }
+            }}
+          >
+            Copy Code
+          </Button>
+        </div>
+        <div className="flex justify-between text-xs font-semibold text-foreground/90 px-1">
+          <span>Successful Referrals:</span>
+          <span className="text-primary font-black">{referredCount} users</span>
+        </div>
+      </div>
     </div>
   );
 }

@@ -113,6 +113,7 @@ function AdminPage() {
           <TabsTrigger value="payments">Payments</TabsTrigger>
           <TabsTrigger value="content">Content</TabsTrigger>
           <TabsTrigger value="spotlight">Spotlight Control</TabsTrigger>
+          <TabsTrigger value="sessions">Sessions Log</TabsTrigger>
           {isSuperAdmin && <TabsTrigger value="roles">Roles & Audit</TabsTrigger>}
         </TabsList>
         <TabsContent value="overview"><OverviewTab /></TabsContent>
@@ -122,6 +123,7 @@ function AdminPage() {
         <TabsContent value="payments"><PaymentsTab /></TabsContent>
         <TabsContent value="content"><ContentTab /></TabsContent>
         <TabsContent value="spotlight"><SpotlightTab /></TabsContent>
+        <TabsContent value="sessions"><SessionsTab /></TabsContent>
         {isSuperAdmin && (
           <TabsContent value="roles"><RolesTab /></TabsContent>
         )}
@@ -133,20 +135,41 @@ function AdminPage() {
 /* ===================== Executive Overview ===================== */
 
 interface Overview {
-  users: { total: number; new_today: number; new_week: number };
-  founders: { total: number; completed_vantage: number; avg_vantage: number; fundable: number; total_valuation: number };
-  communities: { total: number; leaders: number; members: number };
-  academy: { enrollments: number; completed: number };
-  financial: {
-    total_revenue_ngn: number;
-    total_dot_issued: number;
-    total_dot_spent: number;
-    wallet_balances: number;
-    reserve_balance: number;
+  users: {
+    total: number;
+    active: number;
+    founders: number;
+    builders: number;
+    vendors: number;
+    leaders: number;
+    investors: number;
+    partners: number;
   };
-  marketplace: { orders_completed: number; builder_revenue: number; active_services: number };
-  investors: { registered: number; saves: number; meetings: number };
-  virality: { total_assessments: number; shares_generated: number; profile_views: number; wrapped_shares: number };
+  revenue: {
+    total_deposits: number;
+    total_purchased: number;
+    total_spent: number;
+    total_earned: number;
+    total_withdrawals: number;
+    monthly_revenue: number;
+  };
+  ventures: {
+    total: number;
+    avg_vantage: number;
+    fundable: number;
+    demo_qualified: number;
+  };
+  communities: {
+    total: number;
+    growth: number;
+    referral_conversions: number;
+  };
+  capital: {
+    committed: number;
+    scholarship_allocated: number;
+    rewards_allocated: number;
+    treasury_holdings: number;
+  };
 }
 
 function OverviewTab() {
@@ -159,86 +182,48 @@ function OverviewTab() {
     },
   });
 
-  const { data: scholarshipCount = 0 } = useQuery({
-    queryKey: ["admin-scholarship-count"],
-    queryFn: async () => {
-      const { count } = await supabase
-        .from("reserve_allocations")
-        .select("id", { count: "exact", head: true })
-        .eq("purpose", "Founder Scholarship");
-      return count ?? 0;
-    },
-  });
-
   if (isLoading || !data) return <Loader2 className="mt-6 size-6 animate-spin text-primary" />;
-
-  const totalUsers = Number(data.users.total) || 1;
-  const communityMembers = Number(data.communities.members) || 0;
-  const referralRate = ((communityMembers / totalUsers) * 100).toFixed(1);
-  const newToday = Number(data.users.new_today) || 0;
-  const newWeek = Number(data.users.new_week) || 0;
-  const dailyGrowth = ((newToday / totalUsers) * 100).toFixed(1);
-  const weeklyGrowth = ((newWeek / totalUsers) * 100).toFixed(1);
 
   return (
     <div className="mt-4 space-y-8">
-      <MetricGroup title="Growth & Referral Statistics" icon={TrendingUp}>
-        <Stat label="Daily User Growth" value={`+${dailyGrowth}%`} />
-        <Stat label="Weekly User Growth" value={`+${weeklyGrowth}%`} />
-        <Stat label="Referral Network Rate" value={`${referralRate}%`} />
-        <Stat label="Scholarship Activations" value={String(scholarshipCount)} />
+      <MetricGroup title="User Metrics" icon={Users}>
+        <Stat label="Total Users" value={String(data.users.total)} />
+        <Stat label="Active Users" value={String(data.users.active)} />
+        <Stat label="Founders" value={String(data.users.founders)} />
+        <Stat label="Builders" value={String(data.users.builders)} />
+        <Stat label="Vendors" value={String(data.users.vendors)} />
+        <Stat label="Community Leaders" value={String(data.users.leaders)} />
+        <Stat label="Investors" value={String(data.users.investors)} />
+        <Stat label="Capital Partners" value={String(data.users.partners)} />
       </MetricGroup>
 
-      <MetricGroup title="Users" icon={Users}>
-        <Stat label="Total users" value={String(data.users.total)} />
-        <Stat label="New today" value={String(data.users.new_today)} />
-        <Stat label="New this week" value={String(data.users.new_week)} />
+      <MetricGroup title="Revenue Metrics" icon={WalletIcon}>
+        <Stat label="Total Wallet Deposits" value={formatNaira(data.revenue.total_deposits)} />
+        <Stat label="Total DOT Purchased" value={formatDot(data.revenue.total_purchased)} />
+        <Stat label="Total DOT Spent" value={formatDot(data.revenue.total_spent)} />
+        <Stat label="Total DOT Earned" value={formatDot(data.revenue.total_earned)} />
+        <Stat label="Total Withdrawals" value={formatDot(data.revenue.total_withdrawals)} />
+        <Stat label="Monthly Revenue" value={formatNaira(data.revenue.monthly_revenue)} />
       </MetricGroup>
 
-      <MetricGroup title="Founders & Valuation" icon={TrendingUp}>
-        <Stat label="Total founders" value={String(data.founders.total)} />
-        <Stat label="Completed Vantage" value={String(data.founders.completed_vantage)} />
-        <Stat label="Avg Vantage" value={String(data.founders.avg_vantage)} />
-        <Stat label="Ecosystem Valuation" value={formatNaira(data.founders.total_valuation ?? 0)} />
-        <Stat label="Fundable ventures" value={String(data.founders.fundable)} />
+      <MetricGroup title="Venture Metrics" icon={TrendingUp}>
+        <Stat label="Total Ventures" value={String(data.ventures.total)} />
+        <Stat label="Average Vantage Score" value={`${data.ventures.avg_vantage} pts`} />
+        <Stat label="Fundable Ventures" value={String(data.ventures.fundable)} />
+        <Stat label="Demo Qualified Ventures" value={String(data.ventures.demo_qualified)} />
       </MetricGroup>
 
-      <MetricGroup title="Communities" icon={Users}>
-        <Stat label="Communities" value={String(data.communities.total)} />
-        <Stat label="Community leaders" value={String(data.communities.leaders)} />
-        <Stat label="Members" value={String(data.communities.members)} />
+      <MetricGroup title="Community Metrics" icon={Users}>
+        <Stat label="Total Communities" value={String(data.communities.total)} />
+        <Stat label="Community Growth" value={`+${data.communities.growth} this month`} />
+        <Stat label="Referral Conversions" value={String(data.communities.referral_conversions)} />
       </MetricGroup>
 
-      <MetricGroup title="Academy" icon={BookOpen}>
-        <Stat label="Enrollments" value={String(data.academy.enrollments)} />
-        <Stat label="Completed" value={String(data.academy.completed)} />
-      </MetricGroup>
-
-      <MetricGroup title="Financial" icon={WalletIcon}>
-        <Stat label="Revenue" value={formatNaira(data.financial.total_revenue_ngn)} />
-        <Stat label="DOT issued" value={formatDot(data.financial.total_dot_issued)} />
-        <Stat label="DOT spent" value={formatDot(data.financial.total_dot_spent)} />
-        <Stat label="Wallet balances" value={`${formatDot(data.financial.wallet_balances)} DOT`} />
-        <Stat label="Reserve balance" value={`${formatDot(data.financial.reserve_balance)} DOT`} />
-      </MetricGroup>
-
-      <MetricGroup title="Virality & Sharing" icon={Sparkles}>
-        <Stat label="Assessments Done" value={String(data.virality?.total_assessments ?? 0)} />
-        <Stat label="Shares Generated" value={String(data.virality?.shares_generated ?? 0)} />
-        <Stat label="Profile Views" value={String(data.virality?.profile_views ?? 0)} />
-        <Stat label="Wrapped Shared" value={String(data.virality?.wrapped_shares ?? 0)} />
-      </MetricGroup>
-
-      <MetricGroup title="Marketplace" icon={Building2}>
-        <Stat label="Orders completed" value={String(data.marketplace.orders_completed)} />
-        <Stat label="Builder revenue" value={`${formatDot(data.marketplace.builder_revenue)} DOT`} />
-        <Stat label="Active services" value={String(data.marketplace.active_services)} />
-      </MetricGroup>
-
-      <MetricGroup title="Investors" icon={Landmark}>
-        <Stat label="Investors registered" value={String(data.investors.registered)} />
-        <Stat label="Ventures saved" value={String(data.investors.saves)} />
-        <Stat label="Meetings requested" value={String(data.investors.meetings)} />
+      <MetricGroup title="Capital Metrics" icon={Landmark}>
+        <Stat label="Capital Committed" value={`${formatDot(data.capital.committed)} DOT`} />
+        <Stat label="Founder Scholarship Allocated" value={`${formatDot(data.capital.scholarship_allocated)} DOT`} />
+        <Stat label="Community Rewards Allocated" value={`${formatDot(data.capital.rewards_allocated)} DOT`} />
+        <Stat label="Treasury Holdings" value={`${formatDot(data.capital.treasury_holdings)} DOT`} />
       </MetricGroup>
     </div>
   );
@@ -453,11 +438,24 @@ function WalletsTab() {
 
 function ReserveTab() {
   const qc = useQueryClient();
+  const { roles } = useAuth();
+  
+  // Checks
+  const isModerator = roles.includes("moderator") && !roles.includes("admin") && !roles.includes("super_admin");
+
   const [recipientDotId, setRecipientDotId] = useState("");
   const [amount, setAmount] = useState(0);
   const [purpose, setPurpose] = useState("Founder Scholarship");
   const [description, setDescription] = useState("");
   const [busy, setBusy] = useState(false);
+
+  // Engine states
+  const [engineAction, setEngineAction] = useState<"lock" | "release" | "burn" | "transfer">("lock");
+  const [enginePool, setEnginePool] = useState("treasury");
+  const [engineToPool, setEngineToPool] = useState("scholarship");
+  const [engineAmount, setEngineAmount] = useState(0);
+  const [engineReason, setEngineReason] = useState("");
+  const [engineBusy, setEngineBusy] = useState(false);
 
   const { data: reserve } = useQuery({
     queryKey: ["reserve-wallet"],
@@ -502,6 +500,10 @@ function ReserveTab() {
   });
 
   async function allocate() {
+    if (isModerator) {
+      toast.error("Moderators are not permitted to allocate funds.");
+      return;
+    }
     setBusy(true);
     try {
       const { data: recipient, error: lookupErr } = await supabase.rpc("lookup_dot_id", {
@@ -510,7 +512,6 @@ function ReserveTab() {
       if (lookupErr) throw lookupErr;
       if (!recipient) throw new Error("No member found for that DOT ID");
 
-      // Resolve the recipient's user id from profiles
       const { data: prof, error: profErr } = await supabase
         .from("profiles")
         .select("id")
@@ -524,6 +525,7 @@ function ReserveTab() {
         _amount: amount,
         _purpose: purpose,
         _description: description || undefined,
+        _reason: "Manual admin allocation",
       });
       if (error) throw error;
       toast.success(`Allocated ${formatDot(amount)} DOT to ${recipient}`);
@@ -542,8 +544,68 @@ function ReserveTab() {
     }
   }
 
+  async function handleEngineSubmit() {
+    if (isModerator) {
+      toast.error("Moderators are not permitted to modify pool allocations.");
+      return;
+    }
+    setEngineBusy(true);
+    try {
+      if (engineAction === "lock") {
+        const { error } = await supabase.rpc("lock_pool_funds", {
+          _pool_name: enginePool,
+          _amount: engineAmount,
+          _reason: engineReason || undefined,
+        });
+        if (error) throw error;
+        toast.success(`Locked ${formatDot(engineAmount)} DOT in ${enginePool} pool`);
+      } else if (engineAction === "release") {
+        const { error } = await supabase.rpc("release_pool_funds", {
+          _pool_name: enginePool,
+          _amount: engineAmount,
+          _reason: engineReason || undefined,
+        });
+        if (error) throw error;
+        toast.success(`Released ${formatDot(engineAmount)} DOT in ${enginePool} pool`);
+      } else if (engineAction === "burn") {
+        const { error } = await supabase.rpc("burn_pool_funds", {
+          _pool_name: enginePool,
+          _amount: engineAmount,
+          _reason: engineReason || undefined,
+        });
+        if (error) throw error;
+        toast.success(`Permanently burned ${formatDot(engineAmount)} DOT from ${enginePool} pool`);
+      } else if (engineAction === "transfer") {
+        const { error } = await supabase.rpc("transfer_pool_funds", {
+          _from_pool: enginePool,
+          _to_pool: engineToPool,
+          _amount: engineAmount,
+          _reason: engineReason || undefined,
+        });
+        if (error) throw error;
+        toast.success(`Transferred ${formatDot(engineAmount)} DOT from ${enginePool} to ${engineToPool}`);
+      }
+      qc.invalidateQueries({ queryKey: ["reserve-wallet"] });
+      qc.invalidateQueries({ queryKey: ["treasury-pools"] });
+      qc.invalidateQueries({ queryKey: ["admin-audit"] });
+      setEngineAmount(0);
+      setEngineReason("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Engine operation failed");
+    } finally {
+      setEngineBusy(false);
+    }
+  }
+
   return (
     <div className="mt-4 space-y-6">
+      {isModerator && (
+        <div className="flex items-center gap-2 rounded-xl bg-amber-500/5 border border-amber-500/10 p-3 text-xs text-amber-400 font-semibold">
+          <ShieldMinus className="size-4 shrink-0" />
+          <span>Moderator Mode: View-only access. You cannot allocate, lock, release, burn, or transfer pool funds.</span>
+        </div>
+      )}
+
       <div className="rounded-2xl border border-border [background-image:var(--gradient-primary)] p-6 text-primary-foreground">
         <div className="flex items-center gap-2">
           <Landmark className="size-5" />
@@ -551,78 +613,149 @@ function ReserveTab() {
         </div>
         <p className="mt-3 font-display text-4xl font-bold">{formatDot(Number(reserve?.balance ?? 0))} DOT</p>
         <p className="mt-1 text-sm opacity-80">
-          Funds scholarships, rewards, grants and ecosystem growth. Every allocation is logged.
+          Total Supply: 100,000,000,000 DOT · Master ledger strategic reserve and sub-pools.
         </p>
       </div>
 
       {pools.length > 0 && (
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
           {pools.map((p: any) => (
-            <div key={p.pool_name} className="rounded-xl border border-border bg-card p-4 space-y-1">
+            <div key={p.pool_name} className="rounded-xl border border-border bg-card p-4 space-y-1.5 text-left">
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block truncate">
-                {p.pool_name === "scholarship" ? "Scholarship Pool" :
-                 p.pool_name === "growth" ? "Growth Pool" :
-                 p.pool_name === "work" ? "Work Pool" :
-                 p.pool_name === "community" ? "Community Pool" :
-                 p.pool_name === "reward" ? "Reward Pool" :
-                 p.pool_name === "partner" ? "Partner Pool" : "Withdrawal Pool"}
+                {p.pool_name === "treasury" ? "Strategic Treasury" :
+                 p.pool_name === "scholarship" ? "Founder Scholarship" :
+                 p.pool_name === "community" ? "Community Reward" :
+                 p.pool_name === "reward" ? "Reward Pool" : p.pool_name}
               </span>
-              <p className="font-display font-black text-white text-sm">{formatDot(Number(p.balance))} DOT</p>
-              <p className="text-[9px] text-muted-foreground">Used: {formatDot(Number(p.total_allocated))}</p>
+              <p className="font-display font-black text-foreground text-base">{formatDot(Number(p.balance))} DOT</p>
+              <div className="grid grid-cols-2 gap-1 text-[9px] text-muted-foreground border-t border-border/40 pt-1">
+                <div>Locked: {formatDot(Number(p.locked_balance))}</div>
+                <div>Burned: {formatDot(Number(p.burned_balance))}</div>
+                <div className="col-span-2">Allocated: {formatDot(Number(p.total_allocated))}</div>
+              </div>
             </div>
           ))}
         </div>
       )}
 
-      <div className="rounded-2xl border border-border bg-card p-5">
-        <h3 className="font-display font-semibold">Allocate from reserve</h3>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label className="text-xs">Recipient DOT ID</Label>
-            <Input value={recipientDotId} onChange={(e) => setRecipientDotId(e.target.value)} placeholder="DOT-100042" />
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Allocation Form */}
+        <div className="rounded-2xl border border-border bg-card p-5 text-left space-y-4">
+          <div>
+            <h3 className="font-display font-semibold text-foreground">Allocate DOT</h3>
+            <p className="text-xs text-muted-foreground">Distribute tokens directly to a founder or builder wallet.</p>
           </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs">Amount (DOT)</Label>
-            <Input type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} />
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs">Recipient DOT ID</Label>
+              <Input value={recipientDotId} onChange={(e) => setRecipientDotId(e.target.value)} placeholder="DOT-100042" className="bg-background border-border text-foreground" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Amount (DOT)</Label>
+              <Input type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} className="bg-background border-border text-foreground" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Purpose / Sub-Pool</Label>
+              <select
+                value={purpose}
+                onChange={(e) => setPurpose(e.target.value)}
+                className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus:outline-none"
+              >
+                <option value="Founder Scholarship">Founder Scholarship</option>
+                <option value="Reward">Reward Pool</option>
+                <option value="Community Leader Reward">Community Reward</option>
+                <option value="Strategic Treasury">Strategic Treasury</option>
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Note (optional)</Label>
+              <Input value={description} onChange={(e) => setDescription(e.target.value)} className="bg-background border-border text-foreground" />
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs">Purpose</Label>
-            <select
-              value={purpose}
-              onChange={(e) => setPurpose(e.target.value)}
-              className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
-            >
-              {[
-                "Founder Scholarship",
-                "Reward",
-                "Grant",
-                "Incentive",
-                "Community Leader Reward",
-                "Pilot Program",
-                "Ecosystem Growth",
-                "Internal Testing",
-              ].map((p) => (
-                <option key={p} value={p}>{p}</option>
-              ))}
-            </select>
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs">Note (optional)</Label>
-            <Input value={description} onChange={(e) => setDescription(e.target.value)} />
-          </div>
+          <Button variant="hero" className="w-full mt-2" onClick={allocate} disabled={busy || !recipientDotId || amount <= 0 || isModerator}>
+            {busy ? <Loader2 className="size-4 animate-spin" /> : <Coins className="size-4" />}
+            Allocate Funds
+          </Button>
         </div>
-        <Button variant="hero" className="mt-4" onClick={allocate} disabled={busy || !recipientDotId || amount <= 0}>
-          {busy ? <Loader2 className="size-4 animate-spin" /> : <Coins className="size-4" />}
-          Allocate
-        </Button>
+
+        {/* Treasury Allocation Engine Controls */}
+        <div className="rounded-2xl border border-border bg-card p-5 text-left space-y-4">
+          <div>
+            <h3 className="font-display font-semibold text-foreground">Treasury Allocation Engine</h3>
+            <p className="text-xs text-muted-foreground">Admin controls to lock, release, burn, or transfer funds between pools.</p>
+          </div>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs">Action Type</Label>
+              <select
+                value={engineAction}
+                onChange={(e) => setEngineAction(e.target.value as any)}
+                className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus:outline-none"
+              >
+                <option value="lock">Lock Supply</option>
+                <option value="release">Release Supply</option>
+                <option value="burn">Burn Supply</option>
+                <option value="transfer">Transfer Between Pools</option>
+              </select>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs">{engineAction === "transfer" ? "Source Pool" : "Target Pool"}</Label>
+                <select
+                  value={enginePool}
+                  onChange={(e) => setEnginePool(e.target.value)}
+                  className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus:outline-none"
+                >
+                  <option value="treasury">Strategic Treasury</option>
+                  <option value="scholarship">Founder Scholarship</option>
+                  <option value="community">Community Reward</option>
+                  <option value="reward">Reward Pool</option>
+                </select>
+              </div>
+
+              {engineAction === "transfer" && (
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Destination Pool</Label>
+                  <select
+                    value={engineToPool}
+                    onChange={(e) => setEngineToPool(e.target.value)}
+                    className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus:outline-none"
+                  >
+                    <option value="treasury">Strategic Treasury</option>
+                    <option value="scholarship">Founder Scholarship</option>
+                    <option value="community">Community Reward</option>
+                    <option value="reward">Reward Pool</option>
+                  </select>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs">Amount (DOT)</Label>
+              <Input type="number" value={engineAmount} onChange={(e) => setEngineAmount(Number(e.target.value))} className="bg-background border-border text-foreground" />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs">Reason / Audit justification</Label>
+              <Input value={engineReason} onChange={(e) => setEngineReason(e.target.value)} placeholder="e.g. Locking future strategic reserve" className="bg-background border-border text-foreground" />
+            </div>
+          </div>
+
+          <Button variant="hero" className="w-full mt-2" onClick={handleEngineSubmit} disabled={engineBusy || engineAmount <= 0 || isModerator}>
+            {engineBusy ? <Loader2 className="size-4 animate-spin" /> : <Lock className="size-4" />}
+            Execute Engine Call
+          </Button>
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-border bg-card">
-        <div className="border-b border-border p-4">
-          <h3 className="font-display font-semibold">Recent allocations</h3>
+        <div className="flex items-center gap-2 border-b border-border p-4">
+          <History className="size-5 text-primary" />
+          <h3 className="font-display font-semibold">Ecosystem Reserve Allocations</h3>
         </div>
         {allocations.length === 0 ? (
-          <p className="p-4 text-sm text-muted-foreground">No allocations yet.</p>
+          <p className="p-4 text-sm text-muted-foreground">No reserve allocations found.</p>
         ) : (
           <table className="w-full text-sm">
             <thead>
@@ -630,7 +763,7 @@ function ReserveTab() {
                 <th className="p-4 font-medium">When</th>
                 <th className="p-4 font-medium">Purpose</th>
                 <th className="p-4 font-medium">Amount</th>
-                <th className="p-4 font-medium">Note</th>
+                <th className="p-4 font-medium">Description</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -1941,6 +2074,64 @@ function UsersTab() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function SessionsTab() {
+  const { data: logs = [], isLoading } = useQuery({
+    queryKey: ["admin-sessions-log"],
+    queryFn: async () => {
+      const [{ data: rows }, { data: profiles }] = await Promise.all([
+        supabase.from("login_audit_log").select("*").order("created_at", { ascending: false }).limit(200),
+        supabase.from("profiles").select("id, name, email"),
+      ]);
+      const pmap = new Map((profiles ?? []).map((p) => [p.id, p]));
+      return (rows ?? []).map((r) => ({
+        ...r,
+        profile: r.user_id ? pmap.get(r.user_id) : null,
+      }));
+    },
+  });
+
+  if (isLoading) return <Loader2 className="mt-6 size-6 animate-spin text-primary" />;
+
+  return (
+    <div className="mt-4 space-y-6">
+      <div className="overflow-x-auto rounded-2xl border border-border bg-card">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border text-left text-muted-foreground">
+              <th className="p-4 font-medium">User</th>
+              <th className="p-4 font-medium">IP Address</th>
+              <th className="p-4 font-medium">User Agent / Device</th>
+              <th className="p-4 font-medium">Timestamp</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {logs.length === 0 && (
+              <tr>
+                <td colSpan={4} className="p-8 text-center text-muted-foreground">No login logs recorded yet.</td>
+              </tr>
+            )}
+            {logs.map((log) => (
+              <tr key={log.id}>
+                <td className="p-4">
+                  <div className="font-medium">{log.profile?.name ?? "—"}</div>
+                  <div className="text-xs text-muted-foreground">{log.email ?? log.profile?.email ?? "—"}</div>
+                </td>
+                <td className="p-4 font-mono text-xs">{log.ip_address ?? "—"}</td>
+                <td className="p-4 text-xs text-muted-foreground max-w-xs truncate" title={log.user_agent}>
+                  {log.user_agent ?? "—"}
+                </td>
+                <td className="p-4 text-muted-foreground text-xs">
+                  {new Date(log.created_at).toLocaleString()}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

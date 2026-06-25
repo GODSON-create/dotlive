@@ -15,6 +15,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PlatformRouteImport } from './routes/platform'
 import { Route as JourneyRouteImport } from './routes/journey'
 import { Route as InvestorsRouteImport } from './routes/investors'
+import { Route as FounderScholarshipRouteImport } from './routes/founder-scholarship'
 import { Route as CommunitiesRouteImport } from './routes/communities'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -69,6 +70,11 @@ const JourneyRoute = JourneyRouteImport.update({
 const InvestorsRoute = InvestorsRouteImport.update({
   id: '/investors',
   path: '/investors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FounderScholarshipRoute = FounderScholarshipRouteImport.update({
+  id: '/founder-scholarship',
+  path: '/founder-scholarship',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CommunitiesRoute = CommunitiesRouteImport.update({
@@ -204,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/communities': typeof CommunitiesRoute
+  '/founder-scholarship': typeof FounderScholarshipRoute
   '/investors': typeof InvestorsRoute
   '/journey': typeof JourneyRoute
   '/platform': typeof PlatformRoute
@@ -236,6 +243,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/communities': typeof CommunitiesRoute
+  '/founder-scholarship': typeof FounderScholarshipRoute
   '/investors': typeof InvestorsRoute
   '/journey': typeof JourneyRoute
   '/platform': typeof PlatformRoute
@@ -270,6 +278,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/communities': typeof CommunitiesRoute
+  '/founder-scholarship': typeof FounderScholarshipRoute
   '/investors': typeof InvestorsRoute
   '/journey': typeof JourneyRoute
   '/platform': typeof PlatformRoute
@@ -304,6 +313,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/communities'
+    | '/founder-scholarship'
     | '/investors'
     | '/journey'
     | '/platform'
@@ -336,6 +346,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/communities'
+    | '/founder-scholarship'
     | '/investors'
     | '/journey'
     | '/platform'
@@ -369,6 +380,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/communities'
+    | '/founder-scholarship'
     | '/investors'
     | '/journey'
     | '/platform'
@@ -403,6 +415,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CommunitiesRoute: typeof CommunitiesRoute
+  FounderScholarshipRoute: typeof FounderScholarshipRoute
   InvestorsRoute: typeof InvestorsRoute
   JourneyRoute: typeof JourneyRoute
   PlatformRoute: typeof PlatformRoute
@@ -457,6 +470,13 @@ declare module '@tanstack/react-router' {
       path: '/investors'
       fullPath: '/investors'
       preLoaderRoute: typeof InvestorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/founder-scholarship': {
+      id: '/founder-scholarship'
+      path: '/founder-scholarship'
+      fullPath: '/founder-scholarship'
+      preLoaderRoute: typeof FounderScholarshipRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/communities': {
@@ -685,6 +705,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   CommunitiesRoute: CommunitiesRoute,
+  FounderScholarshipRoute: FounderScholarshipRoute,
   InvestorsRoute: InvestorsRoute,
   JourneyRoute: JourneyRoute,
   PlatformRoute: PlatformRoute,
