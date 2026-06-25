@@ -1505,40 +1505,40 @@ function SpotlightTab() {
 
       {/* Review Dialog */}
       <Dialog open={!!selectedCampaign} onOpenChange={() => setSelectedCampaign(null)}>
-        <DialogContent className="bg-slate-950 border-slate-900 text-white max-w-lg">
+        <DialogContent className="bg-popover border-border text-popover-foreground max-w-lg">
           <DialogHeader>
-            <DialogTitle className="font-display font-bold text-white text-base">Review Spotlight Submission</DialogTitle>
+            <DialogTitle className="font-display font-bold text-foreground text-base">Review Spotlight Submission</DialogTitle>
           </DialogHeader>
           {selectedCampaign && (
             <form onSubmit={handleSave} className="space-y-4 text-left">
-              <div className="bg-slate-900/40 border border-slate-900 p-4 rounded-2xl space-y-2 text-xs">
+              <div className="bg-muted/40 border border-border p-4 rounded-2xl space-y-2 text-xs">
                 <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Venture Name</span>
-                  <span className="font-bold text-white text-sm">{selectedCampaign.venture_name}</span>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase block">Venture Name</span>
+                  <span className="font-bold text-foreground text-sm">{selectedCampaign.venture_name}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Founder's Pitch</span>
-                  <p className="text-slate-300 whitespace-pre-line mt-1">{selectedCampaign.pitch}</p>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase block">Founder's Pitch</span>
+                  <p className="text-foreground/90 whitespace-pre-line mt-1">{selectedCampaign.pitch}</p>
                 </div>
-                <div className="grid grid-cols-2 gap-4 border-t border-slate-900/60 pt-2.5">
+                <div className="grid grid-cols-2 gap-4 border-t border-border/60 pt-2.5">
                   <div>
-                    <span className="text-[10px] font-bold text-slate-500 uppercase block">Package</span>
-                    <span className="font-semibold text-white">{selectedCampaign.package_type}</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase block">Package</span>
+                    <span className="font-semibold text-foreground">{selectedCampaign.package_type}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold text-slate-500 uppercase block">Cost</span>
-                    <span className="font-semibold text-white">{formatDot(selectedCampaign.cost_dot)} DOT</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase block">Cost</span>
+                    <span className="font-semibold text-foreground">{formatDot(selectedCampaign.cost_dot)} DOT</span>
                   </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-bold text-slate-400">Campaign Status</Label>
+                  <Label className="text-xs font-bold text-muted-foreground">Campaign Status</Label>
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value as any)}
-                    className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none"
+                    className="w-full bg-background border border-border rounded-lg p-2.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                   >
                     <option value="pending">Pending</option>
                     <option value="approved">Approved</option>
@@ -1549,68 +1549,68 @@ function SpotlightTab() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="assignedTeam" className="text-xs font-bold text-slate-400">Assigned Team Agent</Label>
+                  <Label htmlFor="assignedTeam" className="text-xs font-bold text-muted-foreground">Assigned Team Agent</Label>
                   <Input
                     id="assignedTeam"
                     value={assignedTeam}
                     onChange={(e) => setAssignedTeam(e.target.value)}
                     placeholder="e.g. Sandra Cole"
-                    className="bg-slate-900 border-slate-850 text-xs text-white"
+                    className="bg-background border-border text-xs text-foreground"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="pubContent" className="text-xs font-bold text-slate-400">Published content / Hook</Label>
+                <Label htmlFor="pubContent" className="text-xs font-bold text-muted-foreground">Published content / Hook</Label>
                 <Textarea
                   id="pubContent"
                   value={publishedContent}
                   onChange={(e) => setPublishedContent(e.target.value)}
                   placeholder="The description or promo copy published for the spotlight features..."
                   rows={3}
-                  className="bg-slate-900 border-slate-850 text-xs text-white resize-none"
+                  className="bg-background border-border text-xs text-foreground resize-none"
                 />
               </div>
 
               <div className="grid grid-cols-3 gap-2.5">
                 <div className="space-y-1.5">
-                  <Label htmlFor="impr" className="text-xs font-bold text-slate-400">Impressions</Label>
+                  <Label htmlFor="impr" className="text-xs font-bold text-muted-foreground">Impressions</Label>
                   <Input
                     id="impr"
                     type="number"
                     value={impressions}
                     onChange={(e) => setImpressions(Number(e.target.value))}
-                    className="bg-slate-900 border-slate-850 text-xs text-white"
+                    className="bg-background border-border text-xs text-foreground"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="clk" className="text-xs font-bold text-slate-400">Clicks</Label>
+                  <Label htmlFor="clk" className="text-xs font-bold text-muted-foreground">Clicks</Label>
                   <Input
                     id="clk"
                     type="number"
                     value={clicks}
                     onChange={(e) => setClicks(Number(e.target.value))}
-                    className="bg-slate-900 border-slate-850 text-xs text-white"
+                    className="bg-background border-border text-xs text-foreground"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="ld" className="text-xs font-bold text-slate-400">Leads</Label>
+                  <Label htmlFor="ld" className="text-xs font-bold text-muted-foreground">Leads</Label>
                   <Input
                     id="ld"
                     type="number"
                     value={leads}
                     onChange={(e) => setLeads(Number(e.target.value))}
-                    className="bg-slate-900 border-slate-850 text-xs text-white"
+                    className="bg-background border-border text-xs text-foreground"
                   />
                 </div>
               </div>
 
-              <DialogFooter className="pt-3 border-t border-slate-900/60 mt-3">
+              <DialogFooter className="pt-3 border-t border-border/60 mt-3">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setSelectedCampaign(null)}
-                  className="border-slate-800 text-xs font-bold"
+                  className="border-border text-xs font-bold"
                 >
                   Cancel
                 </Button>
@@ -1648,7 +1648,7 @@ function UsersTab() {
     queryKey: ["admin-users-list"],
     queryFn: async () => {
       const [{ data: profiles }, { data: roleRows }] = await Promise.all([
-        supabase.from("profiles").select("id, name, email, dot_id, verified, suspended, created_at"),
+        supabase.from("profiles").select("id, name, email, dot_id, verified, suspended, created_at, active_role, bio, location, website, linkedin, twitter, whatsapp, skills, industry, community, username"),
         supabase.from("user_roles").select("user_id, role"),
       ]);
       const rmap = new Map<string, string[]>();
@@ -1808,11 +1808,70 @@ function UsersTab() {
       </div>
 
       <Dialog open={!!target} onOpenChange={(o) => !o && setTarget(null)}>
-        <DialogContent className="max-h-[85vh] overflow-y-auto bg-slate-950 border-slate-900 text-white">
+        <DialogContent className="max-h-[85vh] overflow-y-auto bg-popover border-border text-popover-foreground max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-white">Manage User — {target?.name || target?.email}</DialogTitle>
+            <DialogTitle className="text-foreground">Manage User — {target?.name || target?.email}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          
+          {target && (
+            <div className="bg-muted/40 p-4 rounded-2xl border border-border space-y-3 text-xs">
+              <h3 className="font-bold text-foreground uppercase tracking-wider text-[10px] border-b border-border/40 pb-1">User Profile Information</h3>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-foreground/90">
+                <div><span className="text-muted-foreground font-medium">DOT ID:</span> {target.dot_id || "—"}</div>
+                <div><span className="text-muted-foreground font-medium">Username:</span> {target.username || "—"}</div>
+                <div><span className="text-muted-foreground font-medium">Active Role:</span> {target.active_role || "—"}</div>
+                <div><span className="text-muted-foreground font-medium">Industry:</span> {target.industry || "—"}</div>
+                <div><span className="text-muted-foreground font-medium">Location:</span> {target.location || "—"}</div>
+                <div><span className="text-muted-foreground font-medium">Community:</span> {target.community || "—"}</div>
+                
+                {target.website && (
+                  <div className="col-span-2">
+                    <span className="text-muted-foreground font-medium">Website:</span>{" "}
+                    <a href={target.website} target="_blank" rel="noreferrer" className="text-primary hover:underline font-semibold">{target.website}</a>
+                  </div>
+                )}
+                
+                {target.bio && (
+                  <div className="col-span-2">
+                    <span className="text-muted-foreground font-medium">Bio:</span> {target.bio}
+                  </div>
+                )}
+
+                {target.skills && target.skills.length > 0 && (
+                  <div className="col-span-2">
+                    <span className="text-muted-foreground font-medium">Skills:</span>{" "}
+                    <span className="inline-flex flex-wrap gap-1 mt-1">
+                      {target.skills.map((s: string) => (
+                        <Badge key={s} variant="secondary" className="text-[9px] px-1.5 py-0">
+                          {s}
+                        </Badge>
+                      ))}
+                    </span>
+                  </div>
+                )}
+
+                {(target.linkedin || target.twitter || target.whatsapp) && (
+                  <div className="col-span-2 flex gap-3 mt-1 pt-1.5 border-t border-border/40">
+                    {target.linkedin && <a href={target.linkedin} target="_blank" rel="noreferrer" className="text-primary hover:underline font-semibold">LinkedIn</a>}
+                    {target.twitter && <a href={target.twitter} target="_blank" rel="noreferrer" className="text-primary hover:underline font-semibold">Twitter</a>}
+                    {target.whatsapp && <a href={`https://wa.me/${target.whatsapp}`} target="_blank" rel="noreferrer" className="text-primary hover:underline font-semibold">WhatsApp</a>}
+                  </div>
+                )}
+              </div>
+              <div className="pt-2 border-t border-border/40 flex justify-end">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => window.open(`/founder/${target.dot_id || target.id}`, '_blank')}
+                  className="h-7 text-[10px] border-border hover:bg-muted cursor-pointer font-bold"
+                >
+                  View Public Profile →
+                </Button>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-4 pt-2">
             <div className="flex items-center justify-between border-b border-border/40 pb-3">
               <span className="text-sm font-medium">Verified Status</span>
               <Button
@@ -1838,12 +1897,12 @@ function UsersTab() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-slate-350">Assign User Roles</Label>
-              <div className="grid grid-cols-2 gap-2 p-3 rounded-xl bg-slate-900/40 border border-slate-800">
+              <Label className="text-sm font-medium text-muted-foreground">Assign User Roles</Label>
+              <div className="grid grid-cols-2 gap-2 p-3 rounded-xl bg-muted/40 border border-border">
                 {AVAILABLE_ROLES.map((role) => {
                   const checked = selectedRoles.includes(role);
                   return (
-                    <label key={role} className="flex items-center gap-2 text-xs text-slate-300 hover:text-white cursor-pointer select-none">
+                    <label key={role} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer select-none">
                       <input
                         type="checkbox"
                         checked={checked}
@@ -1854,7 +1913,7 @@ function UsersTab() {
                             setSelectedRoles(selectedRoles.filter((r) => r !== role));
                           }
                         }}
-                        className="rounded border-slate-800 bg-slate-950 text-indigo-500 focus:ring-0 cursor-pointer"
+                        className="rounded border-border bg-background text-primary focus:ring-0 cursor-pointer"
                       />
                       {ROLE_LABELS[role as AppRole] ?? role}
                     </label>
@@ -1864,13 +1923,13 @@ function UsersTab() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="auditReason" className="text-slate-350">Reason for Update (Audit Log)</Label>
+              <Label htmlFor="auditReason" className="text-muted-foreground">Reason for Update (Audit Log)</Label>
               <Input
                 id="auditReason"
                 placeholder="e.g. Verifying startup founder identity"
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="bg-slate-900 border-slate-800 text-white"
+                className="bg-background border-border text-foreground"
               />
             </div>
           </div>

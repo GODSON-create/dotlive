@@ -35,15 +35,10 @@ function PublicVentureProfile() {
     queryKey: ["public-venture-profile", slug],
     queryFn: async () => {
       const formattedSlug = slug.replace(/-/g, " ");
-      const { data, error } = await supabase
+      const { data: founderData, error: founderErr } = await supabase
         .from("founder_profiles")
         .select(`
           *,
-          profiles (
-            name,
-            avatar_url,
-            dot_id
-          ),
           communities (
             name,
             region
@@ -53,8 +48,21 @@ function PublicVentureProfile() {
         .limit(1)
         .maybeSingle();
 
-      if (error) throw error;
-      return data as any;
+      if (founderErr) throw founderErr;
+      if (!founderData) return null;
+
+      const { data: profileData, error: profileErr } = await supabase
+        .from("profiles")
+        .select("name, avatar_url, dot_id")
+        .eq("id", founderData.user_id)
+        .maybeSingle();
+
+      if (profileErr) throw profileErr;
+
+      return {
+        ...founderData,
+        profiles: profileData || null,
+      } as any;
     },
   });
 

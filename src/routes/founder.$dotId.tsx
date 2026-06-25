@@ -67,7 +67,7 @@ function PublicFounderProfile() {
           .select(
             "id, name, avatar_url, dot_id, username, active_role, banner_url, bio, location, website, linkedin, twitter, whatsapp, skills, industry, community, achievements, created_at"
           )
-          .eq("dot_id", dotId)
+          .ilike("dot_id", dotId.trim())
           .maybeSingle();
         res = await q;
       }

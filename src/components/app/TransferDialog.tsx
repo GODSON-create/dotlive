@@ -101,15 +101,7 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
       return;
     }
 
-    // Limit Enforcements
-    if (amount > 100000) {
-      toast.error("Single transfer limit is 100,000 DOT");
-      return;
-    }
-    if (todaySent + amount > 250000) {
-      toast.error(`Daily transfer limit is 250,000 DOT. You have already transferred ${formatDot(todaySent)} DOT today.`);
-      return;
-    }
+    // Limit Enforcements (Removed for now by user request)
 
     setBusy(true);
     try {
@@ -227,7 +219,7 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
                 />
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>Available: {formatDot(balance)} DOT · ≈ {formatNaira(dotToNaira(amount || 0))}</span>
-                  <span>Daily limit: 250K DOT</span>
+                  <span>Daily limit: Unlimited</span>
                 </div>
               </div>
               <div className="space-y-1.5">

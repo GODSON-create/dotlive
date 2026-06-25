@@ -41,20 +41,27 @@ function ResultPage() {
   const { data: assessment, isLoading } = useQuery({
     queryKey: ["public-assessment", id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: assessmentData, error: assessmentErr } = await supabase
         .from("assessments")
-        .select(`
-          *,
-          profiles (
-            name,
-            dot_id
-          )
-        `)
+        .select("*")
         .eq("id", id)
         .maybeSingle();
 
-      if (error) throw error;
-      return data as any;
+      if (assessmentErr) throw assessmentErr;
+      if (!assessmentData) return null;
+
+      const { data: profileData, error: profileErr } = await supabase
+        .from("profiles")
+        .select("name, dot_id")
+        .eq("id", assessmentData.user_id)
+        .maybeSingle();
+
+      if (profileErr) throw profileErr;
+
+      return {
+        ...assessmentData,
+        profiles: profileData || null,
+      } as any;
     },
   });
 
