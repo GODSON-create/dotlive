@@ -52,52 +52,52 @@ export type Database = {
           answers: Json
           category_scores: Json
           created_at: string
+          current_valuation: number | null
+          founder_archetype: string | null
           fundability: number
           id: string
           investment_readiness: number
+          potential_valuation: number | null
           report: Json | null
           score: number
           stage: string | null
+          unicorn_potential: number | null
           user_id: string
           vantage_point: number
-          current_valuation: number | null
-          potential_valuation: number | null
-          unicorn_potential: number | null
-          founder_archetype: string | null
         }
         Insert: {
           answers?: Json
           category_scores?: Json
           created_at?: string
+          current_valuation?: number | null
+          founder_archetype?: string | null
           fundability?: number
           id?: string
           investment_readiness?: number
+          potential_valuation?: number | null
           report?: Json | null
           score?: number
           stage?: string | null
+          unicorn_potential?: number | null
           user_id: string
           vantage_point?: number
-          current_valuation?: number | null
-          potential_valuation?: number | null
-          unicorn_potential?: number | null
-          founder_archetype?: string | null
         }
         Update: {
           answers?: Json
           category_scores?: Json
           created_at?: string
+          current_valuation?: number | null
+          founder_archetype?: string | null
           fundability?: number
           id?: string
           investment_readiness?: number
+          potential_valuation?: number | null
           report?: Json | null
           score?: number
           stage?: string | null
+          unicorn_potential?: number | null
           user_id?: string
           vantage_point?: number
-          current_valuation?: number | null
-          potential_valuation?: number | null
-          unicorn_potential?: number | null
-          founder_archetype?: string | null
         }
         Relationships: []
       }
@@ -344,75 +344,75 @@ export type Database = {
       founder_profiles: {
         Row: {
           bio: string | null
+          city: string | null
           community_id: string | null
           country: string | null
           created_at: string
+          current_valuation: number | null
+          founder_archetype: string | null
           fundability: number | null
           funding_goal: number | null
           industry: string | null
           investment_readiness: number | null
           logo_url: string | null
+          potential_valuation: number | null
           stage: string | null
+          state: string | null
+          unicorn_potential: number | null
+          university: string | null
           updated_at: string
           user_id: string
           vantage_point: number | null
           venture_name: string | null
           website: string | null
-          current_valuation: number | null
-          potential_valuation: number | null
-          unicorn_potential: number | null
-          founder_archetype: string | null
-          city: string | null
-          state: string | null
-          university: string | null
         }
         Insert: {
           bio?: string | null
+          city?: string | null
           community_id?: string | null
           country?: string | null
           created_at?: string
+          current_valuation?: number | null
+          founder_archetype?: string | null
           fundability?: number | null
           funding_goal?: number | null
           industry?: string | null
           investment_readiness?: number | null
           logo_url?: string | null
+          potential_valuation?: number | null
           stage?: string | null
+          state?: string | null
+          unicorn_potential?: number | null
+          university?: string | null
           updated_at?: string
           user_id: string
           vantage_point?: number | null
           venture_name?: string | null
           website?: string | null
-          current_valuation?: number | null
-          potential_valuation?: number | null
-          unicorn_potential?: number | null
-          founder_archetype?: string | null
-          city?: string | null
-          state?: string | null
-          university?: string | null
         }
         Update: {
           bio?: string | null
+          city?: string | null
           community_id?: string | null
           country?: string | null
           created_at?: string
+          current_valuation?: number | null
+          founder_archetype?: string | null
           fundability?: number | null
           funding_goal?: number | null
           industry?: string | null
           investment_readiness?: number | null
           logo_url?: string | null
+          potential_valuation?: number | null
           stage?: string | null
+          state?: string | null
+          unicorn_potential?: number | null
+          university?: string | null
           updated_at?: string
           user_id?: string
           vantage_point?: number | null
           venture_name?: string | null
           website?: string | null
-          current_valuation?: number | null
-          potential_valuation?: number | null
-          unicorn_potential?: number | null
-          founder_archetype?: string | null
-          city?: string | null
-          state?: string | null
-          university?: string | null
         }
         Relationships: [
           {
@@ -1021,6 +1021,10 @@ export type Database = {
       assert_wallet_active: { Args: { _user_id: string }; Returns: undefined }
       bootstrap_super_admin: { Args: { _email: string }; Returns: string }
       cancel_service_order: { Args: { _order_id: string }; Returns: undefined }
+      charge_revaluation_fee: {
+        Args: { _fee: number; _user_id: string }
+        Returns: boolean
+      }
       claim_course_reward: {
         Args: { _course_id: string; _user_id: string }
         Returns: number
@@ -1069,6 +1073,18 @@ export type Database = {
           total_earned: number
         }[]
       }
+      get_community_leaderboard: {
+        Args: { _type: string }
+        Returns: {
+          avg_valuation: number
+          avg_vantage: number
+          group_name: string
+          highest_unicorn_potential: number
+          member_count: number
+          most_fundable_count: number
+          most_improved: string
+        }[]
+      }
       get_my_referral_code: { Args: never; Returns: string }
       get_pitchathon_leaderboard: {
         Args: { _pitchathon_id: string }
@@ -1079,6 +1095,19 @@ export type Database = {
           venture_name: string
         }[]
       }
+      get_runway_challenges: {
+        Args: { _type: string }
+        Returns: {
+          current_valuation: number
+          fundability: number
+          growth_score: number
+          logo_url: string
+          stage: string
+          user_id: string
+          vantage_point: number
+          venture_name: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1086,6 +1115,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
       lookup_dot_id: { Args: { _dot_id: string }; Returns: string }
       review_service_order: {
         Args: { _comment?: string; _order_id: string; _rating: number }
@@ -1126,6 +1156,7 @@ export type Database = {
         | "builder"
         | "vendor"
         | "capital_partner"
+        | "moderator"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1262,6 +1293,7 @@ export const Constants = {
         "builder",
         "vendor",
         "capital_partner",
+        "moderator",
       ],
     },
   },
