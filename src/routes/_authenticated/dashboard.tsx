@@ -21,6 +21,8 @@ import {
   Users,
   Award,
   Calendar,
+  Building2,
+  AlertCircle,
 } from "lucide-react";
 import { AppShell } from "@/components/app/AppShell";
 import { Button } from "@/components/ui/button";
@@ -31,6 +33,7 @@ import {
   useAssessments,
   useMyEnrollments,
   useMyMembership,
+  useTransactions,
 } from "@/hooks/use-dot-data";
 import { JOURNEY_STAGES, dotToNaira, formatDot, formatNaira } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -40,6 +43,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { buyUpgrade } from "@/lib/vantage.functions";
 import { toast } from "sonner";
 import { ProfileEditDialog } from "@/components/app/ProfileEditDialog";
+import { getFounderCampaigns } from "@/lib/spotlight.functions";
 import { Progress } from "@/components/ui/progress";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -54,12 +58,34 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 
 function Dashboard() {
   const { profile, primaryRole, roles, user, refresh } = useAuth();
-  const { data: balance = 0 } = useWallet();
+  const wallet = useWallet();
+  const balance = wallet.data ?? 0;
   const { data: founder } = useFounderProfile();
-  const { data: assessments = [] } = useAssessments();
+  const assessmentQuery = useAssessments();
+  const assessments = assessmentQuery.data ?? [];
   const { data: enrollments = [] } = useMyEnrollments();
   const { data: membership } = useMyMembership();
   
+  const activityQuery = useTransactions();
+  const campaignsFn = useServerFn(getFounderCampaigns);
+  const campaigns = useQuery({ queryKey: ["founder-campaigns", user?.id], queryFn: () => campaignsFn(), enabled: !!user });
+  const events = useQuery({
+    queryKey: ["dashboard-upcoming-event"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("events").select("*").gte("event_date", new Date().toISOString()).order("event_date").limit(1);
+      if (error) throw error;
+      return data?.[0] ?? null;
+    },
+  });
+  const pitches = useQuery({
+    queryKey: ["dashboard-pitch", user?.id], enabled: !!user,
+    queryFn: async () => {
+      if (!user) return null;
+      const { data, error } = await supabase.from("pitchathon_applications").select("*").eq("founder_id", user.id).order("created_at", { ascending: false }).limit(1);
+      if (error) throw error;
+      return data?.[0] ?? null;
+    },
+  });
   const qc = useQueryClient();
   const buyUpgradeFn = useServerFn(buyUpgrade);
   const [buying, setBuying] = useState<string | null>(null);
@@ -201,31 +227,28 @@ function Dashboard() {
     enabled: isFounder,
   });
 
+  const hasAssessment = assessments.length > 0;
   const stats = [
-    { label: "Vantage Score", value: formatDot(vantagePoint), sub: "/ 1000", icon: Gauge, accent: "text-primary" },
-    { label: "Venture Valuation", value: formatNaira(currentValuation), sub: `Potential: ${formatNaira(potentialValuation)}`, icon: TrendingUp, accent: "text-accent" },
-    { label: "Fundability", value: `${fundability}%`, sub: `Readiness: ${investmentReadiness}%`, icon: Sparkles, accent: "text-gold" },
-    { label: "Unicorn Potential", value: `${typeof unicornPotential === 'number' ? unicornPotential.toFixed(1) : '0.0'}%`, sub: archetype, icon: Trophy, accent: "text-accent" },
+    { label: "AVA Score", value: assessmentQuery.isPending ? "—" : assessmentQuery.isError ? "Unavailable" : hasAssessment ? formatDot(vantagePoint) : "Not assessed", sub: hasAssessment ? "out of 1,000" : "Your assessment is the starting point", icon: Gauge, accent: "text-primary" },
+    { label: "Venture Valuation", value: hasAssessment ? formatNaira(currentValuation) : "—", sub: hasAssessment ? `Potential: ${formatNaira(potentialValuation)}` : "Available after assessment", icon: TrendingUp, accent: "text-primary" },
+    { label: "Funding Readiness", value: hasAssessment ? `${investmentReadiness}%` : "—", sub: hasAssessment ? `Fundability: ${fundability}%` : "No assessment yet", icon: Sparkles, accent: "text-gold" },
+    { label: "DOT Wallet", value: wallet.isPending ? "—" : wallet.isError ? "Unavailable" : formatDot(balance), sub: wallet.isError ? "Please try again" : "DOT credits", icon: Wallet, accent: "text-primary" },
   ];
 
-  // Exchange rate conversions for multi-currency wallet preview
-  const balanceNGN = dotToNaira(balance);
-  const balanceUSD = balanceNGN / 1500; // ₦1500 = $1
-  const balanceBTC = balanceUSD / 60000; // $60,000 = 1 BTC
 
   return (
     <AppShell>
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-        <div>
-          <p className="text-sm text-muted-foreground">Welcome back,</p>
-          <h1 className="font-display text-3xl font-bold flex items-center gap-3">
-            {profile?.name || "Founder"}
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:items-end">
+        <div className="min-w-0">
+          <p className="text-sm text-muted-foreground">Your venture workspace</p>
+          <h1 className="mt-2 font-display text-3xl font-semibold flex min-w-0 items-center gap-2">
+            <span className="min-w-0 break-words">Welcome, {profile?.name || "Founder"}</span>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setShowEditProfile(true)}
-              className="size-8 rounded-full border border-border/40 hover:bg-muted cursor-pointer"
-              title="Edit Profile"
+              className="size-10 shrink-0 rounded-md hover:bg-muted"
+              title="Edit Profile" aria-label="Edit Profile"
             >
               <Edit3 className="size-3.5 text-muted-foreground" />
             </Button>
@@ -262,19 +285,19 @@ function Dashboard() {
           )}
         </div>
         {isFounder && (
-          <div className="flex items-center gap-2">
+          <div className="col-span-2 flex flex-wrap items-center gap-2 sm:col-span-1">
             {latest && (
-              <Button variant="outline" asChild className="border-pink-500/25 bg-pink-500/10 text-pink-400 hover:bg-pink-500/20">
+              <Button variant="outline" asChild className="border-border bg-card text-foreground">
                 <Link to="/result/$id" params={{ id: latest.id }}>
                   <Sparkles className="size-4" />
-                  View Wrapped
+                  View assessment
                 </Link>
               </Button>
             )}
             <Button variant="hero" asChild>
               <Link to="/vantage">
                 <Gauge className="size-4" />
-                {latest ? "Update Valuation" : "Get Valuation"}
+                {latest ? "Update AVA" : "Start AVA"}
               </Link>
             </Button>
           </div>
@@ -282,14 +305,14 @@ function Dashboard() {
       </div>
 
       {/* Grid Stats */}
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="dashboard-stats mt-6 grid gap-3 sm:gap-4">
         {stats.map((s) => (
           <div key={s.label} className="rounded-2xl border border-border bg-card p-5">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">{s.label}</span>
               <s.icon className={cn("size-4", s.accent)} />
             </div>
-            <p className="mt-3 font-display text-2xl font-bold">
+            <p className="mt-3 break-words font-display text-xl font-semibold tabular-nums">
               {s.value}
             </p>
             <p className="text-xs text-muted-foreground mt-1 truncate">{s.sub}</p>
@@ -297,39 +320,53 @@ function Dashboard() {
         ))}
       </div>
 
-      {/* Multi-Currency Wallet Preview Widget */}
-      <div className="mt-6 rounded-2xl border border-border bg-card p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Wallet className="size-5 text-primary" />
-            <h2 className="font-display text-lg font-semibold">Wallet Balances</h2>
-          </div>
-          <Link to="/wallet" className="text-xs text-primary hover:underline flex items-center gap-1">
-            Manage Wallet <ArrowUpRight className="size-3" />
-          </Link>
+      <div className="dashboard-widgets mt-6 grid gap-4">
+        <section className="border-b border-border py-4">
+          <div className="flex items-center gap-2 text-sm font-semibold"><Building2 className="size-4 text-primary" />Venture</div>
+          <h2 className="mt-3 font-display text-xl font-semibold">{founder?.venture_name || "Your venture starts here"}</h2>
+          <p className="mt-2 text-sm text-muted-foreground">{founder?.venture_name ? [founder.industry, founder.stage, founder.country].filter(Boolean).join(" · ") : "No venture details added yet."}</p>
+          <Button variant="outline" size="sm" className="mt-4" onClick={() => setShowEditProfile(true)}><Edit3 />{founder?.venture_name ? "Edit venture profile" : "Complete your profile"}</Button>
+        </section>
+        <section className="border-b border-border py-4">
+          <div className="flex items-center gap-2 text-sm font-semibold"><Calendar className="size-4 text-gold" />Foundry Progress</div>
+          <h2 className="mt-3 font-display text-xl font-semibold">Your 90-day journey</h2>
+          <p className="mt-2 text-sm text-muted-foreground">Cohort progress is not available yet. ARISE is DOT’s first Foundry.</p>
+          <Button variant="outline" size="sm" className="mt-4" asChild><Link to="/foundry">ARISE Foundry <ArrowUpRight /></Link></Button>
+        </section>
+        <section className="border-b border-border py-4">
+          <div className="flex items-center gap-2 text-sm font-semibold"><ArrowRight className="size-4 text-primary" />Next Action</div>
+          <h2 className="mt-3 font-display text-xl font-semibold">{!founder?.venture_name ? "Introduce your venture" : !latest ? "Establish your baseline" : "Move your venture forward"}</h2>
+          <p className="mt-2 text-sm text-muted-foreground">{(latest?.report as { nextActions?: string[] } | null)?.nextActions?.[0] || (!founder?.venture_name ? "Add your venture details to your founder profile." : !latest ? "Complete AVA to receive your score and recommendations." : "Review your latest assessment and recommendations.")}</p>
+          {!founder?.venture_name ? <Button size="sm" className="mt-4" onClick={() => setShowEditProfile(true)}>Complete profile <ArrowRight /></Button> : <Button size="sm" className="mt-4" asChild><Link to="/vantage">{latest ? "Review AVA" : "Start AVA"} <ArrowRight /></Link></Button>}
+        </section>
+      </div>
+      <div className="dashboard-widgets mt-6 grid gap-4">
+        <div className="rounded-lg border border-border bg-card p-5">
+          <h2 className="flex items-center gap-2 text-base font-semibold"><Calendar className="size-4 text-primary" />Upcoming Event</h2>
+          <p className="mt-4 text-sm font-medium">{events.isPending ? "Loading event…" : events.isError ? "Events are temporarily unavailable" : events.data?.title || "No upcoming events"}</p>
+          <p className="mt-2 text-xs text-muted-foreground">{events.data?.event_date ? new Date(events.data.event_date).toLocaleString() : "New event dates will appear here when scheduled."}</p>
+          <Button variant="link" className="mt-3 h-9 px-0" asChild><Link to="/sessions">View events <ArrowUpRight /></Link></Button>
         </div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-4">
-          <div className="rounded-xl bg-muted p-4 border border-border/40">
-            <span className="text-[10px] text-muted-foreground block tracking-widest font-semibold uppercase">DOT Tokens</span>
-            <span className="font-display text-xl font-bold text-foreground mt-1 block">{formatDot(balance)} DOT</span>
-          </div>
-          <div className="rounded-xl bg-muted p-4 border border-border/40">
-            <span className="text-[10px] text-muted-foreground block tracking-widest font-semibold uppercase">Naira (NGN)</span>
-            <span className="font-display text-xl font-bold text-foreground mt-1 block">{formatNaira(balanceNGN)}</span>
-          </div>
-          <div className="rounded-xl bg-muted p-4 border border-border/40">
-            <span className="text-[10px] text-muted-foreground block tracking-widest font-semibold uppercase">Dollars (USD)</span>
-            <span className="font-display text-xl font-bold text-foreground mt-1 block">${balanceUSD.toLocaleString("en-US", { maximumFractionDigits: 2 })}</span>
-          </div>
-          <div className="rounded-xl bg-muted p-4 border border-border/40">
-            <span className="text-[10px] text-muted-foreground block tracking-widest font-semibold uppercase">Bitcoin (BTC)</span>
-            <span className="font-display text-xl font-bold text-foreground mt-1 block">{balanceBTC.toFixed(6)} BTC</span>
-          </div>
+        <div className="rounded-lg border border-border bg-card p-5">
+          <h2 className="flex items-center gap-2 text-base font-semibold"><Trophy className="size-4 text-gold" />Pitch</h2>
+          <p className="mt-4 text-sm font-medium">{pitches.isPending ? "Loading application…" : pitches.isError ? "Applications are temporarily unavailable" : pitches.data?.venture_name || "No pitch application yet"}</p>
+          <p className="mt-2 text-xs capitalize text-muted-foreground">{pitches.data?.status || "Your next pitch opportunity awaits."}</p>
+          <Button variant="link" className="mt-3 h-9 px-0" asChild><Link to="/pitchathons">View pitchathons <ArrowUpRight /></Link></Button>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-5">
+          <h2 className="flex items-center gap-2 text-base font-semibold"><Sparkles className="size-4 text-primary" />Spotlight</h2>
+          <p className="mt-4 text-sm font-medium">{campaigns.isPending ? "Loading campaign…" : campaigns.isError ? "Campaigns are temporarily unavailable" : campaigns.data?.[0]?.venture_name || "No active campaign"}</p>
+          <p className="mt-2 text-xs capitalize text-muted-foreground">{campaigns.data?.[0]?.status || "Your venture’s visibility, in one place."}</p>
+          <Button variant="link" className="mt-3 h-9 px-0" asChild><Link to="/spotlight">View Spotlight <ArrowUpRight /></Link></Button>
         </div>
       </div>
+      <section className="mt-6 border-y border-border py-5">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3"><h2 className="text-base font-semibold">Recent Activity</h2><Button variant="link" size="sm" asChild><Link to="/wallet">DOT Wallet <ArrowUpRight /></Link></Button></div>
+        {activityQuery.isPending ? <p className="mt-4 text-sm text-muted-foreground" role="status">Loading activity…</p> : activityQuery.isError ? <p className="mt-4 flex items-center gap-2 text-sm text-muted-foreground"><AlertCircle className="size-4" />Activity is temporarily unavailable.</p> : !activityQuery.data?.length ? <p className="mt-4 text-sm text-muted-foreground">No wallet activity yet. Your transactions will appear here.</p> : <div className="mt-3 divide-y divide-border">{activityQuery.data.slice(0, 4).map((transaction) => <div key={transaction.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3"><div className="min-w-0"><p className="text-sm">{transaction.description || transaction.type}</p><p className="mt-1 text-xs text-muted-foreground">{new Date(transaction.created_at).toLocaleDateString()}</p></div><span className="shrink-0 text-sm font-semibold tabular-nums">{formatDot(transaction.amount)} DOT</span></div>)}</div>}
+      </section>
 
       {isFounder && (
-        <div className="mt-6 rounded-2xl border border-border bg-card p-6">
+        <div className="mt-6 border-b border-border py-6">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-lg font-semibold">Your progression</h2>
             <span className="text-sm text-muted-foreground">
@@ -361,14 +398,16 @@ function Dashboard() {
         </div>
       )}
 
+      <details className="mt-6">
+        <summary className="cursor-pointer py-3 text-sm font-semibold text-muted-foreground">Insights, achievements &amp; account resources</summary>
       {/* Main dashboard widgets */}
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        {/* AI Advisor Recommendations */}
+        {/* AVA Recommendations */}
         <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-6">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-lg font-semibold flex items-center gap-2">
               <MessageSquare className="size-5 text-primary" />
-              AI Advisor Recommendations
+              AVA Recommendations
             </h2>
             {currentValuation > 0 && (
               <span className="text-xs font-semibold text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border">
@@ -377,7 +416,7 @@ function Dashboard() {
             )}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            Tailored suggestions to increase your Vantage score and venture valuation.
+            Tailored suggestions to increase your AVA score and venture valuation.
           </p>
 
           <div className="mt-5 space-y-3">
@@ -399,7 +438,7 @@ function Dashboard() {
               </>
             ) : (
               <div className="py-6 text-center">
-                <p className="text-sm text-muted-foreground">Take your Vantage assessment to unlock personalized AI guidance.</p>
+                <p className="text-sm text-muted-foreground">Take your AVA assessment to unlock personalized AI guidance.</p>
                 <Button variant="outline" className="mt-4" asChild>
                   <Link to="/vantage">Start your assessment <ArrowRight className="size-4" /></Link>
                 </Button>
@@ -591,6 +630,7 @@ function Dashboard() {
         </div>
       </div>
 
+      </details>
       <ProfileEditDialog open={showEditProfile} onOpenChange={setShowEditProfile} />
     </AppShell>
   );

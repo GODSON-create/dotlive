@@ -100,12 +100,12 @@ function AdminPage() {
 
   return (
     <AppShell>
-      <h1 className="font-display text-3xl font-bold">Admin Portal</h1>
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4"><div className="min-w-0"><p className="mb-2 text-xs font-semibold uppercase text-primary">DOT Operations</p><h1 className="font-display text-3xl font-semibold">Control Room</h1></div><Badge variant="outline" className="shrink-0 gap-1.5"><ShieldCheck className="size-3.5" />{isSuperAdmin ? "Super Admin" : "Admin"}</Badge></div>
       <p className="mt-1 text-sm text-muted-foreground">
         Executive overview, ecosystem reserve, wallet controls and platform content.
       </p>
       <Tabs defaultValue="overview" className="mt-6">
-        <TabsList className="flex-wrap">
+        <TabsList className="h-auto w-full justify-start gap-1 overflow-x-auto border-b border-border bg-transparent p-0 pb-3">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="users">User Management</TabsTrigger>
           <TabsTrigger value="wallets">Wallets</TabsTrigger>
@@ -173,7 +173,7 @@ interface Overview {
 }
 
 function OverviewTab() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["admin-overview"],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("get_admin_overview");
@@ -182,11 +182,12 @@ function OverviewTab() {
     },
   });
 
-  if (isLoading || !data) return <Loader2 className="mt-6 size-6 animate-spin text-primary" />;
+  if (isLoading) return <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" role="status" aria-label="Loading operational metrics">{Array.from({ length: 4 }, (_, i) => <div key={i} className="h-28 animate-pulse rounded-lg border border-border bg-muted" />)}</div>;
+  if (isError || !data) return <div className="py-12 text-center"><p className="font-semibold">Operational metrics could not load</p><p className="mt-2 text-sm text-muted-foreground">No figures are shown until live data is available.</p><Button variant="outline" className="mt-4" onClick={() => refetch()}>Try again</Button></div>;
 
   return (
     <div className="mt-4 space-y-8">
-      <MetricGroup title="User Metrics" icon={Users}>
+      <MetricGroup title="People & ecosystem" icon={Users}>
         <Stat label="Total Users" value={String(data.users.total)} />
         <Stat label="Active Users" value={String(data.users.active)} />
         <Stat label="Founders" value={String(data.users.founders)} />
@@ -197,7 +198,7 @@ function OverviewTab() {
         <Stat label="Capital Partners" value={String(data.users.partners)} />
       </MetricGroup>
 
-      <MetricGroup title="Revenue Metrics" icon={WalletIcon}>
+      <MetricGroup title="Wallet & revenue" icon={WalletIcon}>
         <Stat label="Total Wallet Deposits" value={formatNaira(data.revenue.total_deposits)} />
         <Stat label="Total DOT Purchased" value={formatDot(data.revenue.total_purchased)} />
         <Stat label="Total DOT Spent" value={formatDot(data.revenue.total_spent)} />
@@ -206,20 +207,20 @@ function OverviewTab() {
         <Stat label="Monthly Revenue" value={formatNaira(data.revenue.monthly_revenue)} />
       </MetricGroup>
 
-      <MetricGroup title="Venture Metrics" icon={TrendingUp}>
+      <MetricGroup title="Venture intelligence" icon={TrendingUp}>
         <Stat label="Total Ventures" value={String(data.ventures.total)} />
-        <Stat label="Average Vantage Score" value={`${data.ventures.avg_vantage} pts`} />
+        <Stat label="Average AVA Score" value={`${data.ventures.avg_vantage} pts`} />
         <Stat label="Fundable Ventures" value={String(data.ventures.fundable)} />
         <Stat label="Demo Qualified Ventures" value={String(data.ventures.demo_qualified)} />
       </MetricGroup>
 
-      <MetricGroup title="Community Metrics" icon={Users}>
+      <MetricGroup title="Community growth" icon={Users}>
         <Stat label="Total Communities" value={String(data.communities.total)} />
         <Stat label="Community Growth" value={`+${data.communities.growth} this month`} />
         <Stat label="Referral Conversions" value={String(data.communities.referral_conversions)} />
       </MetricGroup>
 
-      <MetricGroup title="Capital Metrics" icon={Landmark}>
+      <MetricGroup title="Capital & treasury" icon={Landmark}>
         <Stat label="Capital Committed" value={`${formatDot(data.capital.committed)} DOT`} />
         <Stat label="Founder Scholarship Allocated" value={`${formatDot(data.capital.scholarship_allocated)} DOT`} />
         <Stat label="Community Rewards Allocated" value={`${formatDot(data.capital.rewards_allocated)} DOT`} />
@@ -1108,9 +1109,9 @@ function PaymentsTab() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-1 font-display text-2xl font-bold">{value}</p>
+    <div className="min-w-0 rounded-lg border border-border bg-card p-5">
+      <p className="text-xs font-medium text-muted-foreground">{label}</p>
+      <p className="mt-3 break-words font-display text-2xl font-semibold tabular-nums">{value}</p>
     </div>
   );
 }
