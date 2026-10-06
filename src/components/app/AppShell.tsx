@@ -22,6 +22,10 @@ import {
   ShieldAlert,
   MapPin,
   Store,
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
+  UserRound,
 } from "lucide-react";
 import { Logo } from "@/components/site/Logo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -56,31 +60,34 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useWallet } from "@/hooks/use-dot-data";
 import { Badge } from "@/components/ui/badge";
 
 interface NavItem {
   label: string;
   to: string;
   icon: typeof LayoutDashboard;
+  future?: boolean;
   roles?: AppRole[]; // if omitted, all roles
 }
 
 const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
-  { label: "Vantage", to: "/vantage", icon: Gauge, roles: ["founder"] },
-  { label: "Leaderboards", to: "/leaderboards", icon: Trophy },
-  { label: "Wallet", to: "/wallet", icon: Wallet },
-  { label: "DOT Store", to: "/store", icon: Store },
-  { label: "DOT Work", to: "/work", icon: Hammer },
-  { label: "Academy", to: "/academy", icon: BookOpen, roles: ["founder"] },
-  { label: "Sessions", to: "/sessions", icon: CalendarCheck },
-  { label: "Pitchathons", to: "/pitchathons", icon: Trophy, roles: ["founder"] },
+  { label: "AVA", to: "/vantage", icon: Gauge, roles: ["founder"] },
+  { label: "ARISE Foundry", to: "/foundry", icon: Building2, roles: ["founder"] },
+  { label: "Pitch / Pitchathons", to: "/pitchathons", icon: Trophy, roles: ["founder"] },
   { label: "Spotlight", to: "/spotlight", icon: Sparkles, roles: ["founder"] },
+  { label: "Events", to: "/sessions", icon: CalendarCheck },
   { label: "DOT Demo", to: "/demo", icon: Building2 },
-  { label: "Community", to: "/community", icon: Users, roles: ["community_leader"] },
-  { label: "Investor Portal", to: "/investor", icon: Briefcase, roles: ["investor"] },
-  { label: "Capital Partner", to: "/capital-partner", icon: Building2, roles: ["capital_partner"] },
+  { label: "Leaderboards", to: "/leaderboards", icon: Trophy },
+  { label: "DOT Wallet", to: "/wallet", icon: Wallet },
   { label: "Admin", to: "/admin", icon: Shield, roles: ["admin", "super_admin"] },
+  { label: "Store", to: "/store", icon: Store, future: true },
+  { label: "Work / Services", to: "/work", icon: Hammer, future: true },
+  { label: "Academy", to: "/academy", icon: BookOpen, roles: ["founder"], future: true },
+  { label: "Community OS", to: "/community", icon: Users, roles: ["community_leader"], future: true },
+  { label: "Investor Portal", to: "/investor", icon: Briefcase, roles: ["investor"], future: true },
+  { label: "Capital Partner", to: "/capital-partner", icon: Building2, roles: ["capital_partner"], future: true },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -94,6 +101,20 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [showProfileDrawer, setShowProfileDrawer] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [updatingPassword, setUpdatingPassword] = useState(false);
+
+  const [collapsed, setCollapsed] = useState(false);
+  const [showNavigation, setShowNavigation] = useState(false);
+  const wallet = useWallet();
+  useEffect(() => {
+    setCollapsed(localStorage.getItem("dot-sidebar-collapsed") === "true");
+  }, []);
+  useEffect(() => { setShowNavigation(false); }, [pathname]);
+  function toggleSidebar() {
+    setCollapsed((value) => {
+      localStorage.setItem("dot-sidebar-collapsed", String(!value));
+      return !value;
+    });
+  }
 
   const updateRolesFn = useServerFn(updateUserRoles);
 
@@ -134,7 +155,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-muted/30">
+      <div className="flex min-h-dvh items-center justify-center bg-background" role="status" aria-label="Loading DOT workspace">
         <Loader2 className="size-6 animate-spin text-primary" />
       </div>
     );
@@ -144,118 +165,119 @@ export function AppShell({ children }: { children: ReactNode }) {
   const items = NAV_ITEMS.filter((i) => !i.roles || (activeRole && i.roles.includes(activeRole)));
   const initial = (profile?.name || profile?.email || "?").charAt(0).toUpperCase();
 
+  const coreItems = items.filter((item) => !item.future);
+  const futureItems = items.filter((item) => item.future);
+  const currentItem = items.find((item) => item.to === pathname);
+
+  function navigation(compact = false) {
+    return (
+      <nav aria-label="Workspace navigation" className="space-y-1">
+        {coreItems.map((item) => (
+          <Button key={item.to} variant="ghost" asChild className={cn(
+            "h-11 w-full justify-start gap-3 font-medium",
+            compact ? "justify-center px-0" : "px-3",
+            pathname === item.to ? "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+          )}>
+            <Link to={item.to} aria-current={pathname === item.to ? "page" : undefined} title={compact ? item.label : undefined}>
+              <item.icon className="size-4 shrink-0" />
+              {!compact && <span className="truncate">{item.label}</span>}
+              {compact && <span className="sr-only">{item.label}</span>}
+            </Link>
+          </Button>
+        ))}
+        <Button variant="ghost" onClick={() => { setShowNavigation(false); setShowProfileDrawer(true); }} title={compact ? "Profile" : undefined} className={cn("h-11 w-full justify-start gap-3 text-muted-foreground hover:bg-muted hover:text-foreground", compact ? "justify-center px-0" : "px-3")}>
+          <UserRound className="size-4 shrink-0" />
+          <span className={compact ? "sr-only" : ""}>Profile</span>
+        </Button>
+        {!compact && futureItems.length > 0 && (
+          <details className="pt-5" open={currentItem?.future || undefined}>
+            <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2 text-xs font-semibold text-muted-foreground">
+              Coming Soon <ChevronDown className="size-3.5" />
+            </summary>
+            <div className="mt-1 space-y-1">
+              {futureItems.map((item) => (
+                <Button key={item.to} variant="ghost" asChild className="h-11 w-full justify-start gap-3 px-3 text-muted-foreground hover:bg-muted hover:text-foreground">
+                  <Link to={item.to} aria-current={pathname === item.to ? "page" : undefined}>
+                    <item.icon className="size-4 shrink-0" /><span className="min-w-0 flex-1 truncate">{item.label}</span>
+                    <span className="text-[10px]">Soon</span>
+                  </Link>
+                </Button>
+              ))}
+            </div>
+          </details>
+        )}
+      </nav>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen flex-col bg-muted/30">
-      <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Logo />
-          <div className="flex items-center gap-2">
+    <div className="dot-workspace min-h-dvh bg-canvas">
+      <a href="#workspace-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-[100] focus:rounded-md focus:bg-card focus:px-4 focus:py-3 focus:text-foreground">Skip to content</a>
+      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-xl">
+        <div className="grid h-16 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-4 sm:px-6 lg:px-8">
+          <div className="flex min-w-0 items-center gap-3">
+            <Button variant="ghost" size="icon" className="shrink-0 md:hidden" onClick={() => setShowNavigation(true)} aria-label="Open navigation"><Menu /></Button>
+            <Logo className="shrink-0" />
+            <span className="mx-2 hidden h-5 w-px bg-border sm:block" />
+            <span className="hidden truncate text-sm text-muted-foreground sm:block">{currentItem?.label || "Workspace"}</span>
+          </div>
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+            <Button variant="ghost" asChild className="hidden h-9 gap-2 text-xs sm:inline-flex">
+              <Link to="/wallet"><Wallet />{wallet.isError ? "Wallet unavailable" : wallet.isPending ? "— DOT" : `${formatDot(wallet.data ?? 0)} DOT`}</Link>
+            </Button>
             <ThemeToggle />
-            
-            {/* Active Role Selector */}
             {roles.length > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-9 gap-1.5 text-xs border border-border bg-card hover:bg-muted text-foreground rounded-lg cursor-pointer">
-                    <span className="font-semibold text-muted-foreground hover:text-foreground">
-                      {activeRole ? ROLE_LABELS[activeRole] : "Select Role"}
-                    </span>
-                    <ChevronDown className="size-3 text-muted-foreground" />
+                  <Button variant="outline" size="sm" className="hidden h-9 gap-1.5 sm:inline-flex">
+                    <span>{activeRole ? ROLE_LABELS[activeRole] : "Select Role"}</span><ChevronDown className="size-3" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-popover border border-border text-popover-foreground">
-                  <div className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                    Switch Active Persona
-                  </div>
-                  {roles.map((r) => (
-                    <DropdownMenuItem
-                      key={r}
-                      onClick={() => switchActiveRole(r)}
-                      className={cn(
-                        "text-xs cursor-pointer py-2 rounded-md focus:bg-muted focus:text-foreground",
-                        activeRole === r ? "bg-primary/10 text-primary font-bold" : "text-muted-foreground hover:text-foreground"
-                      )}
-                    >
-                      <UserCheck className="size-3.5 mr-2 text-primary" />
-                      {ROLE_LABELS[r]}
-                    </DropdownMenuItem>
-                  ))}
-                  <DropdownMenuSeparator className="bg-border" />
-                  <DropdownMenuItem
-                    onClick={openRoleDialog}
-                    className="text-xs cursor-pointer text-primary focus:text-primary focus:bg-muted font-semibold py-2 rounded-md"
-                  >
-                    <Settings className="size-3.5 mr-2" />
-                    Manage Identities...
-                  </DropdownMenuItem>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="px-2 py-2 text-xs font-semibold text-muted-foreground">Switch identity</div>
+                  {roles.map((role) => <DropdownMenuItem key={role} onClick={() => switchActiveRole(role)} className={cn("min-h-10", activeRole === role && "bg-primary/10 text-primary")}><UserCheck className="mr-2 size-4" />{ROLE_LABELS[role]}</DropdownMenuItem>)}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={openRoleDialog}><Settings className="mr-2 size-4" />Manage identities</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-
-            <button
-              onClick={() => setShowProfileDrawer(true)}
-              className="flex size-9 items-center justify-center rounded-full [background-image:var(--gradient-primary)] text-sm font-semibold text-primary-foreground hover:opacity-90 cursor-pointer"
-              aria-label="View Profile"
-            >
-              {initial}
-            </button>
-            <button
-              onClick={handleSignOut}
-              className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground cursor-pointer"
-              aria-label="Sign out"
-            >
-              <LogOut className="size-4" />
-            </button>
+            <Button variant="ghost" size="icon" onClick={() => setShowProfileDrawer(true)} className="rounded-full bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary" aria-label="View Profile">{initial}</Button>
+            <Button variant="ghost" size="icon" onClick={handleSignOut} className="hidden text-muted-foreground sm:inline-flex" aria-label="Sign out"><LogOut /></Button>
           </div>
         </div>
       </header>
-
-      <div className="mx-auto flex w-full max-w-7xl flex-1 gap-6 px-4 py-6 sm:px-6 lg:px-8">
-        <aside className="hidden w-56 shrink-0 lg:block">
-          <nav className="sticky top-20 space-y-1">
-            {items.map((item) => {
-              const active = pathname === item.to;
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                    active
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-accent hover:text-foreground",
-                  )}
-                >
-                  <item.icon className="size-4" />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
+      <div className="flex w-full items-start">
+        <aside className={cn("sticky top-16 hidden h-[calc(100dvh-4rem)] shrink-0 flex-col border-r border-border bg-background transition-[width] duration-200 md:flex", collapsed ? "w-20" : "w-60")}>
+          <div className="flex items-center justify-between px-4 py-4">
+            {!collapsed && <span className="text-[11px] font-semibold uppercase text-muted-foreground">Your workspace</span>}
+            <Button variant="ghost" size="icon" onClick={toggleSidebar} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} aria-expanded={!collapsed} title={collapsed ? "Expand sidebar" : "Collapse sidebar"} className="shrink-0 text-muted-foreground">{collapsed ? <PanelLeftOpen /> : <PanelLeftClose />}</Button>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">{navigation(collapsed)}</div>
+          {!collapsed && <div className="border-t border-border px-6 py-4 text-xs text-muted-foreground">DOT · Venture progression</div>}
         </aside>
-
-        <main className="min-w-0 flex-1">{children}</main>
+        <main id="workspace-content" tabIndex={-1} className="workspace-content min-w-0 flex-1 px-4 py-6 pb-24 sm:px-6 md:pb-8 lg:px-8 lg:py-8">{children}</main>
       </div>
-
-      {/* Mobile bottom nav */}
-      <nav className="sticky bottom-0 z-40 flex items-center justify-around border-t border-border/60 bg-background/90 px-2 py-1 backdrop-blur-xl lg:hidden">
-        {items.slice(0, 5).map((item) => {
-          const active = pathname === item.to;
-          return (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={cn(
-                "flex flex-1 flex-col items-center gap-0.5 rounded-md py-1.5 text-[10px] font-medium",
-                active ? "text-primary" : "text-muted-foreground",
-              )}
-            >
-              <item.icon className="size-5" />
-              {item.label}
-            </Link>
-          );
-        })}
+      <nav aria-label="Mobile navigation" className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-border bg-background/95 px-2 pt-2 pb-[max(.5rem,env(safe-area-inset-bottom))] backdrop-blur-xl md:hidden">
+        {coreItems.filter((item) => ["/dashboard", "/vantage", "/sessions", "/wallet"].includes(item.to)).map((item) => (
+          <Button key={item.to} variant="ghost" asChild className={cn("h-12 flex-col gap-1 px-1 text-[10px]", pathname === item.to ? "text-primary bg-primary/10" : "text-muted-foreground")}>
+            <Link to={item.to} aria-current={pathname === item.to ? "page" : undefined}><item.icon className="size-5" />{item.label === "DOT Wallet" ? "Wallet" : item.label}</Link>
+          </Button>
+        ))}
+        {!coreItems.some((item) => item.to === "/vantage") && <Button variant="ghost" className="h-12 flex-col gap-1 px-1 text-[10px] text-muted-foreground" onClick={() => setShowProfileDrawer(true)}><UserRound />Profile</Button>}
+        <Button variant="ghost" className="h-12 flex-col gap-1 px-1 text-[10px] text-muted-foreground" onClick={() => setShowNavigation(true)} aria-label="More navigation"><Menu />More</Button>
       </nav>
+      <Sheet open={showNavigation} onOpenChange={setShowNavigation}>
+        <SheetContent side="left" className="w-[min(88vw,340px)] overflow-y-auto p-4">
+          <SheetHeader className="mb-5 text-left"><SheetTitle><Logo /></SheetTitle><p className="text-sm text-muted-foreground">Your DOT workspace</p></SheetHeader>
+          {navigation()}
+          <div className="mt-6 border-t border-border pt-4">
+            <p className="mb-2 px-3 text-xs text-muted-foreground">Active identity</p>
+            {roles.map((role) => <Button key={role} variant="ghost" className={cn("h-11 w-full justify-start", role === activeRole && "bg-primary/10 text-primary")} onClick={() => switchActiveRole(role)}><UserCheck />{ROLE_LABELS[role]}</Button>)}
+            <Button variant="ghost" className="mt-2 h-11 w-full justify-start" onClick={() => { setShowNavigation(false); openRoleDialog(); }}><Settings />Manage identities</Button>
+            <Button variant="ghost" className="h-11 w-full justify-start" onClick={handleSignOut}><LogOut />Sign out</Button>
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Manage Roles Dialog */}
       <Dialog open={showRoleDialog} onOpenChange={setShowRoleDialog}>
@@ -305,7 +327,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
 
             {roles.some((r) => r === "admin" || r === "super_admin") && (
-              <div className="flex items-center gap-2 rounded-xl bg-red-500/5 border border-red-500/10 p-3 text-[10px] text-red-400 font-semibold">
+              <div className="flex items-center gap-2 rounded-xl bg-destructive/5 border border-destructive/20 p-3 text-[10px] text-destructive font-semibold">
                 <ShieldAlert className="size-4 shrink-0" />
                 <span>Admin roles cannot be self-removed or modified from this screen.</span>
               </div>
@@ -393,17 +415,17 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Profile Drawer */}
       <Sheet open={showProfileDrawer} onOpenChange={setShowProfileDrawer}>
-        <SheetContent side="right" className="w-full sm:max-w-xl bg-card border-l border-border text-foreground p-6 overflow-y-auto max-h-screen">
+        <SheetContent side="right" className="w-full sm:max-w-xl bg-card border-l border-border text-foreground p-4 sm:p-6 overflow-y-auto max-h-dvh">
           <SheetHeader className="border-b border-border/40 pb-4">
             <div className="flex items-center gap-3">
               <span className="flex size-12 items-center justify-center rounded-full [background-image:var(--gradient-primary)] text-lg font-bold text-primary-foreground">
                 {initial}
               </span>
-              <div>
-                <SheetTitle className="font-display font-black text-xl text-foreground">
+              <div className="min-w-0">
+                <SheetTitle className="font-display font-bold text-xl text-foreground break-words">
                   {profile?.name || "User Profile"}
                 </SheetTitle>
-                <p className="text-xs text-muted-foreground">{profile?.email}</p>
+                <p className="break-all text-xs text-muted-foreground">{profile?.email}</p>
               </div>
             </div>
           </SheetHeader>
