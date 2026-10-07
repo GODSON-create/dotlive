@@ -394,7 +394,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   const { error: profileErr } = await supabase
                     .from("profiles")
                     .update({ force_password_change: false })
-                    .eq("id", user?.id);
+                    .eq("id", user?.id ?? "");
                   if (profileErr) throw profileErr;
                   toast.success("Password updated successfully!");
                   await refresh();
@@ -539,7 +539,7 @@ function VantageHistorySection({ userId }: { userId?: string }) {
               <p className="font-semibold text-foreground">{h.founder_archetype || "Baseline Assessment"}</p>
               <p className="text-[10px] text-muted-foreground">{new Date(h.created_at).toLocaleDateString()}</p>
             </div>
-            <Badge variant="hero" className="font-bold text-[10px]">{h.vantage_point} pts</Badge>
+            <Badge variant="default" className="font-bold text-[10px]">{h.vantage_point} pts</Badge>
           </div>
         ))}
       </div>

@@ -553,7 +553,7 @@ function ReserveTab() {
     setEngineBusy(true);
     try {
       if (engineAction === "lock") {
-        const { error } = await supabase.rpc("lock_pool_funds", {
+        const { error } = await (supabase.rpc as unknown as UntypedRpc)("lock_pool_funds", {
           _pool_name: enginePool,
           _amount: engineAmount,
           _reason: engineReason || undefined,
@@ -561,7 +561,7 @@ function ReserveTab() {
         if (error) throw error;
         toast.success(`Locked ${formatDot(engineAmount)} DOT in ${enginePool} pool`);
       } else if (engineAction === "release") {
-        const { error } = await supabase.rpc("release_pool_funds", {
+        const { error } = await (supabase.rpc as unknown as UntypedRpc)("release_pool_funds", {
           _pool_name: enginePool,
           _amount: engineAmount,
           _reason: engineReason || undefined,
@@ -569,7 +569,7 @@ function ReserveTab() {
         if (error) throw error;
         toast.success(`Released ${formatDot(engineAmount)} DOT in ${enginePool} pool`);
       } else if (engineAction === "burn") {
-        const { error } = await supabase.rpc("burn_pool_funds", {
+        const { error } = await (supabase.rpc as unknown as UntypedRpc)("burn_pool_funds", {
           _pool_name: enginePool,
           _amount: engineAmount,
           _reason: engineReason || undefined,
@@ -577,7 +577,7 @@ function ReserveTab() {
         if (error) throw error;
         toast.success(`Permanently burned ${formatDot(engineAmount)} DOT from ${enginePool} pool`);
       } else if (engineAction === "transfer") {
-        const { error } = await supabase.rpc("transfer_pool_funds", {
+        const { error } = await (supabase.rpc as unknown as UntypedRpc)("transfer_pool_funds", {
           _from_pool: enginePool,
           _to_pool: engineToPool,
           _amount: engineAmount,
@@ -2122,7 +2122,7 @@ function SessionsTab() {
                   <div className="text-xs text-muted-foreground">{log.email ?? log.profile?.email ?? "—"}</div>
                 </td>
                 <td className="p-4 font-mono text-xs">{log.ip_address ?? "—"}</td>
-                <td className="p-4 text-xs text-muted-foreground max-w-xs truncate" title={log.user_agent}>
+                <td className="p-4 text-xs text-muted-foreground max-w-xs truncate" title={log.user_agent ?? undefined}>
                   {log.user_agent ?? "—"}
                 </td>
                 <td className="p-4 text-muted-foreground text-xs">

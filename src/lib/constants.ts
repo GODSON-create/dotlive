@@ -39,7 +39,8 @@ export type AppRole =
   | "investor"
   | "capital_partner"
   | "admin"
-  | "super_admin";
+  | "super_admin"
+  | "moderator";
 
 export const ROLE_LABELS: Record<AppRole, string> = {
   founder: "Founder",
