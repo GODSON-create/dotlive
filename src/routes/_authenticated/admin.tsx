@@ -437,6 +437,8 @@ function WalletsTab() {
 
 /* ===================== Ecosystem Reserve ===================== */
 
+type UntypedRpc = (fn: string, args: Record<string, unknown>) => Promise<{ error: Error | null }>;
+
 function ReserveTab() {
   const qc = useQueryClient();
   const { roles } = useAuth();

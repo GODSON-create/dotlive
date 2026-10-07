@@ -51,6 +51,7 @@ export const ROLE_LABELS: Record<AppRole, string> = {
   capital_partner: "Capital Partner",
   admin: "Admin",
   super_admin: "Super Admin",
+  moderator: "Moderator",
 };
 
 // Roles a user can self-assign / switch into from the app
