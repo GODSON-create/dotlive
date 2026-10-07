@@ -356,7 +356,9 @@ export type Database = {
         Row: {
           action: string
           admin_id: string | null
+          after_value: string | null
           amount: number | null
+          before_value: string | null
           created_at: string
           id: string
           metadata: Json | null
@@ -366,7 +368,9 @@ export type Database = {
         Insert: {
           action: string
           admin_id?: string | null
+          after_value?: string | null
           amount?: number | null
+          before_value?: string | null
           created_at?: string
           id?: string
           metadata?: Json | null
@@ -376,7 +380,9 @@ export type Database = {
         Update: {
           action?: string
           admin_id?: string | null
+          after_value?: string | null
           amount?: number | null
+          before_value?: string | null
           created_at?: string
           id?: string
           metadata?: Json | null
@@ -783,6 +789,33 @@ export type Database = {
         }
         Relationships: []
       }
+      login_audit_log: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       meeting_requests: {
         Row: {
           created_at: string
@@ -998,34 +1031,109 @@ export type Database = {
       }
       profiles: {
         Row: {
+          achievements: string[]
+          active_role: string | null
           avatar_url: string | null
+          banner_url: string | null
+          bio: string | null
+          community: string | null
           created_at: string
           dot_id: string
           email: string | null
+          force_password_change: boolean
           id: string
+          industry: string | null
+          linkedin: string | null
+          location: string | null
           name: string | null
           phone: string | null
+          referred_by_id: string | null
+          skills: string[]
+          suspended: boolean
+          twitter: string | null
           updated_at: string
+          username: string | null
+          verified: boolean
+          website: string | null
+          whatsapp: string | null
         }
         Insert: {
+          achievements?: string[]
+          active_role?: string | null
           avatar_url?: string | null
+          banner_url?: string | null
+          bio?: string | null
+          community?: string | null
           created_at?: string
           dot_id?: string
           email?: string | null
+          force_password_change?: boolean
           id: string
+          industry?: string | null
+          linkedin?: string | null
+          location?: string | null
           name?: string | null
           phone?: string | null
+          referred_by_id?: string | null
+          skills?: string[]
+          suspended?: boolean
+          twitter?: string | null
           updated_at?: string
+          username?: string | null
+          verified?: boolean
+          website?: string | null
+          whatsapp?: string | null
         }
         Update: {
+          achievements?: string[]
+          active_role?: string | null
           avatar_url?: string | null
+          banner_url?: string | null
+          bio?: string | null
+          community?: string | null
           created_at?: string
           dot_id?: string
           email?: string | null
+          force_password_change?: boolean
           id?: string
+          industry?: string | null
+          linkedin?: string | null
+          location?: string | null
           name?: string | null
           phone?: string | null
+          referred_by_id?: string | null
+          skills?: string[]
+          suspended?: boolean
+          twitter?: string | null
           updated_at?: string
+          username?: string | null
+          verified?: boolean
+          website?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      pxxl_analytics: {
+        Row: {
+          created_at: string
+          event_name: string
+          id: string
+          metadata: Json
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_name: string
+          id?: string
+          metadata?: Json
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_name?: string
+          id?: string
+          metadata?: Json
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1250,6 +1358,137 @@ export type Database = {
         }
         Relationships: []
       }
+      spotlight_campaigns: {
+        Row: {
+          assigned_team_member: string | null
+          clicks: number
+          cost_dot: number
+          created_at: string
+          id: string
+          impressions: number
+          leads_generated: number
+          package_type: string
+          pitch: string
+          published_content: string | null
+          status: string
+          target_impressions: number
+          updated_at: string
+          user_id: string
+          venture_name: string
+        }
+        Insert: {
+          assigned_team_member?: string | null
+          clicks?: number
+          cost_dot: number
+          created_at?: string
+          id?: string
+          impressions?: number
+          leads_generated?: number
+          package_type: string
+          pitch: string
+          published_content?: string | null
+          status?: string
+          target_impressions?: number
+          updated_at?: string
+          user_id: string
+          venture_name: string
+        }
+        Update: {
+          assigned_team_member?: string | null
+          clicks?: number
+          cost_dot?: number
+          created_at?: string
+          id?: string
+          impressions?: number
+          leads_generated?: number
+          package_type?: string
+          pitch?: string
+          published_content?: string | null
+          status?: string
+          target_impressions?: number
+          updated_at?: string
+          user_id?: string
+          venture_name?: string
+        }
+        Relationships: []
+      }
+      store_items: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          download_instructions: string | null
+          file_url: string | null
+          id: string
+          is_active: boolean
+          price_dot: number
+          title: string
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          download_instructions?: string | null
+          file_url?: string | null
+          id?: string
+          is_active?: boolean
+          price_dot: number
+          title: string
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          download_instructions?: string | null
+          file_url?: string | null
+          id?: string
+          is_active?: boolean
+          price_dot?: number
+          title?: string
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: []
+      }
+      store_orders: {
+        Row: {
+          amount_dot: number
+          buyer_id: string
+          created_at: string
+          id: string
+          item_id: string
+          vendor_id: string
+        }
+        Insert: {
+          amount_dot: number
+          buyer_id: string
+          created_at?: string
+          id?: string
+          item_id: string
+          vendor_id: string
+        }
+        Update: {
+          amount_dot?: number
+          buyer_id?: string
+          created_at?: string
+          id?: string
+          item_id?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_orders_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "store_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       transactions: {
         Row: {
           amount: number
@@ -1274,6 +1513,36 @@ export type Database = {
           id?: string
           type?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      treasury_pools: {
+        Row: {
+          balance: number
+          burned_balance: number
+          description: string | null
+          locked_balance: number
+          pool_name: string
+          total_allocated: number
+          updated_at: string
+        }
+        Insert: {
+          balance: number
+          burned_balance?: number
+          description?: string | null
+          locked_balance?: number
+          pool_name: string
+          total_allocated?: number
+          updated_at?: string
+        }
+        Update: {
+          balance?: number
+          burned_balance?: number
+          description?: string | null
+          locked_balance?: number
+          pool_name?: string
+          total_allocated?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1305,6 +1574,7 @@ export type Database = {
           status: string
           updated_at: string
           user_id: string
+          withdrawable_balance: number
         }
         Insert: {
           balance?: number
@@ -1312,6 +1582,7 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id: string
+          withdrawable_balance?: number
         }
         Update: {
           balance?: number
@@ -1319,6 +1590,7 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id?: string
+          withdrawable_balance?: number
         }
         Relationships: []
       }
@@ -1365,6 +1637,10 @@ export type Database = {
       cancel_service_order: { Args: { _order_id: string }; Returns: undefined }
       charge_revaluation_fee: {
         Args: { _fee: number; _user_id: string }
+        Returns: boolean
+      }
+      charge_spotlight_fee: {
+        Args: { _fee: number; _package: string; _user_id: string }
         Returns: boolean
       }
       claim_course_reward: {

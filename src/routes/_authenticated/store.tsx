@@ -155,7 +155,7 @@ function StorePage() {
     }
     setBusy(true);
     try {
-      const { error } = await supabase.rpc("purchase_store_item", { _item_id: item.id });
+      const { error } = await (supabase.rpc as unknown as (fn: string, args: Record<string, unknown>) => Promise<{ error: Error | null }>)("purchase_store_item", { _item_id: item.id });
       if (error) throw error;
 
       toast.success(`Purchased "${item.title}" successfully!`);

@@ -84,7 +84,7 @@ const adminUpdateUserInput = z.object({
   targetUserId: z.string().uuid(),
   verified: z.boolean().optional(),
   suspended: z.boolean().optional(),
-  roles: z.array(z.string()).optional(),
+  roles: z.array(z.enum(["founder","builder","vendor","community_leader","investor","capital_partner","admin","super_admin","moderator"])).optional(),
   reason: z.string().trim().max(500).optional(),
 });
 
@@ -145,7 +145,7 @@ export const adminUpdateUser = createServerFn({ method: "POST" })
     if (Object.keys(updates).length > 0) {
       const { error: profileUpdateErr } = await supabaseAdmin
         .from("profiles")
-        .update(updates)
+        .update(updates as never)
         .eq("id", data.targetUserId);
       if (profileUpdateErr) throw profileUpdateErr;
     }
