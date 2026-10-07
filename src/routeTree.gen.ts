@@ -33,6 +33,7 @@ import { Route as AuthenticatedPitchathonsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedLeaderboardsRouteImport } from './routes/_authenticated/leaderboards'
 import { Route as AuthenticatedInvestorRouteImport } from './routes/_authenticated/investor'
+import { Route as AuthenticatedFoundryRouteImport } from './routes/_authenticated/foundry'
 import { Route as AuthenticatedDemoRouteImport } from './routes/_authenticated/demo'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCommunityRouteImport } from './routes/_authenticated/community'
@@ -163,6 +164,11 @@ const AuthenticatedInvestorRoute = AuthenticatedInvestorRouteImport.update({
   path: '/investor',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFoundryRoute = AuthenticatedFoundryRouteImport.update({
+  id: '/foundry',
+  path: '/foundry',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDemoRoute = AuthenticatedDemoRouteImport.update({
   id: '/demo',
   path: '/demo',
@@ -223,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/community': typeof AuthenticatedCommunityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/demo': typeof AuthenticatedDemoRoute
+  '/foundry': typeof AuthenticatedFoundryRoute
   '/investor': typeof AuthenticatedInvestorRoute
   '/leaderboards': typeof AuthenticatedLeaderboardsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -256,6 +263,7 @@ export interface FileRoutesByTo {
   '/community': typeof AuthenticatedCommunityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/demo': typeof AuthenticatedDemoRoute
+  '/foundry': typeof AuthenticatedFoundryRoute
   '/investor': typeof AuthenticatedInvestorRoute
   '/leaderboards': typeof AuthenticatedLeaderboardsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -291,6 +299,7 @@ export interface FileRoutesById {
   '/_authenticated/community': typeof AuthenticatedCommunityRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/demo': typeof AuthenticatedDemoRoute
+  '/_authenticated/foundry': typeof AuthenticatedFoundryRoute
   '/_authenticated/investor': typeof AuthenticatedInvestorRoute
   '/_authenticated/leaderboards': typeof AuthenticatedLeaderboardsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
@@ -326,6 +335,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/dashboard'
     | '/demo'
+    | '/foundry'
     | '/investor'
     | '/leaderboards'
     | '/onboarding'
@@ -359,6 +369,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/dashboard'
     | '/demo'
+    | '/foundry'
     | '/investor'
     | '/leaderboards'
     | '/onboarding'
@@ -393,6 +404,7 @@ export interface FileRouteTypes {
     | '/_authenticated/community'
     | '/_authenticated/dashboard'
     | '/_authenticated/demo'
+    | '/_authenticated/foundry'
     | '/_authenticated/investor'
     | '/_authenticated/leaderboards'
     | '/_authenticated/onboarding'
@@ -598,6 +610,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInvestorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/foundry': {
+      id: '/_authenticated/foundry'
+      path: '/foundry'
+      fullPath: '/foundry'
+      preLoaderRoute: typeof AuthenticatedFoundryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/demo': {
       id: '/_authenticated/demo'
       path: '/demo'
@@ -664,6 +683,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCommunityRoute: typeof AuthenticatedCommunityRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDemoRoute: typeof AuthenticatedDemoRoute
+  AuthenticatedFoundryRoute: typeof AuthenticatedFoundryRoute
   AuthenticatedInvestorRoute: typeof AuthenticatedInvestorRoute
   AuthenticatedLeaderboardsRoute: typeof AuthenticatedLeaderboardsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
@@ -684,6 +704,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCommunityRoute: AuthenticatedCommunityRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDemoRoute: AuthenticatedDemoRoute,
+  AuthenticatedFoundryRoute: AuthenticatedFoundryRoute,
   AuthenticatedInvestorRoute: AuthenticatedInvestorRoute,
   AuthenticatedLeaderboardsRoute: AuthenticatedLeaderboardsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
