@@ -9,20 +9,27 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WaRouteImport } from './routes/wa'
+import { Route as TgRouteImport } from './routes/tg'
+import { Route as StartRouteImport } from './routes/start'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ScholarshipRouteImport } from './routes/scholarship'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PlatformRouteImport } from './routes/platform'
 import { Route as JourneyRouteImport } from './routes/journey'
 import { Route as InvestorsRouteImport } from './routes/investors'
+import { Route as IgRouteImport } from './routes/ig'
 import { Route as FounderScholarshipRouteImport } from './routes/founder-scholarship'
+import { Route as DotRouteImport } from './routes/dot'
 import { Route as CommunitiesRouteImport } from './routes/communities'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VentureSlugRouteImport } from './routes/venture.$slug'
 import { Route as ResultIdRouteImport } from './routes/result.$id'
+import { Route as RRefRouteImport } from './routes/r.$ref'
 import { Route as FounderDotIdRouteImport } from './routes/founder.$dotId'
+import { Route as CCampaignRouteImport } from './routes/c.$campaign'
 import { Route as AuthenticatedWorkRouteImport } from './routes/_authenticated/work'
 import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as AuthenticatedVantageRouteImport } from './routes/_authenticated/vantage'
@@ -43,6 +50,21 @@ import { Route as AuthenticatedAcademyRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedJoinCodeRouteImport } from './routes/_authenticated/join.$code'
 import { Route as ApiPublicWebhooksPaystackRouteImport } from './routes/api/public/webhooks/paystack'
 
+const WaRoute = WaRouteImport.update({
+  id: '/wa',
+  path: '/wa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TgRoute = TgRouteImport.update({
+  id: '/tg',
+  path: '/tg',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StartRoute = StartRouteImport.update({
+  id: '/start',
+  path: '/start',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -73,9 +95,19 @@ const InvestorsRoute = InvestorsRouteImport.update({
   path: '/investors',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IgRoute = IgRouteImport.update({
+  id: '/ig',
+  path: '/ig',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FounderScholarshipRoute = FounderScholarshipRouteImport.update({
   id: '/founder-scholarship',
   path: '/founder-scholarship',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DotRoute = DotRouteImport.update({
+  id: '/dot',
+  path: '/dot',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CommunitiesRoute = CommunitiesRouteImport.update({
@@ -107,9 +139,19 @@ const ResultIdRoute = ResultIdRouteImport.update({
   path: '/result/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RRefRoute = RRefRouteImport.update({
+  id: '/r/$ref',
+  path: '/r/$ref',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FounderDotIdRoute = FounderDotIdRouteImport.update({
   id: '/founder/$dotId',
   path: '/founder/$dotId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CCampaignRoute = CCampaignRouteImport.update({
+  id: '/c/$campaign',
+  path: '/c/$campaign',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedWorkRoute = AuthenticatedWorkRouteImport.update({
@@ -216,13 +258,18 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/communities': typeof CommunitiesRoute
+  '/dot': typeof DotRoute
   '/founder-scholarship': typeof FounderScholarshipRoute
+  '/ig': typeof IgRoute
   '/investors': typeof InvestorsRoute
   '/journey': typeof JourneyRoute
   '/platform': typeof PlatformRoute
   '/reset-password': typeof ResetPasswordRoute
   '/scholarship': typeof ScholarshipRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/start': typeof StartRoute
+  '/tg': typeof TgRoute
+  '/wa': typeof WaRoute
   '/academy': typeof AuthenticatedAcademyRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/capital-partner': typeof AuthenticatedCapitalPartnerRoute
@@ -240,7 +287,9 @@ export interface FileRoutesByFullPath {
   '/vantage': typeof AuthenticatedVantageRoute
   '/wallet': typeof AuthenticatedWalletRoute
   '/work': typeof AuthenticatedWorkRoute
+  '/c/$campaign': typeof CCampaignRoute
   '/founder/$dotId': typeof FounderDotIdRoute
+  '/r/$ref': typeof RRefRoute
   '/result/$id': typeof ResultIdRoute
   '/venture/$slug': typeof VentureSlugRoute
   '/join/$code': typeof AuthenticatedJoinCodeRoute
@@ -250,13 +299,18 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/communities': typeof CommunitiesRoute
+  '/dot': typeof DotRoute
   '/founder-scholarship': typeof FounderScholarshipRoute
+  '/ig': typeof IgRoute
   '/investors': typeof InvestorsRoute
   '/journey': typeof JourneyRoute
   '/platform': typeof PlatformRoute
   '/reset-password': typeof ResetPasswordRoute
   '/scholarship': typeof ScholarshipRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/start': typeof StartRoute
+  '/tg': typeof TgRoute
+  '/wa': typeof WaRoute
   '/academy': typeof AuthenticatedAcademyRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/capital-partner': typeof AuthenticatedCapitalPartnerRoute
@@ -274,7 +328,9 @@ export interface FileRoutesByTo {
   '/vantage': typeof AuthenticatedVantageRoute
   '/wallet': typeof AuthenticatedWalletRoute
   '/work': typeof AuthenticatedWorkRoute
+  '/c/$campaign': typeof CCampaignRoute
   '/founder/$dotId': typeof FounderDotIdRoute
+  '/r/$ref': typeof RRefRoute
   '/result/$id': typeof ResultIdRoute
   '/venture/$slug': typeof VentureSlugRoute
   '/join/$code': typeof AuthenticatedJoinCodeRoute
@@ -286,13 +342,18 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/communities': typeof CommunitiesRoute
+  '/dot': typeof DotRoute
   '/founder-scholarship': typeof FounderScholarshipRoute
+  '/ig': typeof IgRoute
   '/investors': typeof InvestorsRoute
   '/journey': typeof JourneyRoute
   '/platform': typeof PlatformRoute
   '/reset-password': typeof ResetPasswordRoute
   '/scholarship': typeof ScholarshipRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/start': typeof StartRoute
+  '/tg': typeof TgRoute
+  '/wa': typeof WaRoute
   '/_authenticated/academy': typeof AuthenticatedAcademyRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/capital-partner': typeof AuthenticatedCapitalPartnerRoute
@@ -310,7 +371,9 @@ export interface FileRoutesById {
   '/_authenticated/vantage': typeof AuthenticatedVantageRoute
   '/_authenticated/wallet': typeof AuthenticatedWalletRoute
   '/_authenticated/work': typeof AuthenticatedWorkRoute
+  '/c/$campaign': typeof CCampaignRoute
   '/founder/$dotId': typeof FounderDotIdRoute
+  '/r/$ref': typeof RRefRoute
   '/result/$id': typeof ResultIdRoute
   '/venture/$slug': typeof VentureSlugRoute
   '/_authenticated/join/$code': typeof AuthenticatedJoinCodeRoute
@@ -322,13 +385,18 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/communities'
+    | '/dot'
     | '/founder-scholarship'
+    | '/ig'
     | '/investors'
     | '/journey'
     | '/platform'
     | '/reset-password'
     | '/scholarship'
     | '/sitemap.xml'
+    | '/start'
+    | '/tg'
+    | '/wa'
     | '/academy'
     | '/admin'
     | '/capital-partner'
@@ -346,7 +414,9 @@ export interface FileRouteTypes {
     | '/vantage'
     | '/wallet'
     | '/work'
+    | '/c/$campaign'
     | '/founder/$dotId'
+    | '/r/$ref'
     | '/result/$id'
     | '/venture/$slug'
     | '/join/$code'
@@ -356,13 +426,18 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/communities'
+    | '/dot'
     | '/founder-scholarship'
+    | '/ig'
     | '/investors'
     | '/journey'
     | '/platform'
     | '/reset-password'
     | '/scholarship'
     | '/sitemap.xml'
+    | '/start'
+    | '/tg'
+    | '/wa'
     | '/academy'
     | '/admin'
     | '/capital-partner'
@@ -380,7 +455,9 @@ export interface FileRouteTypes {
     | '/vantage'
     | '/wallet'
     | '/work'
+    | '/c/$campaign'
     | '/founder/$dotId'
+    | '/r/$ref'
     | '/result/$id'
     | '/venture/$slug'
     | '/join/$code'
@@ -391,13 +468,18 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/communities'
+    | '/dot'
     | '/founder-scholarship'
+    | '/ig'
     | '/investors'
     | '/journey'
     | '/platform'
     | '/reset-password'
     | '/scholarship'
     | '/sitemap.xml'
+    | '/start'
+    | '/tg'
+    | '/wa'
     | '/_authenticated/academy'
     | '/_authenticated/admin'
     | '/_authenticated/capital-partner'
@@ -415,7 +497,9 @@ export interface FileRouteTypes {
     | '/_authenticated/vantage'
     | '/_authenticated/wallet'
     | '/_authenticated/work'
+    | '/c/$campaign'
     | '/founder/$dotId'
+    | '/r/$ref'
     | '/result/$id'
     | '/venture/$slug'
     | '/_authenticated/join/$code'
@@ -427,14 +511,21 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CommunitiesRoute: typeof CommunitiesRoute
+  DotRoute: typeof DotRoute
   FounderScholarshipRoute: typeof FounderScholarshipRoute
+  IgRoute: typeof IgRoute
   InvestorsRoute: typeof InvestorsRoute
   JourneyRoute: typeof JourneyRoute
   PlatformRoute: typeof PlatformRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ScholarshipRoute: typeof ScholarshipRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  StartRoute: typeof StartRoute
+  TgRoute: typeof TgRoute
+  WaRoute: typeof WaRoute
+  CCampaignRoute: typeof CCampaignRoute
   FounderDotIdRoute: typeof FounderDotIdRoute
+  RRefRoute: typeof RRefRoute
   ResultIdRoute: typeof ResultIdRoute
   VentureSlugRoute: typeof VentureSlugRoute
   ApiPublicWebhooksPaystackRoute: typeof ApiPublicWebhooksPaystackRoute
@@ -442,6 +533,27 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wa': {
+      id: '/wa'
+      path: '/wa'
+      fullPath: '/wa'
+      preLoaderRoute: typeof WaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tg': {
+      id: '/tg'
+      path: '/tg'
+      fullPath: '/tg'
+      preLoaderRoute: typeof TgRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/start': {
+      id: '/start'
+      path: '/start'
+      fullPath: '/start'
+      preLoaderRoute: typeof StartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -484,11 +596,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvestorsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ig': {
+      id: '/ig'
+      path: '/ig'
+      fullPath: '/ig'
+      preLoaderRoute: typeof IgRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/founder-scholarship': {
       id: '/founder-scholarship'
       path: '/founder-scholarship'
       fullPath: '/founder-scholarship'
       preLoaderRoute: typeof FounderScholarshipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dot': {
+      id: '/dot'
+      path: '/dot'
+      fullPath: '/dot'
+      preLoaderRoute: typeof DotRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/communities': {
@@ -533,11 +659,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResultIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/r/$ref': {
+      id: '/r/$ref'
+      path: '/r/$ref'
+      fullPath: '/r/$ref'
+      preLoaderRoute: typeof RRefRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/founder/$dotId': {
       id: '/founder/$dotId'
       path: '/founder/$dotId'
       fullPath: '/founder/$dotId'
       preLoaderRoute: typeof FounderDotIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/c/$campaign': {
+      id: '/c/$campaign'
+      path: '/c/$campaign'
+      fullPath: '/c/$campaign'
+      preLoaderRoute: typeof CCampaignRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/work': {
@@ -726,14 +866,21 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   CommunitiesRoute: CommunitiesRoute,
+  DotRoute: DotRoute,
   FounderScholarshipRoute: FounderScholarshipRoute,
+  IgRoute: IgRoute,
   InvestorsRoute: InvestorsRoute,
   JourneyRoute: JourneyRoute,
   PlatformRoute: PlatformRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ScholarshipRoute: ScholarshipRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  StartRoute: StartRoute,
+  TgRoute: TgRoute,
+  WaRoute: WaRoute,
+  CCampaignRoute: CCampaignRoute,
   FounderDotIdRoute: FounderDotIdRoute,
+  RRefRoute: RRefRoute,
   ResultIdRoute: ResultIdRoute,
   VentureSlugRoute: VentureSlugRoute,
   ApiPublicWebhooksPaystackRoute: ApiPublicWebhooksPaystackRoute,
