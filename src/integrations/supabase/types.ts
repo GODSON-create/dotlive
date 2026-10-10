@@ -352,6 +352,39 @@ export type Database = {
           },
         ]
       }
+      acquisition_visits: {
+        Row: {
+          campaign: string | null
+          created_at: string
+          foundry_slug: string | null
+          id: string
+          landing_path: string | null
+          ref_code: string | null
+          source: string
+          visitor_id: string
+        }
+        Insert: {
+          campaign?: string | null
+          created_at?: string
+          foundry_slug?: string | null
+          id?: string
+          landing_path?: string | null
+          ref_code?: string | null
+          source: string
+          visitor_id: string
+        }
+        Update: {
+          campaign?: string | null
+          created_at?: string
+          foundry_slug?: string | null
+          id?: string
+          landing_path?: string | null
+          ref_code?: string | null
+          source?: string
+          visitor_id?: string
+        }
+        Relationships: []
+      }
       admin_audit_log: {
         Row: {
           action: string
@@ -840,6 +873,42 @@ export type Database = {
           investor_id?: string
           message?: string | null
           status?: string
+        }
+        Relationships: []
+      }
+      member_attributions: {
+        Row: {
+          campaign: string | null
+          created_at: string
+          first_seen_at: string | null
+          foundry_slug: string | null
+          landing_path: string | null
+          ref_code: string | null
+          source: string
+          user_id: string
+          visitor_id: string | null
+        }
+        Insert: {
+          campaign?: string | null
+          created_at?: string
+          first_seen_at?: string | null
+          foundry_slug?: string | null
+          landing_path?: string | null
+          ref_code?: string | null
+          source: string
+          user_id: string
+          visitor_id?: string | null
+        }
+        Update: {
+          campaign?: string | null
+          created_at?: string
+          first_seen_at?: string | null
+          foundry_slug?: string | null
+          landing_path?: string | null
+          ref_code?: string | null
+          source?: string
+          user_id?: string
+          visitor_id?: string | null
         }
         Relationships: []
       }
@@ -1643,6 +1712,18 @@ export type Database = {
         Args: { _fee: number; _package: string; _user_id: string }
         Returns: boolean
       }
+      claim_acquisition_attribution: {
+        Args: {
+          _campaign?: string
+          _first_seen_at?: string
+          _foundry_slug?: string
+          _landing_path?: string
+          _ref_code?: string
+          _source: string
+          _visitor_id: string
+        }
+        Returns: boolean
+      }
       claim_course_reward: {
         Args: { _course_id: string; _user_id: string }
         Returns: number
@@ -1682,6 +1763,17 @@ export type Database = {
       }
       generate_dot_id: { Args: never; Returns: string }
       get_academy_analytics: { Args: { _program_id: string }; Returns: Json }
+      get_acquisition_overview: {
+        Args: { _days?: number }
+        Returns: {
+          founders: number
+          members: number
+          source: string
+          ventures: number
+          visitors: number
+          visits: number
+        }[]
+      }
       get_admin_overview: { Args: never; Returns: Json }
       get_builder_stats: {
         Args: { _builder_id: string }
@@ -1750,6 +1842,17 @@ export type Database = {
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       lookup_dot_id: { Args: { _dot_id: string }; Returns: string }
+      record_acquisition_visit: {
+        Args: {
+          _campaign?: string
+          _foundry_slug?: string
+          _landing_path?: string
+          _ref_code?: string
+          _source: string
+          _visitor_id: string
+        }
+        Returns: undefined
+      }
       review_service_order: {
         Args: { _comment?: string; _order_id: string; _rating: number }
         Returns: undefined
