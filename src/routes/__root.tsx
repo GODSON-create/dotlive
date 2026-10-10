@@ -14,6 +14,8 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/hooks/use-auth";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useRouterState } from "@tanstack/react-router";
+import { captureAttribution, claimAttribution } from "@/lib/attribution";
 
 function NotFoundComponent() {
   return (
@@ -151,11 +153,20 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
 
+  const href = useRouterState({ select: (s) => s.location.href });
   useEffect(() => {
+    void captureAttribution();
+  }, [href]);
+
+  useEffect(() => {
+    void supabase.auth.getSession().then(({ data }) => {
+      if (data.session) void claimAttribution();
+    });
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+      if (event === "SIGNED_IN") void claimAttribution();
     });
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
