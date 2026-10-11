@@ -1840,6 +1840,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_active_member: { Args: { _user_id: string }; Returns: boolean }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       lookup_dot_id: { Args: { _dot_id: string }; Returns: string }
       record_acquisition_visit: {
