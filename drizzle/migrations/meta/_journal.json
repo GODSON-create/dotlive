@@ -15,6 +15,13 @@
       "when": 1791642174379,
       "tag": "0001_acquisition_attribution",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791686987401,
+      "tag": "0002_member_scoped_profile_visibility",
+      "breakpoints": true
     }
   ]
 }
