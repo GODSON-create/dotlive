@@ -43,8 +43,8 @@ import { submitAssessment } from "@/lib/vantage.functions";
 export const Route = createFileRoute("/_authenticated/vantage")({
   head: () => ({
     meta: [
-      { title: "Vantage — DOT" },
-      { name: "description", content: "Measure your venture with the Vantage assessment." },
+      { title: "AVA Assessment — DOT" },
+      { name: "description", content: "Measure your venture with the AVA assessment." },
     ],
   }),
   component: VantagePage,
@@ -101,7 +101,7 @@ function VantagePage() {
     try {
       const result = await submitAssessmentFn({ data: answers });
 
-      toast.success(`Vantage complete! You scored ${result.vantagePoint} points.`);
+      toast.success(`AVA complete! You scored ${result.vantagePoint} points.`);
       qc.invalidateQueries({ queryKey: ["assessments", user.id] });
       qc.invalidateQueries({ queryKey: ["founder_profile", user.id] });
       setTaking(false);
@@ -194,7 +194,7 @@ function VantagePage() {
     <AppShell>
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <h1 className="font-display text-3xl font-bold">Vantage</h1>
+          <h1 className="font-display text-3xl font-bold">AVA</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Your measurable venture intelligence score.
           </p>
@@ -208,10 +208,10 @@ function VantagePage() {
       {!latest ? (
         <div className="mt-8 rounded-2xl border border-dashed border-border bg-card p-10 text-center">
           <Gauge className="mx-auto size-10 text-primary" />
-          <h2 className="mt-4 font-display text-xl font-semibold">Take your first Vantage</h2>
+          <h2 className="mt-4 font-display text-xl font-semibold">Take your first AVA</h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
             Answer {TOTAL_QUESTIONS} quick questions across 9 categories. We'll generate your
-            Vantage Point, Fundability and Investment Readiness, plus a venture report.
+            AVA Score, Fundability and Investment Readiness, plus a venture report.
           </p>
           <Button variant="hero" className="mt-6" onClick={() => setTaking(true)}>
             Start now <ArrowRight className="size-4" />
@@ -220,26 +220,26 @@ function VantagePage() {
       ) : (
         <>
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
-            <ScoreCard label="Vantage Point" value={`${formatDot(latest.vantage_point)}`} max="/ 1000" icon={Gauge} pct={latest.vantage_point / 10} />
+            <ScoreCard label="AVA Score" value={`${formatDot(latest.vantage_point)}`} max="/ 1000" icon={Gauge} pct={latest.vantage_point / 10} />
             <ScoreCard label="Fundability" value={`${latest.fundability}%`} icon={TrendingUp} pct={latest.fundability} />
             <ScoreCard label="Investment Ready" value={`${latest.investment_readiness}%`} icon={Target} pct={latest.investment_readiness} />
           </div>
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-2xl border border-border bg-card p-5">
-              <span className="text-sm text-muted-foreground">Estimated Startup Valuation</span>
+              <span className="text-sm text-muted-foreground">Model estimate (not a valuation)</span>
               <p className="mt-3 font-display text-2xl font-bold text-gradient">
                 {formatNaira(latest.current_valuation ?? 0)}
               </p>
             </div>
             <div className="rounded-2xl border border-border bg-card p-5">
-              <span className="text-sm text-muted-foreground">Potential Valuation</span>
+              <span className="text-sm text-muted-foreground">Modelled upside</span>
               <p className="mt-3 font-display text-2xl font-bold text-foreground">
                 {formatNaira(latest.potential_valuation ?? 0)}
               </p>
             </div>
             <div className="rounded-2xl border border-border bg-card p-5">
-              <span className="text-sm text-muted-foreground">Unicorn Potential</span>
+              <span className="text-sm text-muted-foreground">Scale signal (model)</span>
               <p className="mt-3 font-display text-2xl font-bold text-primary">
                 {typeof latest.unicorn_potential === 'number' ? latest.unicorn_potential.toFixed(1) : '0.0'}%
               </p>
@@ -272,7 +272,7 @@ function VantagePage() {
                     <XAxis dataKey="date" className="text-xs" />
                     <YAxis className="text-xs" />
                     <Tooltip />
-                    <Line type="monotone" dataKey="vantage" name="Vantage Point" stroke="hsl(var(--primary))" strokeWidth={2} dot />
+                    <Line type="monotone" dataKey="vantage" name="AVA Score" stroke="hsl(var(--primary))" strokeWidth={2} dot />
                   </LineChart>
                 </ResponsiveContainer>
               </div>

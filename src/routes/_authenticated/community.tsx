@@ -171,9 +171,9 @@ function CommunityPage() {
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Stat label="Members" value={members.length} icon={Users} />
         <Stat label="Active founders" value={activeCount} icon={TrendingUp} />
-        <Stat label="Vantage completed" value={withVantage} icon={CheckCircle2} />
-        <Stat label="Avg Vantage" value={avgVantage} icon={Gauge} />
-        <Stat label="Avg Valuation" value={formatNaira(avgValuation)} icon={Coins} isValuation />
+        <Stat label="AVA completed" value={withVantage} icon={CheckCircle2} />
+        <Stat label="Avg AVA" value={avgVantage} icon={Gauge} />
+        <Stat label="Avg model estimate" value={formatNaira(avgValuation)} icon={Coins} isValuation />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
@@ -188,8 +188,8 @@ function CommunityPage() {
                   <tr className="border-b border-border text-left text-muted-foreground">
                     <th className="pb-2 font-medium">Venture</th>
                     <th className="pb-2 font-medium">Stage</th>
-                    <th className="pb-2 font-medium">Vantage</th>
-                    <th className="pb-2 font-medium text-right">Valuation</th>
+                    <th className="pb-2 font-medium">AVA</th>
+                    <th className="pb-2 font-medium text-right">Model estimate</th>
                     <th className="pb-2 font-medium text-right">Joined</th>
                   </tr>
                 </thead>

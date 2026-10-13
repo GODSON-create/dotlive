@@ -153,7 +153,7 @@ function InvestorPage() {
             <Select value={sortBy} onValueChange={(val: any) => setSortBy(val)}>
               <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="vantage">Vantage Score</SelectItem>
+                <SelectItem value="vantage">AVA Score</SelectItem>
                 <SelectItem value="fundability">Fundability Score</SelectItem>
                 <SelectItem value="industry">Industry</SelectItem>
                 <SelectItem value="stage">Stage</SelectItem>
@@ -161,7 +161,7 @@ function InvestorPage() {
             </Select>
           </div>
           <div>
-            <label className="text-xs text-muted-foreground">Min Vantage: {minVantage}</label>
+            <label className="text-xs text-muted-foreground">Min AVA Score: {minVantage}</label>
             <Slider className="mt-3" value={[minVantage]} onValueChange={([v]) => setMinVantage(v)} max={1000} step={50} />
           </div>
           <div className="flex items-end">

@@ -110,7 +110,7 @@ function CapitalPartnerPage() {
                     <th className="p-4 font-semibold uppercase">Venture Name</th>
                     <th className="p-4 font-semibold uppercase">Industry</th>
                     <th className="p-4 font-semibold uppercase">Stage</th>
-                    <th className="p-4 font-semibold uppercase text-center">Vantage Point</th>
+                    <th className="p-4 font-semibold uppercase text-center">AVA Score</th>
                     <th className="p-4 font-semibold uppercase text-center">Fundability</th>
                     <th className="p-4 font-semibold uppercase text-center">Actions</th>
                   </tr>
