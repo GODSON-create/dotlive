@@ -239,17 +239,10 @@ function CommunityPage() {
             <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-slate-400">Referral Performance</h2>
             <div className="mt-4 space-y-3">
               <div className="flex justify-between text-xs">
-                <span className="text-slate-400">Link Clicks (Visits)</span>
-                <span className="font-bold text-white">{Math.round(members.length * 3.7)}</span>
-              </div>
-              <div className="flex justify-between text-xs">
                 <span className="text-slate-400">Total Joins (Signups)</span>
                 <span className="font-bold text-white">{members.length}</span>
               </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-slate-400">Conversion Rate</span>
-                <span className="font-bold text-pink-400">27%</span>
-              </div>
+              <p className="text-xs text-muted-foreground">Link visit and conversion tracking for communities is coming soon.</p>
             </div>
           </div>
         </div>
