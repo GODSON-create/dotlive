@@ -50,7 +50,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title: "Dashboard — DOT" },
-      { name: "description", content: "Track your venture progression, Vantage score and DOT wallet." },
+      { name: "description", content: "Track your venture progression, AVA Score and DOT wallet." },
     ],
   }),
   component: Dashboard,
@@ -180,14 +180,14 @@ function Dashboard() {
     {
       id: "first_assessment",
       title: "Valuation Pioneer",
-      desc: "Completed your first Vantage assessment",
+      desc: "Completed your first AVA assessment",
       icon: Gauge,
       unlocked: assessments.length > 0 || (profile?.achievements || []).includes("first_assessment"),
     },
     {
       id: "vantage_guru",
-      title: "Vantage Elite",
-      desc: "Attained a Vantage score over 700",
+      title: "AVA Elite",
+      desc: "Reached an AVA Score over 700",
       icon: Trophy,
       unlocked: vantagePoint > 700 || (profile?.achievements || []).includes("vantage_guru"),
     },
@@ -230,7 +230,7 @@ function Dashboard() {
   const hasAssessment = assessments.length > 0;
   const stats = [
     { label: "AVA Score", value: assessmentQuery.isPending ? "—" : assessmentQuery.isError ? "Unavailable" : hasAssessment ? formatDot(vantagePoint) : "Not assessed", sub: hasAssessment ? "out of 1,000" : "Your assessment is the starting point", icon: Gauge, accent: "text-primary" },
-    { label: "Venture Valuation", value: hasAssessment ? formatNaira(currentValuation) : "—", sub: hasAssessment ? `Potential: ${formatNaira(potentialValuation)}` : "Available after assessment", icon: TrendingUp, accent: "text-primary" },
+    { label: "Model Estimate", value: hasAssessment ? formatNaira(currentValuation) : "—", sub: hasAssessment ? `Potential: ${formatNaira(potentialValuation)}` : "Available after assessment", icon: TrendingUp, accent: "text-primary" },
     { label: "Funding Readiness", value: hasAssessment ? `${investmentReadiness}%` : "—", sub: hasAssessment ? `Fundability: ${fundability}%` : "No assessment yet", icon: Sparkles, accent: "text-gold" },
     { label: "DOT Wallet", value: wallet.isPending ? "—" : wallet.isError ? "Unavailable" : formatDot(balance), sub: wallet.isError ? "Please try again" : "DOT credits", icon: Wallet, accent: "text-primary" },
   ];
@@ -424,7 +424,7 @@ function Dashboard() {
               <>
                 <div className="rounded-xl bg-muted/40 border border-border p-4 mb-4 text-xs">
                   <p className="text-muted-foreground leading-relaxed">
-                    💡 <span className="font-bold text-foreground">Advisor Insight:</span> Your venture is currently valued at <span className="font-bold text-accent">{formatNaira(currentValuation)}</span>. Act on the recommendations below to unlock your valuation potential of <span className="font-bold text-primary">{formatNaira(potentialValuation)}</span>.
+                    💡 <span className="font-bold text-foreground">Advisor Insight:</span> Model-based estimate (not an appraisal): <span className="font-bold text-accent">{formatNaira(currentValuation)}</span>. Completing the recommendations below models an upside of <span className="font-bold text-primary">{formatNaira(potentialValuation)}</span>.
                   </p>
                 </div>
                 {(latest.report as { nextActions?: string[] }).nextActions?.map((a: string, i: number) => (
@@ -598,7 +598,7 @@ function Dashboard() {
             <div className="rounded-2xl border border-border bg-card p-6">
               <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-4">
                 <Award className="size-4 text-gold" />
-                Vantage Achievements
+                AVA Achievements
               </h2>
               
               <div className="space-y-3">

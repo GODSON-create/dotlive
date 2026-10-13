@@ -89,10 +89,10 @@ function LeaderboardsPage() {
                   <tr className="border-b border-border bg-muted text-muted-foreground text-xs uppercase tracking-wider">
                     <th className="px-6 py-4 font-semibold text-center w-16">Rank</th>
                     <th className="px-6 py-4 font-semibold">Name</th>
-                    <th className="px-6 py-4 font-semibold text-right">Avg Vantage</th>
-                    <th className="px-6 py-4 font-semibold text-right">Avg Valuation</th>
+                    <th className="px-6 py-4 font-semibold text-right">Avg AVA</th>
+                    <th className="px-6 py-4 font-semibold text-right">Avg model estimate</th>
                     <th className="px-6 py-4 font-semibold text-center">Fundable</th>
-                    <th className="px-6 py-4 font-semibold text-right">Highest Unicorn</th>
+                    <th className="px-6 py-4 font-semibold text-right">Top scale signal</th>
                     <th className="px-6 py-4 font-semibold text-center">Members</th>
                   </tr>
                 </thead>

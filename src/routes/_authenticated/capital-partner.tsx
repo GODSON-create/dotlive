@@ -32,21 +32,6 @@ export const Route = createFileRoute("/_authenticated/capital-partner")({
   component: CapitalPartnerPage,
 });
 
-// Mock commitments data for the executive dashboard
-const mockCommitments = {
-  totalCommitted: 1500000000, // ₦1.5 Billion
-  drawnDown: 650000000, // ₦650 Million
-  available: 850000000, // ₦850 Million
-  capitalPartnerType: "Venture Capital Firm",
-};
-
-// Mock portfolio activity data
-const mockPortfolio = [
-  { name: "FarmGrid Ltd", industry: "Agriculture", valuation: 120000000, stage: "Pitch", status: "Seed Round Open", progress: 75 },
-  { name: "PayShield Technologies", industry: "Fintech", valuation: 450000000, stage: "Scale", status: "Series A Pre-evaluation", progress: 40 },
-  { name: "MedVitals Africa", industry: "Health", valuation: 85000000, stage: "Improve", status: "Vantage Diagnostic Completed", progress: 100 },
-];
-
 function CapitalPartnerPage() {
   const [selectedPipelineStage, setSelectedPipelineStage] = useState<string>("all");
 
@@ -69,7 +54,6 @@ function CapitalPartnerPage() {
     return v.stage === selectedPipelineStage;
   });
 
-  const drawdownPercent = Math.round((mockCommitments.drawnDown / mockCommitments.totalCommitted) * 100);
 
   return (
     <AppShell>
@@ -80,54 +64,13 @@ function CapitalPartnerPage() {
             Capital Partner Portal
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Manage your firm's commitments, active pipelines, and check portfolio achievements.
+            Review ventures on DOT by stage and AVA Score.
           </p>
         </div>
-        <Badge variant="outline" className="px-3 py-1 text-xs border-primary/20 bg-primary/5 text-primary w-fit">
-          Partner Type: {mockCommitments.capitalPartnerType}
-        </Badge>
       </div>
 
-      {/* Commitments Overview */}
-      <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <Card className="border-border bg-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5 uppercase tracking-wider">
-              <DollarSign className="size-4 text-emerald-500" /> Capital Commitment
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="font-display text-2xl font-black text-white">{formatNaira(mockCommitments.totalCommitted)}</p>
-            <p className="text-[10px] text-muted-foreground mt-1">Total allocated seed capital allocation pool</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border bg-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5 uppercase tracking-wider">
-              <TrendingUp className="size-4 text-primary" /> Drawdowns
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex justify-between items-baseline">
-              <span className="font-display text-2xl font-black text-white">{formatNaira(mockCommitments.drawnDown)}</span>
-              <span className="text-xs font-semibold text-primary">{drawdownPercent}%</span>
-            </div>
-            <Progress value={drawdownPercent} className="h-1.5 bg-slate-900" />
-          </CardContent>
-        </Card>
-
-        <Card className="border-border bg-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5 uppercase tracking-wider">
-              <Target className="size-4 text-pink-500" /> Available Reserve
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="font-display text-2xl font-black text-slate-300">{formatNaira(mockCommitments.available)}</p>
-            <p className="text-[10px] text-muted-foreground mt-1">Remaining capital available for deployment</p>
-          </CardContent>
-        </Card>
+      <div className="mt-6 rounded-lg border border-border bg-card p-5 text-sm text-muted-foreground">
+        Commitment and drawdown tracking is coming soon. No figures are shown until your firm's records exist in DOT.
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-12">
@@ -167,7 +110,7 @@ function CapitalPartnerPage() {
                     <th className="p-4 font-semibold uppercase">Venture Name</th>
                     <th className="p-4 font-semibold uppercase">Industry</th>
                     <th className="p-4 font-semibold uppercase">Stage</th>
-                    <th className="p-4 font-semibold uppercase text-center">Vantage Point</th>
+                    <th className="p-4 font-semibold uppercase text-center">AVA Score</th>
                     <th className="p-4 font-semibold uppercase text-center">Fundability</th>
                     <th className="p-4 font-semibold uppercase text-center">Actions</th>
                   </tr>
@@ -224,27 +167,8 @@ function CapitalPartnerPage() {
             Portfolio Performance
           </h2>
 
-          <div className="space-y-4">
-            {mockPortfolio.map((p) => (
-              <div key={p.name} className="rounded-2xl border border-border bg-card p-5 space-y-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-display font-bold text-white">{p.name}</h3>
-                    <p className="text-[10px] text-muted-foreground">{p.industry} · {p.stage} Stage</p>
-                  </div>
-                  <Badge variant="outline" className="text-[9px] border-emerald-500/20 bg-emerald-500/5 text-emerald-400">
-                    {p.status}
-                  </Badge>
-                </div>
-                <div className="space-y-1.5">
-                  <div className="flex justify-between text-[10px] text-muted-foreground">
-                    <span>Valuation Progress</span>
-                    <span className="font-semibold text-white">{p.progress}%</span>
-                  </div>
-                  <Progress value={p.progress} className="h-1 bg-slate-900" />
-                </div>
-              </div>
-            ))}
+          <div className="rounded-lg border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
+            Portfolio tracking is coming soon. No portfolio companies are recorded yet.
           </div>
         </div>
       </div>

@@ -171,9 +171,9 @@ function CommunityPage() {
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Stat label="Members" value={members.length} icon={Users} />
         <Stat label="Active founders" value={activeCount} icon={TrendingUp} />
-        <Stat label="Vantage completed" value={withVantage} icon={CheckCircle2} />
-        <Stat label="Avg Vantage" value={avgVantage} icon={Gauge} />
-        <Stat label="Avg Valuation" value={formatNaira(avgValuation)} icon={Coins} isValuation />
+        <Stat label="AVA completed" value={withVantage} icon={CheckCircle2} />
+        <Stat label="Avg AVA" value={avgVantage} icon={Gauge} />
+        <Stat label="Avg model estimate" value={formatNaira(avgValuation)} icon={Coins} isValuation />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
@@ -188,8 +188,8 @@ function CommunityPage() {
                   <tr className="border-b border-border text-left text-muted-foreground">
                     <th className="pb-2 font-medium">Venture</th>
                     <th className="pb-2 font-medium">Stage</th>
-                    <th className="pb-2 font-medium">Vantage</th>
-                    <th className="pb-2 font-medium text-right">Valuation</th>
+                    <th className="pb-2 font-medium">AVA</th>
+                    <th className="pb-2 font-medium text-right">Model estimate</th>
                     <th className="pb-2 font-medium text-right">Joined</th>
                   </tr>
                 </thead>
@@ -239,17 +239,10 @@ function CommunityPage() {
             <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-slate-400">Referral Performance</h2>
             <div className="mt-4 space-y-3">
               <div className="flex justify-between text-xs">
-                <span className="text-slate-400">Link Clicks (Visits)</span>
-                <span className="font-bold text-white">{Math.round(members.length * 3.7)}</span>
-              </div>
-              <div className="flex justify-between text-xs">
                 <span className="text-slate-400">Total Joins (Signups)</span>
                 <span className="font-bold text-white">{members.length}</span>
               </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-slate-400">Conversion Rate</span>
-                <span className="font-bold text-pink-400">27%</span>
-              </div>
+              <p className="text-xs text-muted-foreground">Link visit and conversion tracking for communities is coming soon.</p>
             </div>
           </div>
         </div>
