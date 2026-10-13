@@ -14,3 +14,14 @@
 - [ ] Referral codes are stored but not yet linked to a referring member's profile.
 - [ ] Foundry relation is a slug for now; link to a foundries table when Build 3 creates it.
 - [x] Founder/builder profiles visible only to active (non-suspended) signed-in members; contact details stay owner/admin-only.
+
+# Content & product-surface audit
+- [x] Route-by-route audit reported (no app code changed).
+- [ ] P1 Remove fabricated data: Capital Partner mock commitments/portfolio, Community fake clicks/27%, homepage LIVE leaderboard + A/B toggle, scholarship 7420 counter, onboarding "Top 15%" fallback.
+- [ ] P2 Remove unsupported claims: valuation/unicorn/"idea to funded"/free revaluations; qualify $200k pilot; Spotlight reach; Wallet "Become Fundable".
+- [ ] P3 Work + Store → real Coming Soon screens (data kept). Blocked: confirm.
+- [ ] P4 AVA naming everywhere user-visible; one slogan "Venture Progression Network".
+- [ ] P5 /founder-scholarship → redirect to /scholarship; scholarship terms. Blocked: real terms.
+- [ ] P6 /start Foundry step as "opens soon"; footer dead links; sitemap; per-page canonical + unique profile/result titles.
+- [ ] P7 Admin IP column; treasury buttons disabled until RPCs exist; investor meeting-request dead end.
+- [ ] P8 Planned labels: PING (pending trademark), GRIOT, DOT Build mapping. Blocked: DOT Build mapping.
