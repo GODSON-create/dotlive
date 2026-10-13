@@ -356,7 +356,7 @@ function OnboardingPage() {
     drawRoundRect(80, 720, 920, 260, 28, "#0f172a", "rgba(99, 102, 241, 0.2)", 2);
     ctx.fillStyle = "#94a3b8";
     ctx.font = "600 24px sans-serif";
-    ctx.fillText("ESTIMATED STARTUP VALUE", 120, 785);
+    ctx.fillText("MODEL ESTIMATE · NOT A VALUATION", 120, 785);
 
     const valGrad = ctx.createLinearGradient(120, 0, 800, 0);
     valGrad.addColorStop(0, "#818cf8"); // indigo-400
@@ -370,7 +370,7 @@ function OnboardingPage() {
     drawRoundRect(80, 1020, 440, 240, 28, "#0f172a", "rgba(255, 255, 255, 0.05)", 1.5);
     ctx.fillStyle = "#94a3b8";
     ctx.font = "600 24px sans-serif";
-    ctx.fillText("DOT SCORE", 120, 1080);
+    ctx.fillText("AVA SCORE", 120, 1080);
     ctx.fillStyle = "#ffffff";
     ctx.font = "800 76px sans-serif";
     ctx.fillText(`${resultScore.vantagePoint}`, 120, 1180);
@@ -382,7 +382,7 @@ function OnboardingPage() {
     drawRoundRect(560, 1020, 440, 240, 28, "#0f172a", "rgba(255, 255, 255, 0.05)", 1.5);
     ctx.fillStyle = "#94a3b8";
     ctx.font = "600 24px sans-serif";
-    ctx.fillText("VALUATION POTENTIAL", 600, 1080);
+    ctx.fillText("MODELLED UPSIDE", 600, 1080);
     ctx.fillStyle = "#e2e8f0";
     ctx.font = "800 48px sans-serif";
     ctx.fillText(formatNaira(resultScore.potentialValuation), 600, 1180);
@@ -403,7 +403,7 @@ function OnboardingPage() {
     ctx.fillText("Find out what your startup is worth.", 120, 1560);
     ctx.fillStyle = "#94a3b8";
     ctx.font = "500 26px sans-serif";
-    ctx.fillText("Discover your DOT Score and join the network at", 120, 1615);
+    ctx.fillText("Take your AVA assessment on DOT at", 120, 1615);
     ctx.fillStyle = "#ec4899";
     ctx.font = "bold 30px sans-serif";
     ctx.fillText("dotlive.cv", 120, 1665);
@@ -742,7 +742,7 @@ function OnboardingPage() {
 
               <div className="my-auto space-y-6">
                 <div>
-                  <span className="text-[11px] font-bold text-slate-400 block uppercase">STARTUP VALUATION</span>
+                  <span className="text-[11px] font-bold text-slate-400 block uppercase">MODEL ESTIMATE · NOT A VALUATION</span>
                   <span className="font-display text-3xl sm:text-4xl font-black text-gradient block mt-1">
                     {formatNaira(resultScore.currentValuation)}
                   </span>
@@ -750,11 +750,11 @@ function OnboardingPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <span className="text-[10px] font-bold text-slate-400 block uppercase">DOT SCORE</span>
+                    <span className="text-[10px] font-bold text-slate-400 block uppercase">AVA BASELINE</span>
                     <span className="font-display text-2xl font-black text-white block mt-1">{resultScore.vantagePoint}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold text-slate-400 block uppercase">POTENTIAL</span>
+                    <span className="text-[10px] font-bold text-slate-400 block uppercase">MODELLED UPSIDE</span>
                     <span className="font-display text-lg font-bold text-slate-300 block mt-1">{formatNaira(resultScore.potentialValuation)}</span>
                   </div>
                 </div>
