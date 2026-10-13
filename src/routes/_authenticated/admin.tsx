@@ -52,6 +52,8 @@ import { elevateUser, revokeAdmin, claimSuperAdmin, adminUpdateUser } from "@/li
 import { getAdminCampaigns, updateCampaignStatus } from "@/lib/spotlight.functions";
 import { toast } from "sonner";
 
+const POOL_ENGINE_AVAILABLE: boolean = false;
+
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Admin Portal — DOT" }] }),
   component: AdminPage,
@@ -551,6 +553,11 @@ function ReserveTab() {
   }
 
   async function handleEngineSubmit() {
+    // Pool engine RPCs (lock/release/burn/transfer) do not exist in the backend yet — keep disabled.
+    if (POOL_ENGINE_AVAILABLE === false) {
+      toast.error("Pool actions are not available yet.");
+      return;
+    }
     if (isModerator) {
       toast.error("Moderators are not permitted to modify pool allocations.");
       return;
@@ -748,7 +755,7 @@ function ReserveTab() {
             </div>
           </div>
 
-          <Button variant="hero" className="w-full mt-2" onClick={handleEngineSubmit} disabled={engineBusy || engineAmount <= 0 || isModerator}>
+          <Button variant="hero" className="w-full mt-2" onClick={handleEngineSubmit} disabled title="Pool lock, release, burn and transfer are not available yet">
             {engineBusy ? <Loader2 className="size-4 animate-spin" /> : <Lock className="size-4" />}
             Execute Engine Call
           </Button>
@@ -2109,7 +2116,6 @@ function SessionsTab() {
           <thead>
             <tr className="border-b border-border text-left text-muted-foreground">
               <th className="p-4 font-medium">User</th>
-              <th className="p-4 font-medium">IP Address</th>
               <th className="p-4 font-medium">User Agent / Device</th>
               <th className="p-4 font-medium">Timestamp</th>
             </tr>
@@ -2117,7 +2123,7 @@ function SessionsTab() {
           <tbody className="divide-y divide-border">
             {logs.length === 0 && (
               <tr>
-                <td colSpan={4} className="p-8 text-center text-muted-foreground">No login logs recorded yet.</td>
+                <td colSpan={3} className="p-8 text-center text-muted-foreground">No login logs recorded yet.</td>
               </tr>
             )}
             {logs.map((log) => (
@@ -2126,7 +2132,6 @@ function SessionsTab() {
                   <div className="font-medium">{log.profile?.name ?? "—"}</div>
                   <div className="text-xs text-muted-foreground">{log.email ?? log.profile?.email ?? "—"}</div>
                 </td>
-                <td className="p-4 font-mono text-xs">{log.ip_address ?? "—"}</td>
                 <td className="p-4 text-xs text-muted-foreground max-w-xs truncate" title={log.user_agent ?? undefined}>
                   {log.user_agent ?? "—"}
                 </td>
