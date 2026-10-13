@@ -245,7 +245,7 @@ function OnboardingPage() {
 
   function handleShare(platform: "whatsapp" | "linkedin" | "twitter") {
     if (!resultScore) return;
-    const shareText = `I just discovered my startup could become a ${formatNaira(resultScore.potentialValuation)} company! DOT Score: ${resultScore.vantagePoint}. Check yours at dotlive.cv 🚀`;
+    const shareText = `I just took my AVA baseline on DOT — AVA Score: ${resultScore.vantagePoint}. Now working on what to improve next.`;
     const url = encodeURIComponent(window.location.origin + `/result/${resultScore.assessmentId}`);
     
     let link = "";
@@ -394,7 +394,7 @@ function OnboardingPage() {
     ctx.fillText("🏆", 120, 1390);
     ctx.fillStyle = "#ffffff";
     ctx.font = "bold 36px sans-serif";
-    ctx.fillText(`Top ${resultScore.rankPercent || 15}% of African Founders`, 190, 1390);
+    if (resultScore.rankPercent) ctx.fillText(`Top ${resultScore.rankPercent}% of founders on DOT`, 190, 1390);
 
     // SECTION 5: Scan Box
     drawRoundRect(80, 1490, 920, 210, 28, "rgba(15, 23, 42, 0.6)", "rgba(255, 255, 255, 0.03)", 1.5);

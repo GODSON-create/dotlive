@@ -235,7 +235,7 @@ function WalletPage() {
                         amount === v ? "border-primary bg-primary/10 text-primary" : "border-border text-slate-400 hover:border-slate-600",
                       )}
                     >
-                      {v === 2000 ? "Activate Access" : v === 5000 ? "Join Cohort" : v === 10000 ? "Become Fundable" : "Accelerate"} ({formatDot(v)} DOT)
+                      {formatDot(v)} DOT
                     </button>
                   ))}
                 </div>

@@ -270,7 +270,7 @@ function FounderSpotlightPage() {
 
                   <div className="mt-5 pt-3 border-t border-slate-900/60">
                     <span className={`inline-flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded bg-gradient-to-r ${pkg.accent} text-white`}>
-                      <Flame className="size-2.5 animate-pulse" /> {pkg.impressions} Est. Reach
+                      <Flame className="size-2.5 animate-pulse" /> {pkg.impressions} target reach · not guaranteed
                     </span>
                   </div>
                 </div>
