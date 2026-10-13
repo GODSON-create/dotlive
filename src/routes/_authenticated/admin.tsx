@@ -757,8 +757,9 @@ function ReserveTab() {
 
           <Button variant="hero" className="w-full mt-2" onClick={handleEngineSubmit} disabled title="Pool lock, release, burn and transfer are not available yet">
             {engineBusy ? <Loader2 className="size-4 animate-spin" /> : <Lock className="size-4" />}
-            Execute Engine Call
+            Not available yet
           </Button>
+          <p className="text-xs text-muted-foreground">Pool lock, release, burn and transfer will be enabled once their secure backend actions exist.</p>
         </div>
       </div>
 
