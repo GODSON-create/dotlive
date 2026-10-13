@@ -763,7 +763,7 @@ function OnboardingPage() {
                   <p className="text-xs font-semibold text-slate-400">Ecosystem Rank</p>
                   <p className="font-display text-base font-bold text-white mt-1 flex items-center gap-1.5">
                     <Trophy className="size-4 text-accent" />
-                    Top {resultScore.rankPercent || 15}% of African Founders
+                    {resultScore.rankPercent ? `Top ${resultScore.rankPercent}% of founders on DOT` : "Not ranked yet"}
                   </p>
                 </div>
               </div>
