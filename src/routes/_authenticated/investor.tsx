@@ -110,7 +110,7 @@ function InvestorPage() {
         message: "I'd like to learn more about your venture.",
       });
       if (error) throw error;
-      toast.success("Meeting request sent!");
+      toast.success("Meeting request saved. Founders can't see requests in DOT yet — this is coming soon.");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not send request");
     }

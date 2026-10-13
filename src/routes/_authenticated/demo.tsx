@@ -83,7 +83,7 @@ function DemoPage() {
         message: "I'd like to learn more about your venture.",
       });
       if (error) throw error;
-      toast.success("Meeting request sent!");
+      toast.success("Meeting request saved. Founders can't see requests in DOT yet — this is coming soon.");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not send request");
     }
@@ -93,7 +93,7 @@ function DemoPage() {
     <AppShell>
       <h1 className="font-display text-3xl font-bold">DOT Demo</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Investable ventures, ranked by Vantage. {isInvestor ? "Save and request meetings." : "Boost your Vantage to rank higher."}
+        Ventures ranked by AVA Score. {isInvestor ? "Save ventures and record meeting interest." : "Improve your AVA Score to rank higher."}
       </p>
 
       {isLoading ? (
