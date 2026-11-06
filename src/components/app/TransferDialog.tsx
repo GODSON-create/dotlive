@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { formatDot, dotToNaira, formatNaira } from "@/lib/constants";
+import { formatDot } from "@/lib/constants";
 import { useTransactions } from "@/hooks/use-dot-data";
 import { toast } from "sonner";
 
@@ -37,6 +37,7 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [saveContact, setSaveContact] = useState(true);
+  const [requestKey, setRequestKey] = useState(() => crypto.randomUUID());
 
   // Load saved recipients from localStorage
   const [savedRecipients, setSavedRecipients] = useState<SavedRecipient[]>(() => {
@@ -67,6 +68,7 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
     setNote("");
     setBusy(false);
     setSaveContact(true);
+    setRequestKey(crypto.randomUUID());
   }
 
   function close(o: boolean) {
@@ -105,10 +107,10 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
 
     setBusy(true);
     try {
-      const { data, error } = await supabase.rpc("lookup_dot_id", { _dot_id: code });
+      const { data, error } = await supabase.rpc("lookup_verified_recipient", { _dot_id: code });
       if (error) throw error;
       if (!data) {
-        toast.error("No wallet found for that DOT ID");
+        toast.error("That DOT ID can't receive transfers. Both members must be verified.");
         return;
       }
       setRecipientName(data);
@@ -124,10 +126,11 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
     const code = recipientId.trim().toUpperCase();
     setBusy(true);
     try {
-      const { error } = await supabase.rpc("transfer_dot", {
+      const { error } = await supabase.rpc("request_dot_transfer", {
         _recipient_dot_id: code,
         _amount: Math.floor(amount),
-        _note: note.trim() || undefined,
+        _note: note.trim(),
+        _idempotency_key: requestKey,
       });
       if (error) throw error;
 
@@ -142,9 +145,9 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
       }
 
       qc.invalidateQueries({ queryKey: ["wallet"] });
-      qc.invalidateQueries({ queryKey: ["transactions"] });
+      qc.invalidateQueries({ queryKey: ["transfer-requests"] });
       setStep("done");
-      toast.success(`Sent ${formatDot(amount)} DOT to ${recipientName}`);
+      toast.success("Transfer request submitted for review");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Transfer failed");
     } finally {
@@ -165,7 +168,7 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
             <DialogHeader>
               <DialogTitle>Send DOT</DialogTitle>
               <DialogDescription>
-                Transfer credits instantly to another user by their DOT ID.
+                Request a credit transfer to another verified member. An admin reviews it before any DOT moves. DOT credits are not cash.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
@@ -190,14 +193,14 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
                       <div
                         key={contact.dotId}
                         onClick={() => setRecipientId(contact.dotId)}
-                        className="flex items-center gap-1.5 cursor-pointer rounded-full bg-slate-900 border border-slate-800 px-2.5 py-1 text-xs hover:border-primary/50 transition-colors"
+                        className="flex items-center gap-1.5 cursor-pointer rounded-full bg-card border border-border px-2.5 py-1 text-xs hover:border-primary/50 transition-colors"
                       >
-                        <User className="size-3 text-slate-400" />
-                        <span className="text-white font-medium">{contact.name}</span>
-                        <span className="text-[10px] text-slate-500 font-mono">({contact.dotId})</span>
+                        <User className="size-3 text-muted-foreground" />
+                        <span className="text-foreground font-medium">{contact.name}</span>
+                        <span className="text-[10px] text-muted-foreground font-mono">({contact.dotId})</span>
                         <button
                           onClick={(e) => deleteContact(contact.dotId, e)}
-                          className="text-slate-500 hover:text-destructive transition-colors pl-1"
+                          className="text-muted-foreground hover:text-destructive transition-colors pl-1"
                         >
                           <Trash2 className="size-3" />
                         </button>
@@ -218,8 +221,8 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
                   onChange={(e) => setAmount(Number(e.target.value))}
                 />
                 <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Available: {formatDot(balance)} DOT · ≈ {formatNaira(dotToNaira(amount || 0))}</span>
-                  <span>Daily limit: Unlimited</span>
+                  <span>Available: {formatDot(balance)} DOT</span>
+                  <span>Reviewed before settlement</span>
                 </div>
               </div>
               <div className="space-y-1.5">
@@ -246,7 +249,7 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
           <>
             <DialogHeader>
               <DialogTitle>Confirm transfer</DialogTitle>
-              <DialogDescription>Please review before sending. This cannot be undone.</DialogDescription>
+              <DialogDescription>Your balance is not debited until an admin approves this request.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2 rounded-xl border border-border bg-muted/40 p-4 text-sm">
@@ -276,7 +279,7 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
               </Button>
               <Button variant="hero" onClick={handleTransfer} disabled={busy}>
                 {busy && <Loader2 className="size-4 animate-spin" />}
-                Send {formatDot(amount)} DOT
+                Request {formatDot(amount)} DOT transfer
               </Button>
             </DialogFooter>
           </>
@@ -288,9 +291,9 @@ export function TransferDialog({ balance, myDotId }: { balance: number; myDotId?
               <div className="mx-auto mb-2 flex size-12 items-center justify-center rounded-full bg-primary/10">
                 <CheckCircle2 className="size-6 text-primary" />
               </div>
-              <DialogTitle className="text-center">Transfer complete</DialogTitle>
+              <DialogTitle className="text-center">Request submitted</DialogTitle>
               <DialogDescription className="text-center">
-                {formatDot(amount)} DOT sent to {recipientName}.
+                {formatDot(amount)} DOT to {recipientName} is pending admin review.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>

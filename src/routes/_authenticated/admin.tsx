@@ -208,7 +208,6 @@ function OverviewTab() {
         <Stat label="Total DOT Purchased" value={formatDot(data.revenue.total_purchased)} />
         <Stat label="Total DOT Spent" value={formatDot(data.revenue.total_spent)} />
         <Stat label="Total DOT Earned" value={formatDot(data.revenue.total_earned)} />
-        <Stat label="Total Withdrawals" value={formatDot(data.revenue.total_withdrawals)} />
         <Stat label="Monthly Revenue" value={formatNaira(data.revenue.monthly_revenue)} />
       </MetricGroup>
 

@@ -20,9 +20,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { initPaystackPayment, verifyPaystackPayment } from "@/lib/paystack.functions";
 import { TransferDialog } from "@/components/app/TransferDialog";
 import {
-  MIN_DEPOSIT_DOT,
-  DOT_RATE_NGN,
-  dotToNaira,
   formatDot,
   formatNaira,
 } from "@/lib/constants";
@@ -48,7 +45,7 @@ const TYPE_META: Record<string, { icon: typeof Plus; tone: string }> = {
   "Admin Credit": { icon: Settings2, tone: "text-primary" },
 };
 
-type Currency = "DOT" | "NGN" | "USD" | "BTC";
+type Currency = "DOT";
 
 function WalletPage() {
   const qc = useQueryClient();
@@ -56,7 +53,7 @@ function WalletPage() {
   const { data: balance = 0 } = useWallet();
   const { data: transactions = [] } = useTransactions();
   const { data: profile } = useMyProfile();
-  const [amount, setAmount] = useState(MIN_DEPOSIT_DOT);
+  const [amount, setAmount] = useState(200);
   const [busy, setBusy] = useState(false);
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -93,7 +90,7 @@ function WalletPage() {
     verifyFn({ data: { reference } })
       .then((res) => {
         if (res.status === "success") {
-          setReceipt({ dot: res.dotAmount, naira: dotToNaira(res.dotAmount), reference });
+          setReceipt({ dot: res.dotAmount, naira: res.nairaAmount ?? 0, reference });
           toast.success(`Access activated successfully!`);
           refresh();
         } else {
@@ -108,10 +105,6 @@ function WalletPage() {
   }, []);
 
   async function handleDeposit() {
-    if (amount < MIN_DEPOSIT_DOT) {
-      toast.error(`Minimum activation commit is ${formatDot(MIN_DEPOSIT_DOT)} DOT`);
-      return;
-    }
     setBusy(true);
     try {
       const { authorizationUrl } = await initFn({
@@ -126,20 +119,8 @@ function WalletPage() {
 
   // Currency Formatter Layer
   const formatValue = useCallback((amountDOT: number, displayCurrency: Currency) => {
-    const ngn = amountDOT * 15;
-    const usd = ngn / 1500;
-    const btc = usd / 60000;
-
-    switch (displayCurrency) {
-      case "NGN":
-        return formatNaira(ngn);
-      case "USD":
-        return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(usd);
-      case "BTC":
-        return `${btc.toFixed(6)} BTC`;
-      default:
-        return `${formatDot(amountDOT)} DOT`;
-    }
+    void displayCurrency;
+    return `${formatDot(amountDOT)} DOT`;
   }, []);
 
   return (
@@ -152,21 +133,7 @@ function WalletPage() {
           </p>
         </div>
         
-        {/* Multi-Currency toggle tabs */}
-        <div className="flex rounded-lg border border-border bg-card p-1 text-xs font-semibold">
-          {(["DOT", "NGN", "USD", "BTC"] as Currency[]).map((cur) => (
-            <button
-              key={cur}
-              onClick={() => setCurrency(cur)}
-              className={cn(
-                "rounded px-3 py-1.5 transition-colors",
-                currency === cur ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {cur}
-            </button>
-          ))}
-        </div>
+        <p className="text-xs text-muted-foreground">DOT credits are platform credits, not cash. They cannot be withdrawn.</p>
       </div>
 
       {verifying && (
@@ -201,7 +168,7 @@ function WalletPage() {
         <div className="flex flex-col justify-center gap-3 rounded-2xl border border-border bg-card p-6">
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button variant="hero" className="w-full bg-gradient-to-r from-pink-500 to-indigo-500 hover:from-pink-600 hover:to-indigo-600 text-white font-semibold">
+              <Button variant="hero" className="w-full font-semibold">
                 <ArrowDownToLine className="size-4" /> Activate Founder Access
               </Button>
             </DialogTrigger>
@@ -217,13 +184,13 @@ function WalletPage() {
                 <Input
                   id="amount"
                   type="number"
-                  min={MIN_DEPOSIT_DOT}
+                  min={1}
                   step={100}
                   value={amount}
                   onChange={(e) => setAmount(Number(e.target.value))}
                 />
                 <p className="text-sm text-muted-foreground">
-                  Scholarship activation deposit: <span className="font-semibold text-white">{formatNaira(dotToNaira(amount || 0))}</span>
+                  Priced at the DOT purchase price in USD, charged in naira at the admin-set exchange rate. The exact naira total is shown on Paystack.
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {[2000, 5000, 10000, 20000].map((v) => (
@@ -232,7 +199,7 @@ function WalletPage() {
                       onClick={() => setAmount(v)}
                       className={cn(
                         "rounded-full border px-3 py-1 text-sm font-semibold transition-colors",
-                        amount === v ? "border-primary bg-primary/10 text-primary" : "border-border text-slate-400 hover:border-slate-600",
+                        amount === v ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground",
                       )}
                     >
                       {formatDot(v)} DOT
@@ -250,7 +217,7 @@ function WalletPage() {
           </Dialog>
           <TransferDialog balance={balance} myDotId={dotId} />
           <p className="text-center text-xs text-muted-foreground">
-            Send instantly by DOT ID · apply for cohort activations
+            Transfers between verified members are reviewed before settlement
           </p>
         </div>
       </div>
@@ -270,7 +237,7 @@ function WalletPage() {
                     <meta.icon className="size-4" />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-white">{t.description || t.type}</p>
+                    <p className="truncate text-sm font-medium text-foreground">{t.description || t.type}</p>
                     <p className="text-xs text-muted-foreground">
                       {t.type === "Deposit" ? "Scholarship Activation" : t.type} · {new Date(t.created_at).toLocaleString()}
                     </p>

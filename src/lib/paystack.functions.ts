@@ -2,12 +2,12 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const DOT_RATE_NGN = 15;
-const MIN_DEPOSIT_DOT = 200;
+import { parseWalletSettings, quoteCheckout } from "@/lib/wallet-pricing";
+
 const PAYSTACK_BASE = "https://api.paystack.co";
 
 const initInput = z.object({
-  dotAmount: z.number().int().min(MIN_DEPOSIT_DOT),
+  dotAmount: z.number().int().positive().max(10_000_000),
   callbackUrl: z.string().url(),
 });
 
@@ -50,8 +50,16 @@ export const initPaystackPayment = createServerFn({ method: "POST" })
     }
     if (!email) throw new Error("No email on file for this account");
 
-    const dotAmount = data.dotAmount;
-    const nairaAmount = dotAmount * DOT_RATE_NGN;
+    // Price and FX come only from server-held settings; never from the client.
+    const { data: settingsRows, error: sErr } = await supabaseAdmin
+      .from("wallet_settings")
+      .select("key, value, updated_at");
+    if (sErr) throw new Error("Could not load DOT pricing");
+    const quote = quoteCheckout(parseWalletSettings(settingsRows ?? []), data.dotAmount);
+    if (!quote.ok) throw new Error(quote.reason);
+
+    const dotAmount = quote.dotAmount;
+    const nairaAmount = quote.nairaAmount;
     const reference = makeReference(userId);
 
     const { error: insertErr } = await supabaseAdmin.from("payments").insert({
@@ -59,6 +67,9 @@ export const initPaystackPayment = createServerFn({ method: "POST" })
       reference,
       dot_amount: dotAmount,
       naira_amount: nairaAmount,
+      usd_amount: quote.usdAmount,
+      price_usd_per_dot: quote.priceUsd,
+      fx_ngn_per_usd: quote.ngnPerUsd,
       status: "pending",
     });
     if (insertErr) throw new Error(insertErr.message);
@@ -71,7 +82,7 @@ export const initPaystackPayment = createServerFn({ method: "POST" })
       },
       body: JSON.stringify({
         email,
-        amount: nairaAmount * 100, // kobo
+        amount: quote.koboAmount,
         reference,
         callback_url: data.callbackUrl,
         metadata: { user_id: userId, dot_amount: dotAmount },
@@ -92,7 +103,7 @@ export const initPaystackPayment = createServerFn({ method: "POST" })
       throw new Error(body.message || "Could not start payment");
     }
 
-    return { authorizationUrl: body.data.authorization_url, reference };
+    return { authorizationUrl: body.data.authorization_url, reference, nairaAmount, usdAmount: quote.usdAmount };
   });
 
 /**
@@ -128,7 +139,7 @@ export const verifyPaystackPayment = createServerFn({ method: "POST" })
         .select("balance")
         .eq("user_id", userId)
         .maybeSingle();
-      return { status: "success" as const, balance: Number(w?.balance ?? 0), dotAmount: Number(payment.dot_amount) };
+      return { status: "success" as const, balance: Number(w?.balance ?? 0), dotAmount: Number(payment.dot_amount), nairaAmount: Number(payment.naira_amount) };
     }
 
     const res = await fetch(`${PAYSTACK_BASE}/transaction/verify/${encodeURIComponent(data.reference)}`, {
@@ -147,7 +158,7 @@ export const verifyPaystackPayment = createServerFn({ method: "POST" })
         .from("payments")
         .update({ status: tx?.status === "success" ? "amount_mismatch" : "failed" })
         .eq("reference", data.reference);
-      return { status: "failed" as const, balance: 0, dotAmount: Number(payment.dot_amount) };
+      return { status: "failed" as const, balance: 0, dotAmount: Number(payment.dot_amount), nairaAmount: Number(payment.naira_amount) };
     }
 
     await supabaseAdmin
@@ -165,5 +176,5 @@ export const verifyPaystackPayment = createServerFn({ method: "POST" })
     });
     if (cErr) throw new Error(cErr.message);
 
-    return { status: "success" as const, balance: Number(balance ?? 0), dotAmount: Number(payment.dot_amount) };
+    return { status: "success" as const, balance: Number(balance ?? 0), dotAmount: Number(payment.dot_amount), nairaAmount: Number(payment.naira_amount) };
   });

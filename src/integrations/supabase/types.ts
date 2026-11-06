@@ -822,6 +822,48 @@ export type Database = {
         }
         Relationships: []
       }
+      ledger_entries: {
+        Row: {
+          amount: number
+          balance_after: number | null
+          created_at: string
+          description: string | null
+          entry_ref: string
+          entry_type: string
+          id: string
+          idempotency_key: string | null
+          source_id: string | null
+          source_table: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after?: number | null
+          created_at?: string
+          description?: string | null
+          entry_ref?: string
+          entry_type: string
+          id?: string
+          idempotency_key?: string | null
+          source_id?: string | null
+          source_table?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number | null
+          created_at?: string
+          description?: string | null
+          entry_ref?: string
+          entry_type?: string
+          id?: string
+          idempotency_key?: string | null
+          source_id?: string | null
+          source_table?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       login_audit_log: {
         Row: {
           created_at: string
@@ -918,14 +960,17 @@ export type Database = {
           created_at: string
           credited_at: string | null
           dot_amount: number
+          fx_ngn_per_usd: number | null
           id: string
           metadata: Json
           naira_amount: number
           paid_at: string | null
           paystack_reference: string | null
+          price_usd_per_dot: number | null
           reference: string
           status: string
           updated_at: string
+          usd_amount: number | null
           user_id: string
         }
         Insert: {
@@ -933,14 +978,17 @@ export type Database = {
           created_at?: string
           credited_at?: string | null
           dot_amount: number
+          fx_ngn_per_usd?: number | null
           id?: string
           metadata?: Json
           naira_amount: number
           paid_at?: string | null
           paystack_reference?: string | null
+          price_usd_per_dot?: number | null
           reference: string
           status?: string
           updated_at?: string
+          usd_amount?: number | null
           user_id: string
         }
         Update: {
@@ -948,14 +996,17 @@ export type Database = {
           created_at?: string
           credited_at?: string | null
           dot_amount?: number
+          fx_ngn_per_usd?: number | null
           id?: string
           metadata?: Json
           naira_amount?: number
           paid_at?: string | null
           paystack_reference?: string | null
+          price_usd_per_dot?: number | null
           reference?: string
           status?: string
           updated_at?: string
+          usd_amount?: number | null
           user_id?: string
         }
         Relationships: []
@@ -1585,6 +1636,89 @@ export type Database = {
         }
         Relationships: []
       }
+      transfer_request_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          event: string
+          id: string
+          reason: string | null
+          request_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          event: string
+          id?: string
+          reason?: string | null
+          request_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          event?: string
+          id?: string
+          reason?: string | null
+          request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transfer_request_events_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "transfer_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transfer_requests: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          idempotency_key: string
+          note: string | null
+          recipient_id: string
+          reference: string
+          review_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sender_id: string
+          settled_at: string | null
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          idempotency_key: string
+          note?: string | null
+          recipient_id: string
+          reference?: string
+          review_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sender_id: string
+          settled_at?: string | null
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          idempotency_key?: string
+          note?: string | null
+          recipient_id?: string
+          reference?: string
+          review_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sender_id?: string
+          settled_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       treasury_pools: {
         Row: {
           balance: number
@@ -1633,6 +1767,63 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      wallet_settings: {
+        Row: {
+          key: string
+          label: string
+          text_value: string | null
+          updated_at: string
+          updated_by: string | null
+          value: number | null
+        }
+        Insert: {
+          key: string
+          label: string
+          text_value?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          value?: number | null
+        }
+        Update: {
+          key?: string
+          label?: string
+          text_value?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          value?: number | null
+        }
+        Relationships: []
+      }
+      wallet_settings_audit: {
+        Row: {
+          changed_by: string
+          created_at: string
+          id: string
+          key: string
+          new_value: number | null
+          old_value: number | null
+          reason: string | null
+        }
+        Insert: {
+          changed_by: string
+          created_at?: string
+          id?: string
+          key: string
+          new_value?: number | null
+          old_value?: number | null
+          reason?: string | null
+        }
+        Update: {
+          changed_by?: string
+          created_at?: string
+          id?: string
+          key?: string
+          new_value?: number | null
+          old_value?: number | null
+          reason?: string | null
         }
         Relationships: []
       }
@@ -1703,6 +1894,7 @@ export type Database = {
       }
       assert_wallet_active: { Args: { _user_id: string }; Returns: undefined }
       bootstrap_super_admin: { Args: { _email: string }; Returns: string }
+      cancel_dot_transfer: { Args: { _request_id: string }; Returns: undefined }
       cancel_service_order: { Args: { _order_id: string }; Returns: undefined }
       charge_revaluation_fee: {
         Args: { _fee: number; _user_id: string }
@@ -1842,7 +2034,9 @@ export type Database = {
       }
       is_active_member: { Args: { _user_id: string }; Returns: boolean }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_finance_admin: { Args: { _user_id: string }; Returns: boolean }
       lookup_dot_id: { Args: { _dot_id: string }; Returns: string }
+      lookup_verified_recipient: { Args: { _dot_id: string }; Returns: string }
       record_acquisition_visit: {
         Args: {
           _campaign?: string
@@ -1853,6 +2047,19 @@ export type Database = {
           _visitor_id: string
         }
         Returns: undefined
+      }
+      request_dot_transfer: {
+        Args: {
+          _amount: number
+          _idempotency_key: string
+          _note: string
+          _recipient_dot_id: string
+        }
+        Returns: string
+      }
+      review_dot_transfer: {
+        Args: { _approve: boolean; _reason: string; _request_id: string }
+        Returns: string
       }
       review_service_order: {
         Args: { _comment?: string; _order_id: string; _rating: number }
@@ -1885,6 +2092,19 @@ export type Database = {
       transfer_dot: {
         Args: { _amount: number; _note?: string; _recipient_dot_id: string }
         Returns: number
+      }
+      update_wallet_setting: {
+        Args: { _key: string; _reason: string; _value: number }
+        Returns: undefined
+      }
+      wallet_reconciliation: {
+        Args: never
+        Returns: {
+          difference: number
+          ledger_total: number
+          user_id: string
+          wallet_balance: number
+        }[]
       }
     }
     Enums: {
