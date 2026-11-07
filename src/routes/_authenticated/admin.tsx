@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/app/AppShell";
 import { AcquisitionPanel } from "@/components/app/AcquisitionPanel";
+import { ChallengeReport } from "@/components/app/ChallengeReport";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -111,6 +112,7 @@ function AdminPage() {
         <TabsList className="h-auto w-full justify-start gap-1 overflow-x-auto border-b border-border bg-transparent p-0 pb-3">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="acquisition">Acquisition</TabsTrigger>
+          <TabsTrigger value="challenge">Builders Challenge</TabsTrigger>
           <TabsTrigger value="users">User Management</TabsTrigger>
           <TabsTrigger value="wallets">Wallets</TabsTrigger>
           <TabsTrigger value="reserve">Reserve</TabsTrigger>
@@ -122,6 +124,7 @@ function AdminPage() {
         </TabsList>
         <TabsContent value="overview"><OverviewTab /></TabsContent>
         <TabsContent value="acquisition"><AcquisitionPanel /></TabsContent>
+        <TabsContent value="challenge"><ChallengeReport /></TabsContent>
         <TabsContent value="users"><UsersTab /></TabsContent>
         <TabsContent value="wallets"><WalletsTab /></TabsContent>
         <TabsContent value="reserve"><ReserveTab /></TabsContent>

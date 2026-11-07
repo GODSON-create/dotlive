@@ -73,6 +73,8 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
+  { label: "Builders Challenge", to: "/challenge", icon: CalendarCheck },
+  { label: "Challenge Reporting", to: "/challenge-report", icon: Users, roles: ["community_leader"] },
   { label: "AVA", to: "/vantage", icon: Gauge, roles: ["founder"] },
   { label: "ARISE Foundry", to: "/foundry", icon: Building2, roles: ["founder"] },
   { label: "Pitch / Pitchathons", to: "/pitchathons", icon: Trophy, roles: ["founder"] },

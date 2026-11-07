@@ -1,4 +1,5 @@
 # Build 1 — Foundation (repair + verify)
+- [ ] Builders Challenge: additive enrollment/state machine, settings, private 90-day journey, progress evidence and scoped reporting; checkout/credits disabled pending readiness.
 - [x] Design tokens, shell (collapsible sidebar, mobile nav), Coming Soon future modules, dashboard and admin control room.
 - [x] Missing database pieces the app expected restored (additive, security-reviewed); typecheck clean.
 - [x] /foundry page added (ARISE = first Foundry; DOT stays global).

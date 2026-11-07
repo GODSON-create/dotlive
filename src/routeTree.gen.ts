@@ -28,6 +28,8 @@ import { Route as WaRouteImport } from './routes/wa'
 import { Route as AuthenticatedAcademyRouteImport } from './routes/_authenticated/academy'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedCapitalPartnerRouteImport } from './routes/_authenticated/capital-partner'
+import { Route as AuthenticatedChallengeRouteImport } from './routes/_authenticated/challenge'
+import { Route as AuthenticatedChallengeReportRouteImport } from './routes/_authenticated/challenge-report'
 import { Route as AuthenticatedCommunityRouteImport } from './routes/_authenticated/community'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDemoRouteImport } from './routes/_authenticated/demo'
@@ -143,6 +145,17 @@ const AuthenticatedCapitalPartnerRoute =
   AuthenticatedCapitalPartnerRouteImport.update({
     id: '/capital-partner',
     path: '/capital-partner',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedChallengeRoute = AuthenticatedChallengeRouteImport.update({
+  id: '/challenge',
+  path: '/challenge',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedChallengeReportRoute =
+  AuthenticatedChallengeReportRouteImport.update({
+    id: '/challenge-report',
+    path: '/challenge-report',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedCommunityRoute = AuthenticatedCommunityRouteImport.update({
@@ -273,6 +286,8 @@ export interface FileRoutesByFullPath {
   '/academy': typeof AuthenticatedAcademyRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/capital-partner': typeof AuthenticatedCapitalPartnerRoute
+  '/challenge': typeof AuthenticatedChallengeRoute
+  '/challenge-report': typeof AuthenticatedChallengeReportRoute
   '/community': typeof AuthenticatedCommunityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/demo': typeof AuthenticatedDemoRoute
@@ -314,6 +329,8 @@ export interface FileRoutesByTo {
   '/academy': typeof AuthenticatedAcademyRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/capital-partner': typeof AuthenticatedCapitalPartnerRoute
+  '/challenge': typeof AuthenticatedChallengeRoute
+  '/challenge-report': typeof AuthenticatedChallengeReportRoute
   '/community': typeof AuthenticatedCommunityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/demo': typeof AuthenticatedDemoRoute
@@ -357,6 +374,8 @@ export interface FileRoutesById {
   '/_authenticated/academy': typeof AuthenticatedAcademyRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/capital-partner': typeof AuthenticatedCapitalPartnerRoute
+  '/_authenticated/challenge': typeof AuthenticatedChallengeRoute
+  '/_authenticated/challenge-report': typeof AuthenticatedChallengeReportRoute
   '/_authenticated/community': typeof AuthenticatedCommunityRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/demo': typeof AuthenticatedDemoRoute
@@ -400,6 +419,8 @@ export interface FileRouteTypes {
     | '/academy'
     | '/admin'
     | '/capital-partner'
+    | '/challenge'
+    | '/challenge-report'
     | '/community'
     | '/dashboard'
     | '/demo'
@@ -441,6 +462,8 @@ export interface FileRouteTypes {
     | '/academy'
     | '/admin'
     | '/capital-partner'
+    | '/challenge'
+    | '/challenge-report'
     | '/community'
     | '/dashboard'
     | '/demo'
@@ -483,6 +506,8 @@ export interface FileRouteTypes {
     | '/_authenticated/academy'
     | '/_authenticated/admin'
     | '/_authenticated/capital-partner'
+    | '/_authenticated/challenge'
+    | '/_authenticated/challenge-report'
     | '/_authenticated/community'
     | '/_authenticated/dashboard'
     | '/_authenticated/demo'
@@ -666,6 +691,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCapitalPartnerRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/challenge': {
+      id: '/_authenticated/challenge'
+      path: '/challenge'
+      fullPath: '/challenge'
+      preLoaderRoute: typeof AuthenticatedChallengeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/challenge-report': {
+      id: '/_authenticated/challenge-report'
+      path: '/challenge-report'
+      fullPath: '/challenge-report'
+      preLoaderRoute: typeof AuthenticatedChallengeReportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/community': {
       id: '/_authenticated/community'
       path: '/community'
@@ -820,6 +859,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAcademyRoute: typeof AuthenticatedAcademyRoute
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedCapitalPartnerRoute: typeof AuthenticatedCapitalPartnerRoute
+  AuthenticatedChallengeRoute: typeof AuthenticatedChallengeRoute
+  AuthenticatedChallengeReportRoute: typeof AuthenticatedChallengeReportRoute
   AuthenticatedCommunityRoute: typeof AuthenticatedCommunityRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDemoRoute: typeof AuthenticatedDemoRoute
@@ -841,6 +882,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAcademyRoute: AuthenticatedAcademyRoute,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedCapitalPartnerRoute: AuthenticatedCapitalPartnerRoute,
+  AuthenticatedChallengeRoute: AuthenticatedChallengeRoute,
+  AuthenticatedChallengeReportRoute: AuthenticatedChallengeReportRoute,
   AuthenticatedCommunityRoute: AuthenticatedCommunityRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDemoRoute: AuthenticatedDemoRoute,

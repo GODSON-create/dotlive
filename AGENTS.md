@@ -10,3 +10,5 @@
 <!-- LOVABLE:END -->
 - Acquisition attribution is first-touch: anonymous visits go through the `record_acquisition_visit` RPC, and members bind once via `claim_acquisition_attribution` (one row per user) — this keeps one identity per member whatever the source.
 - Foundry links use `foundry_slug` until a foundries table exists — so DOT is never hard-coded to ARISE.
+- Builders Challenge is additive: caller-scoped server functions and authenticated transactional RPCs own enrollment/progress, explicit admin roles own decisions, and role-plus-community ownership scopes lead reports; no new learning system or wallet mutations.
+- Challenge confirmation/activation and credit issuance remain unavailable at the database RPC boundary until a separately verified payment integration is authorized; configuration can enable requests only.

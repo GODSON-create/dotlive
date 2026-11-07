@@ -508,6 +508,279 @@ export type Database = {
         }
         Relationships: []
       }
+      challenge_audit: {
+        Row: {
+          action: string
+          actor_id: string | null
+          after_value: Json | null
+          before_value: Json | null
+          created_at: string
+          enrollment_id: string | null
+          id: string
+          reason: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          after_value?: Json | null
+          before_value?: Json | null
+          created_at?: string
+          enrollment_id?: string | null
+          id?: string
+          reason?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          after_value?: Json | null
+          before_value?: Json | null
+          created_at?: string
+          enrollment_id?: string | null
+          id?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_audit_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_enrollments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenge_checkins: {
+        Row: {
+          created_at: string
+          enrollment_id: string
+          evidence_url: string | null
+          id: string
+          ping_update_url: string | null
+          progress_note: string
+          updated_at: string
+          week_number: number
+        }
+        Insert: {
+          created_at?: string
+          enrollment_id: string
+          evidence_url?: string | null
+          id?: string
+          ping_update_url?: string | null
+          progress_note: string
+          updated_at?: string
+          week_number: number
+        }
+        Update: {
+          created_at?: string
+          enrollment_id?: string
+          evidence_url?: string | null
+          id?: string
+          ping_update_url?: string | null
+          progress_note?: string
+          updated_at?: string
+          week_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_checkins_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_enrollments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenge_enrollments: {
+        Row: {
+          campaign: string | null
+          community_id: string | null
+          confirmed_at: string | null
+          contribution_usd: number
+          created_at: string
+          credit_state: string
+          duration_days: number
+          eligibility_confirmed_at: string | null
+          end_at: string | null
+          foundry_slug: string | null
+          id: string
+          onboarding_completed_at: string | null
+          participant_id: string
+          pass_type: string
+          payment_reference: string | null
+          payment_state: string
+          ping_profile_url: string | null
+          programme_price_usd: number
+          ref_code: string | null
+          region: string | null
+          review_note: string | null
+          reviewed_by: string | null
+          source: string
+          sponsorship_reference: string | null
+          sponsorship_state: string
+          start_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          campaign?: string | null
+          community_id?: string | null
+          confirmed_at?: string | null
+          contribution_usd: number
+          created_at?: string
+          credit_state?: string
+          duration_days?: number
+          eligibility_confirmed_at?: string | null
+          end_at?: string | null
+          foundry_slug?: string | null
+          id?: string
+          onboarding_completed_at?: string | null
+          participant_id: string
+          pass_type: string
+          payment_reference?: string | null
+          payment_state?: string
+          ping_profile_url?: string | null
+          programme_price_usd: number
+          ref_code?: string | null
+          region?: string | null
+          review_note?: string | null
+          reviewed_by?: string | null
+          source?: string
+          sponsorship_reference?: string | null
+          sponsorship_state?: string
+          start_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          campaign?: string | null
+          community_id?: string | null
+          confirmed_at?: string | null
+          contribution_usd?: number
+          created_at?: string
+          credit_state?: string
+          duration_days?: number
+          eligibility_confirmed_at?: string | null
+          end_at?: string | null
+          foundry_slug?: string | null
+          id?: string
+          onboarding_completed_at?: string | null
+          participant_id?: string
+          pass_type?: string
+          payment_reference?: string | null
+          payment_state?: string
+          ping_profile_url?: string | null
+          programme_price_usd?: number
+          ref_code?: string | null
+          region?: string | null
+          review_note?: string | null
+          reviewed_by?: string | null
+          source?: string
+          sponsorship_reference?: string | null
+          sponsorship_state?: string
+          start_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_enrollments_community_id_fkey"
+            columns: ["community_id"]
+            isOneToOne: false
+            referencedRelation: "communities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenge_enrollments_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenge_milestones: {
+        Row: {
+          enrollment_id: string
+          evidence_url: string | null
+          id: string
+          milestone_key: string
+          participant_note: string | null
+          review_note: string | null
+          review_state: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          submitted_at: string
+        }
+        Insert: {
+          enrollment_id: string
+          evidence_url?: string | null
+          id?: string
+          milestone_key: string
+          participant_note?: string | null
+          review_note?: string | null
+          review_state?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          submitted_at?: string
+        }
+        Update: {
+          enrollment_id?: string
+          evidence_url?: string | null
+          id?: string
+          milestone_key?: string
+          participant_note?: string | null
+          review_note?: string | null
+          review_state?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          submitted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_milestones_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_enrollments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenge_settings: {
+        Row: {
+          benefit_catalogue_visible: boolean
+          duration_days: number
+          id: boolean
+          registration_enabled: boolean
+          sponsored_contribution_usd: number
+          standard_price_usd: number
+          start_rule: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          benefit_catalogue_visible?: boolean
+          duration_days?: number
+          id?: boolean
+          registration_enabled?: boolean
+          sponsored_contribution_usd?: number
+          standard_price_usd?: number
+          start_rule?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          benefit_catalogue_visible?: boolean
+          duration_days?: number
+          id?: boolean
+          registration_enabled?: boolean
+          sponsored_contribution_usd?: number
+          standard_price_usd?: number
+          start_rule?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       communities: {
         Row: {
           category: string | null
@@ -1896,6 +2169,12 @@ export type Database = {
       bootstrap_super_admin: { Args: { _email: string }; Returns: string }
       cancel_dot_transfer: { Args: { _request_id: string }; Returns: undefined }
       cancel_service_order: { Args: { _order_id: string }; Returns: undefined }
+      challenge_can_read: { Args: { _enrollment: string }; Returns: boolean }
+      challenge_is_admin: { Args: never; Returns: boolean }
+      challenge_transition: {
+        Args: { _action: string; _id: string; _reason: string }
+        Returns: undefined
+      }
       charge_revaluation_fee: {
         Args: { _fee: number; _user_id: string }
         Returns: boolean
@@ -1922,6 +2201,17 @@ export type Database = {
       }
       complete_service_order: {
         Args: { _order_id: string }
+        Returns: undefined
+      }
+      configure_challenge: {
+        Args: {
+          _catalogue: boolean
+          _duration: number
+          _reason: string
+          _registration: boolean
+          _sponsored: number
+          _standard: number
+        }
         Returns: undefined
       }
       create_service_order: {
@@ -2048,6 +2338,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      request_challenge_enrollment: {
+        Args: { _community_id?: string; _pass_type: string }
+        Returns: string
+      }
       request_dot_transfer: {
         Args: {
           _amount: number
@@ -2056,6 +2350,10 @@ export type Database = {
           _recipient_dot_id: string
         }
         Returns: string
+      }
+      review_challenge_milestone: {
+        Args: { _id: string; _reason: string; _state: string }
+        Returns: undefined
       }
       review_dot_transfer: {
         Args: { _approve: boolean; _reason: string; _request_id: string }
@@ -2076,6 +2374,17 @@ export type Database = {
       reward_dot: {
         Args: { _amount: number; _description: string }
         Returns: number
+      }
+      save_challenge_progress: {
+        Args: {
+          _evidence?: string
+          _id: string
+          _key: string
+          _kind: string
+          _note: string
+          _ping?: string
+        }
+        Returns: undefined
       }
       set_wallet_status: {
         Args: { _reason?: string; _status: string; _user_id: string }

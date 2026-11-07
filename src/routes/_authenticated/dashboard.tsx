@@ -45,6 +45,7 @@ import { toast } from "sonner";
 import { ProfileEditDialog } from "@/components/app/ProfileEditDialog";
 import { getFounderCampaigns } from "@/lib/spotlight.functions";
 import { Progress } from "@/components/ui/progress";
+import { ChallengeJourney } from "@/components/app/ChallengeJourney";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -340,6 +341,7 @@ function Dashboard() {
           {!founder?.venture_name ? <Button size="sm" className="mt-4" onClick={() => setShowEditProfile(true)}>Complete profile <ArrowRight /></Button> : <Button size="sm" className="mt-4" asChild><Link to="/vantage">{latest ? "Review AVA" : "Start AVA"} <ArrowRight /></Link></Button>}
         </section>
       </div>
+      <ChallengeJourney compact />
       <div className="dashboard-widgets mt-6 grid gap-4">
         <div className="rounded-lg border border-border bg-card p-5">
           <h2 className="flex items-center gap-2 text-base font-semibold"><Calendar className="size-4 text-primary" />Upcoming Event</h2>
