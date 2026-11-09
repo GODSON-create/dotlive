@@ -12,6 +12,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { formatNaira, formatDot } from "@/lib/constants";
+import { COMMUNITY_TYPES, COMMUNITY_TYPE_LABELS, type CommunityType } from "@/lib/communities";
 
 export const Route = createFileRoute("/_authenticated/community")({
   head: () => ({ meta: [{ title: "Community OS — DOT" }] }),
@@ -44,6 +45,11 @@ function CommunityPage() {
   const [region, setRegion] = useState("");
   const [category, setCategory] = useState("");
   const [busy, setBusy] = useState(false);
+  const [ctype, setCtype] = useState<CommunityType>("interest");
+  const [visibility, setVisibility] = useState<"public" | "invite_only">("public");
+  const [university, setUniversity] = useState("");
+  const [city, setCity] = useState("");
+  const [country, setCountry] = useState("");
 
   const { data: community, isLoading } = useQuery({
     queryKey: ["my-community", user?.id],
@@ -95,6 +101,11 @@ function CommunityPage() {
         description,
         region,
         category,
+        community_type: ctype,
+        visibility,
+        university_name: ctype === "university" ? university.trim() || null : null,
+        city: city.trim() || null,
+        country: country.trim() || null,
         leader_id: user.id,
       });
       if (error) throw error;
@@ -131,6 +142,35 @@ function CommunityPage() {
             <div className="space-y-2">
               <Label htmlFor="cat">Category</Label>
               <Input id="cat" value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Tech / Agric" />
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="ctype">Community type</Label>
+              <select id="ctype" value={ctype} onChange={(e) => setCtype(e.target.value as CommunityType)} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                {COMMUNITY_TYPES.map((t) => <option key={t} value={t}>{COMMUNITY_TYPE_LABELS[t]}</option>)}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="vis">Who can join</Label>
+              <select id="vis" value={visibility} onChange={(e) => setVisibility(e.target.value as "public" | "invite_only")} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                <option value="public">Anyone on DOT</option>
+                <option value="invite_only">Invite link only</option>
+              </select>
+            </div>
+            {ctype === "university" && (
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="uni">University</Label>
+                <Input id="uni" value={university} onChange={(e) => setUniversity(e.target.value)} placeholder="University of Port Harcourt" />
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="city">City</Label>
+              <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="country">Country</Label>
+              <Input id="country" value={country} onChange={(e) => setCountry(e.target.value)} />
             </div>
           </div>
           <div className="space-y-2">

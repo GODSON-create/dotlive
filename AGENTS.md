@@ -12,3 +12,4 @@
 - Foundry links use `foundry_slug` until a foundries table exists — so DOT is never hard-coded to ARISE.
 - Builders Challenge is additive: caller-scoped server functions and authenticated transactional RPCs own enrollment/progress, explicit admin roles own decisions, and role-plus-community ownership scopes lead reports; no new learning system or wallet mutations.
 - Challenge confirmation/activation and credit issuance remain unavailable at the database RPC boundary until a separately verified payment integration is authorized; configuration can enable requests only.
+- Community membership writes go only through the join_community / join_community_by_code / leave_community RPCs — prevents status spoofing and keeps founder_profiles.community_id as first referral attribution.

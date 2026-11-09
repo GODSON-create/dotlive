@@ -111,7 +111,7 @@ export function useMyMembership() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("community_members")
-        .select("*, communities(*)")
+        .select("*, communities(id,name,description,region,category,community_type,city,country,university_name)")
         .eq("founder_id", user!.id)
         .maybeSingle();
       if (error) throw error;

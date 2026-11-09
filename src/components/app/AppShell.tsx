@@ -79,6 +79,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "ARISE Foundry", to: "/foundry", icon: Building2, roles: ["founder"] },
   { label: "Pitch / Pitchathons", to: "/pitchathons", icon: Trophy, roles: ["founder"] },
   { label: "Spotlight", to: "/spotlight", icon: Sparkles, roles: ["founder"] },
+  { label: "Communities", to: "/explore-communities", icon: Users },
   { label: "Events", to: "/sessions", icon: CalendarCheck },
   { label: "DOT Demo", to: "/demo", icon: Building2 },
   { label: "Leaderboards", to: "/leaderboards", icon: Trophy },
@@ -492,7 +493,7 @@ function VentureDrawerSection({ userId }: { userId?: string }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("founder_profiles")
-        .select("*, communities(*)")
+        .select("*, communities(id,name,description,region,category,community_type,city,country,university_name)")
         .eq("user_id", userId!)
         .maybeSingle();
       if (error) throw error;

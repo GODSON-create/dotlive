@@ -4,34 +4,32 @@ import { PageShell, FeatureGrid } from "@/components/site/PageShell";
 export const Route = createFileRoute("/communities")({
   head: () => ({
     meta: [
-      { title: "Communities — DOT" },
-      {
-        name: "description",
-        content:
-          "The Community Operating System powers community-led founder acquisition with referral links, dashboards, community Vantage and DOT leader rewards.",
-      },
+      { title: "Communities — DOT Venture Progression Network" },
+      { name: "description", content: "Find and join university, city, industry, interest and builder communities on DOT." },
       { property: "og:title", content: "DOT Communities" },
-      { property: "og:description", content: "Community-led growth for African ventures." },
+      { property: "og:description", content: "Find and join founder communities on DOT." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: CommunitiesPage,
 });
 
 const features = [
-  { title: "Unique referral links", desc: "Each community gets a link like dot.africa/community/name to track visits, signups and activated founders." },
-  { title: "Community dashboards", desc: "Members, active members, Vantage completions, Academy progress, Pitchathon entries and Demo qualifiers." },
-  { title: "Community Vantage", desc: "Average community score, fundable ventures and active builders — with cross-community ranking." },
-  { title: "Leader rewards", desc: "Track referrals, engagement and completion rates and reward Community Leaders with DOT." },
-  { title: "WhatsApp-first", desc: "Leaders connect WhatsApp groups and communities; DOT tracks engagement through platform activity." },
-  { title: "100 communities pilot", desc: "100 founders per community, 100 Community Leaders — designed to scale to thousands." },
+  { title: "University", desc: "Connect with founders and builders from your campus." },
+  { title: "City / Region", desc: "Meet people building near you." },
+  { title: "Industry", desc: "Join peers working in the same sector." },
+  { title: "Interest", desc: "Gather around a shared theme or problem." },
+  { title: "Builder", desc: "Ship alongside other makers and operators." },
+  { title: "Leader tools", desc: "Community leaders get invite links and a member view in Community OS." },
 ];
 
 function CommunitiesPage() {
   return (
     <PageShell
-      eyebrow="Community OS"
-      title="Community-led growth, measured end to end"
-      intro="Community Leaders recruit, activate and progress founders — and earn DOT for the value they create."
+      eyebrow="Communities"
+      title="Find your people on DOT"
+      intro="Sign in to browse communities and join as many as fit you. Membership is free."
     >
       <FeatureGrid items={features} />
     </PageShell>

@@ -302,3 +302,21 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
+
+@utility glass {
+  background: color-mix(in oklab, var(--card) 72%, transparent);
+  border: 1px solid color-mix(in oklab, var(--primary) 18%, var(--border));
+  backdrop-filter: blur(10px) saturate(1.2);
+}
+
+@utility community-enter {
+  animation: community-rise 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes community-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}

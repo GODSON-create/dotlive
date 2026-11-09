@@ -784,6 +784,9 @@ export type Database = {
       communities: {
         Row: {
           category: string | null
+          city: string | null
+          community_type: string
+          country: string | null
           created_at: string
           description: string | null
           id: string
@@ -791,10 +794,15 @@ export type Database = {
           name: string
           referral_code: string
           region: string | null
+          university_name: string | null
           updated_at: string
+          visibility: string
         }
         Insert: {
           category?: string | null
+          city?: string | null
+          community_type?: string
+          country?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -802,10 +810,15 @@ export type Database = {
           name: string
           referral_code?: string
           region?: string | null
+          university_name?: string | null
           updated_at?: string
+          visibility?: string
         }
         Update: {
           category?: string | null
+          city?: string | null
+          community_type?: string
+          country?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -813,7 +826,9 @@ export type Database = {
           name?: string
           referral_code?: string
           region?: string | null
+          university_name?: string | null
           updated_at?: string
+          visibility?: string
         }
         Relationships: []
       }
@@ -2325,6 +2340,34 @@ export type Database = {
       is_active_member: { Args: { _user_id: string }; Returns: boolean }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_finance_admin: { Args: { _user_id: string }; Returns: boolean }
+      join_community: { Args: { _community_id: string }; Returns: undefined }
+      join_community_by_code: { Args: { _code: string }; Returns: string }
+      leave_community: { Args: { _community_id: string }; Returns: undefined }
+      list_communities: {
+        Args: {
+          _limit?: number
+          _offset?: number
+          _q?: string
+          _region?: string
+          _type?: string
+        }
+        Returns: {
+          city: string
+          community_type: string
+          country: string
+          created_at: string
+          description: string
+          id: string
+          is_leader: boolean
+          is_member: boolean
+          leader_name: string
+          member_count: number
+          name: string
+          region: string
+          university_name: string
+          visibility: string
+        }[]
+      }
       lookup_dot_id: { Args: { _dot_id: string }; Returns: string }
       lookup_verified_recipient: { Args: { _dot_id: string }; Returns: string }
       record_acquisition_visit: {

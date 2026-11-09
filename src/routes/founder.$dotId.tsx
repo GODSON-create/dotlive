@@ -98,7 +98,7 @@ function PublicFounderProfile() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("founder_profiles")
-        .select("*, communities(*)")
+        .select("*, communities(id,name,description,region,category,community_type,city,country,university_name)")
         .eq("user_id", userId!)
         .maybeSingle();
       if (error) throw error;

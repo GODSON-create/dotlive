@@ -39,14 +39,8 @@ function JoinPage() {
     if (!user || !community) return;
     setBusy(true);
     try {
-      const { error } = await supabase
-        .from("community_members")
-        .upsert(
-          { community_id: community.id, founder_id: user.id, status: "active" },
-          { onConflict: "community_id,founder_id" },
-        );
+      const { error } = await supabase.rpc("join_community_by_code", { _code: code });
       if (error) throw error;
-      await supabase.from("founder_profiles").update({ community_id: community.id }).eq("user_id", user.id);
       qc.invalidateQueries({ queryKey: ["membership", user.id] });
       setStatus("joined");
       toast.success(`Joined ${community.name}!`);

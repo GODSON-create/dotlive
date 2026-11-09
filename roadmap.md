@@ -26,3 +26,8 @@
 - [ ] P6 /start Foundry step as "opens soon"; footer dead links; sitemap; per-page canonical + unique profile/result titles.
 - [ ] P7 Admin IP column; treasury buttons disabled until RPCs exist; investor meeting-request dead end.
 - [ ] P8 Planned labels: PING (pending trademark), GRIOT, DOT Build mapping. Blocked: DOT Build mapping.
+
+# Communities directory
+- [x] Member directory at /explore-communities with search, type and location filters, real member counts, detail pages.
+- [x] Join/leave through server-side functions; multiple memberships; invite links still work; referral codes hidden from directory.
+- [ ] Wallet settings readable by all signed-in users (security finding) — left alone: payments out of scope this pass.

@@ -49,6 +49,8 @@ import { Route as FounderDotIdRouteImport } from './routes/founder.$dotId'
 import { Route as RRefRouteImport } from './routes/r.$ref'
 import { Route as ResultIdRouteImport } from './routes/result.$id'
 import { Route as VentureSlugRouteImport } from './routes/venture.$slug'
+import { Route as AuthenticatedExploreCommunitiesIndexRouteImport } from './routes/_authenticated/explore-communities.index'
+import { Route as AuthenticatedExploreCommunitiesIdRouteImport } from './routes/_authenticated/explore-communities.$id'
 import { Route as AuthenticatedJoinCodeRouteImport } from './routes/_authenticated/join.$code'
 import { Route as ApiPublicWebhooksPaystackRouteImport } from './routes/api/public/webhooks/paystack'
 
@@ -255,6 +257,18 @@ const VentureSlugRoute = VentureSlugRouteImport.update({
   path: '/venture/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedExploreCommunitiesIndexRoute =
+  AuthenticatedExploreCommunitiesIndexRouteImport.update({
+    id: '/explore-communities/',
+    path: '/explore-communities/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedExploreCommunitiesIdRoute =
+  AuthenticatedExploreCommunitiesIdRouteImport.update({
+    id: '/explore-communities/$id',
+    path: '/explore-communities/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedJoinCodeRoute = AuthenticatedJoinCodeRouteImport.update({
   id: '/join/$code',
   path: '/join/$code',
@@ -307,7 +321,9 @@ export interface FileRoutesByFullPath {
   '/r/$ref': typeof RRefRoute
   '/result/$id': typeof ResultIdRoute
   '/venture/$slug': typeof VentureSlugRoute
+  '/explore-communities/$id': typeof AuthenticatedExploreCommunitiesIdRoute
   '/join/$code': typeof AuthenticatedJoinCodeRoute
+  '/explore-communities/': typeof AuthenticatedExploreCommunitiesIndexRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
 export interface FileRoutesByTo {
@@ -350,7 +366,9 @@ export interface FileRoutesByTo {
   '/r/$ref': typeof RRefRoute
   '/result/$id': typeof ResultIdRoute
   '/venture/$slug': typeof VentureSlugRoute
+  '/explore-communities/$id': typeof AuthenticatedExploreCommunitiesIdRoute
   '/join/$code': typeof AuthenticatedJoinCodeRoute
+  '/explore-communities': typeof AuthenticatedExploreCommunitiesIndexRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
 export interface FileRoutesById {
@@ -395,7 +413,9 @@ export interface FileRoutesById {
   '/r/$ref': typeof RRefRoute
   '/result/$id': typeof ResultIdRoute
   '/venture/$slug': typeof VentureSlugRoute
+  '/_authenticated/explore-communities/$id': typeof AuthenticatedExploreCommunitiesIdRoute
   '/_authenticated/join/$code': typeof AuthenticatedJoinCodeRoute
+  '/_authenticated/explore-communities/': typeof AuthenticatedExploreCommunitiesIndexRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
 export interface FileRouteTypes {
@@ -440,7 +460,9 @@ export interface FileRouteTypes {
     | '/r/$ref'
     | '/result/$id'
     | '/venture/$slug'
+    | '/explore-communities/$id'
     | '/join/$code'
+    | '/explore-communities/'
     | '/api/public/webhooks/paystack'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -483,7 +505,9 @@ export interface FileRouteTypes {
     | '/r/$ref'
     | '/result/$id'
     | '/venture/$slug'
+    | '/explore-communities/$id'
     | '/join/$code'
+    | '/explore-communities'
     | '/api/public/webhooks/paystack'
   id:
     | '__root__'
@@ -527,7 +551,9 @@ export interface FileRouteTypes {
     | '/r/$ref'
     | '/result/$id'
     | '/venture/$slug'
+    | '/_authenticated/explore-communities/$id'
     | '/_authenticated/join/$code'
+    | '/_authenticated/explore-communities/'
     | '/api/public/webhooks/paystack'
   fileRoutesById: FileRoutesById
 }
@@ -838,6 +864,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VentureSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/explore-communities/': {
+      id: '/_authenticated/explore-communities/'
+      path: '/explore-communities'
+      fullPath: '/explore-communities/'
+      preLoaderRoute: typeof AuthenticatedExploreCommunitiesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/explore-communities/$id': {
+      id: '/_authenticated/explore-communities/$id'
+      path: '/explore-communities/$id'
+      fullPath: '/explore-communities/$id'
+      preLoaderRoute: typeof AuthenticatedExploreCommunitiesIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/join/$code': {
       id: '/_authenticated/join/$code'
       path: '/join/$code'
@@ -875,7 +915,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedVantageRoute: typeof AuthenticatedVantageRoute
   AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
   AuthenticatedWorkRoute: typeof AuthenticatedWorkRoute
+  AuthenticatedExploreCommunitiesIdRoute: typeof AuthenticatedExploreCommunitiesIdRoute
   AuthenticatedJoinCodeRoute: typeof AuthenticatedJoinCodeRoute
+  AuthenticatedExploreCommunitiesIndexRoute: typeof AuthenticatedExploreCommunitiesIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -898,7 +940,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedVantageRoute: AuthenticatedVantageRoute,
   AuthenticatedWalletRoute: AuthenticatedWalletRoute,
   AuthenticatedWorkRoute: AuthenticatedWorkRoute,
+  AuthenticatedExploreCommunitiesIdRoute:
+    AuthenticatedExploreCommunitiesIdRoute,
   AuthenticatedJoinCodeRoute: AuthenticatedJoinCodeRoute,
+  AuthenticatedExploreCommunitiesIndexRoute:
+    AuthenticatedExploreCommunitiesIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
