@@ -1299,6 +1299,179 @@ export type Database = {
         }
         Relationships: []
       }
+      ping_hub_links: {
+        Row: {
+          community_id: string
+          created_at: string
+          id: string
+          last_error: string | null
+          last_synced_at: string | null
+          ping_hub_id: string
+          sync_status: string
+          updated_at: string
+        }
+        Insert: {
+          community_id: string
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          ping_hub_id: string
+          sync_status?: string
+          updated_at?: string
+        }
+        Update: {
+          community_id?: string
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          ping_hub_id?: string
+          sync_status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ping_hub_links_community_id_fkey"
+            columns: ["community_id"]
+            isOneToOne: true
+            referencedRelation: "communities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ping_identity_links: {
+        Row: {
+          created_at: string
+          id: string
+          linked_at: string
+          ping_user_id: string
+          revoked_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          linked_at?: string
+          ping_user_id: string
+          revoked_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          linked_at?: string
+          ping_user_id?: string
+          revoked_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ping_link_states: {
+        Row: {
+          consumed_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          nonce_hash: string
+          user_id: string
+        }
+        Insert: {
+          consumed_at?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          nonce_hash: string
+          user_id: string
+        }
+        Update: {
+          consumed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          nonce_hash?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ping_outbox: {
+        Row: {
+          aggregate_id: string
+          created_at: string
+          event_type: string
+          id: string
+          idempotency_key: string
+          last_error: string | null
+          next_attempt_at: string
+          payload: Json
+          processed_at: string | null
+          retry_count: number
+          status: string
+        }
+        Insert: {
+          aggregate_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          idempotency_key: string
+          last_error?: string | null
+          next_attempt_at?: string
+          payload?: Json
+          processed_at?: string | null
+          retry_count?: number
+          status?: string
+        }
+        Update: {
+          aggregate_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          idempotency_key?: string
+          last_error?: string | null
+          next_attempt_at?: string
+          payload?: Json
+          processed_at?: string | null
+          retry_count?: number
+          status?: string
+        }
+        Relationships: []
+      }
+      ping_webhook_events: {
+        Row: {
+          event_type: string
+          external_event_id: string
+          id: string
+          metadata: Json
+          processed_at: string | null
+          received_at: string
+          status: string
+        }
+        Insert: {
+          event_type: string
+          external_event_id: string
+          id?: string
+          metadata?: Json
+          processed_at?: string | null
+          received_at?: string
+          status?: string
+        }
+        Update: {
+          event_type?: string
+          external_event_id?: string
+          id?: string
+          metadata?: Json
+          processed_at?: string | null
+          received_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
       pitchathon_applications: {
         Row: {
           created_at: string
@@ -2308,6 +2481,7 @@ export type Database = {
         }[]
       }
       get_my_referral_code: { Args: never; Returns: string }
+      get_ping_hub_status: { Args: { _community_id: string }; Returns: string }
       get_pitchathon_leaderboard: {
         Args: { _pitchathon_id: string }
         Returns: {
@@ -2370,6 +2544,7 @@ export type Database = {
       }
       lookup_dot_id: { Args: { _dot_id: string }; Returns: string }
       lookup_verified_recipient: { Args: { _dot_id: string }; Returns: string }
+      ping_integration_admin_summary: { Args: never; Returns: Json }
       record_acquisition_visit: {
         Args: {
           _campaign?: string

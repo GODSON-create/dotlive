@@ -50,6 +50,13 @@
       "when": 1794305708047,
       "tag": "0006_restrict_wallet_settings_reads",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794314316112,
+      "tag": "0007_ping_integration_foundation",
+      "breakpoints": true
     }
   ]
 }

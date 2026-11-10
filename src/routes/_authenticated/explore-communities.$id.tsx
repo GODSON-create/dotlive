@@ -5,6 +5,7 @@ import { ArrowLeft, Users, MapPin, GraduationCap, Lock } from "lucide-react";
 import { AppShell } from "@/components/app/AppShell";
 import { Badge } from "@/components/ui/badge";
 import { JoinButton } from "@/components/communities/JoinButton";
+import { PingHubStatus } from "@/components/ping/PingStatus";
 import { listCommunities } from "@/lib/communities.functions";
 import { COMMUNITY_TYPE_LABELS, communityLocation, formatMemberCount, parseCommunityType } from "@/lib/communities";
 
@@ -56,6 +57,7 @@ function CommunityDetail() {
           </div>
           {c.description && <p className="mt-6 max-w-2xl whitespace-pre-line leading-relaxed">{c.description}</p>}
           <div className="mt-8"><JoinButton community={c} /></div>
+          <PingHubStatus communityId={c.id} />
         </article>
       )}
     </AppShell>

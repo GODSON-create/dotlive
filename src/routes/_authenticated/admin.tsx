@@ -52,6 +52,7 @@ import { formatDot, formatNaira, ROLE_LABELS, type AppRole } from "@/lib/constan
 import { elevateUser, revokeAdmin, claimSuperAdmin, adminUpdateUser } from "@/lib/admin.functions";
 import { getAdminCampaigns, updateCampaignStatus } from "@/lib/spotlight.functions";
 import { toast } from "sonner";
+import { PingAdminPanel } from "@/components/ping/PingStatus";
 
 const POOL_ENGINE_AVAILABLE: boolean = false;
 
@@ -120,6 +121,7 @@ function AdminPage() {
           <TabsTrigger value="content">Content</TabsTrigger>
           <TabsTrigger value="spotlight">Spotlight Control</TabsTrigger>
           <TabsTrigger value="sessions">Sessions Log</TabsTrigger>
+          <TabsTrigger value="ping">Ping Integration</TabsTrigger>
           {isSuperAdmin && <TabsTrigger value="roles">Roles & Audit</TabsTrigger>}
         </TabsList>
         <TabsContent value="overview"><OverviewTab /></TabsContent>
@@ -132,6 +134,7 @@ function AdminPage() {
         <TabsContent value="content"><ContentTab /></TabsContent>
         <TabsContent value="spotlight"><SpotlightTab /></TabsContent>
         <TabsContent value="sessions"><SessionsTab /></TabsContent>
+        <TabsContent value="ping"><PingAdminPanel /></TabsContent>
         {isSuperAdmin && (
           <TabsContent value="roles"><RolesTab /></TabsContent>
         )}

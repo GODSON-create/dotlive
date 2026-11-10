@@ -52,6 +52,8 @@ import { Route as VentureSlugRouteImport } from './routes/venture.$slug'
 import { Route as AuthenticatedExploreCommunitiesIndexRouteImport } from './routes/_authenticated/explore-communities.index'
 import { Route as AuthenticatedExploreCommunitiesIdRouteImport } from './routes/_authenticated/explore-communities.$id'
 import { Route as AuthenticatedJoinCodeRouteImport } from './routes/_authenticated/join.$code'
+import { Route as ApiPublicPingLinkCallbackRouteImport } from './routes/api/public/ping/link-callback'
+import { Route as ApiPublicPingWebhookRouteImport } from './routes/api/public/ping/webhook'
 import { Route as ApiPublicWebhooksPaystackRouteImport } from './routes/api/public/webhooks/paystack'
 
 const IndexRoute = IndexRouteImport.update({
@@ -274,6 +276,17 @@ const AuthenticatedJoinCodeRoute = AuthenticatedJoinCodeRouteImport.update({
   path: '/join/$code',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicPingLinkCallbackRoute =
+  ApiPublicPingLinkCallbackRouteImport.update({
+    id: '/api/public/ping/link-callback',
+    path: '/api/public/ping/link-callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicPingWebhookRoute = ApiPublicPingWebhookRouteImport.update({
+  id: '/api/public/ping/webhook',
+  path: '/api/public/ping/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicWebhooksPaystackRoute =
   ApiPublicWebhooksPaystackRouteImport.update({
     id: '/api/public/webhooks/paystack',
@@ -324,6 +337,8 @@ export interface FileRoutesByFullPath {
   '/explore-communities/$id': typeof AuthenticatedExploreCommunitiesIdRoute
   '/join/$code': typeof AuthenticatedJoinCodeRoute
   '/explore-communities/': typeof AuthenticatedExploreCommunitiesIndexRoute
+  '/api/public/ping/link-callback': typeof ApiPublicPingLinkCallbackRoute
+  '/api/public/ping/webhook': typeof ApiPublicPingWebhookRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
 export interface FileRoutesByTo {
@@ -369,6 +384,8 @@ export interface FileRoutesByTo {
   '/explore-communities/$id': typeof AuthenticatedExploreCommunitiesIdRoute
   '/join/$code': typeof AuthenticatedJoinCodeRoute
   '/explore-communities': typeof AuthenticatedExploreCommunitiesIndexRoute
+  '/api/public/ping/link-callback': typeof ApiPublicPingLinkCallbackRoute
+  '/api/public/ping/webhook': typeof ApiPublicPingWebhookRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
 export interface FileRoutesById {
@@ -416,6 +433,8 @@ export interface FileRoutesById {
   '/_authenticated/explore-communities/$id': typeof AuthenticatedExploreCommunitiesIdRoute
   '/_authenticated/join/$code': typeof AuthenticatedJoinCodeRoute
   '/_authenticated/explore-communities/': typeof AuthenticatedExploreCommunitiesIndexRoute
+  '/api/public/ping/link-callback': typeof ApiPublicPingLinkCallbackRoute
+  '/api/public/ping/webhook': typeof ApiPublicPingWebhookRoute
   '/api/public/webhooks/paystack': typeof ApiPublicWebhooksPaystackRoute
 }
 export interface FileRouteTypes {
@@ -463,6 +482,8 @@ export interface FileRouteTypes {
     | '/explore-communities/$id'
     | '/join/$code'
     | '/explore-communities/'
+    | '/api/public/ping/link-callback'
+    | '/api/public/ping/webhook'
     | '/api/public/webhooks/paystack'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -508,6 +529,8 @@ export interface FileRouteTypes {
     | '/explore-communities/$id'
     | '/join/$code'
     | '/explore-communities'
+    | '/api/public/ping/link-callback'
+    | '/api/public/ping/webhook'
     | '/api/public/webhooks/paystack'
   id:
     | '__root__'
@@ -554,6 +577,8 @@ export interface FileRouteTypes {
     | '/_authenticated/explore-communities/$id'
     | '/_authenticated/join/$code'
     | '/_authenticated/explore-communities/'
+    | '/api/public/ping/link-callback'
+    | '/api/public/ping/webhook'
     | '/api/public/webhooks/paystack'
   fileRoutesById: FileRoutesById
 }
@@ -579,6 +604,8 @@ export interface RootRouteChildren {
   RRefRoute: typeof RRefRoute
   ResultIdRoute: typeof ResultIdRoute
   VentureSlugRoute: typeof VentureSlugRoute
+  ApiPublicPingLinkCallbackRoute: typeof ApiPublicPingLinkCallbackRoute
+  ApiPublicPingWebhookRoute: typeof ApiPublicPingWebhookRoute
   ApiPublicWebhooksPaystackRoute: typeof ApiPublicWebhooksPaystackRoute
 }
 
@@ -885,6 +912,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJoinCodeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/ping/link-callback': {
+      id: '/api/public/ping/link-callback'
+      path: '/api/public/ping/link-callback'
+      fullPath: '/api/public/ping/link-callback'
+      preLoaderRoute: typeof ApiPublicPingLinkCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ping/webhook': {
+      id: '/api/public/ping/webhook'
+      path: '/api/public/ping/webhook'
+      fullPath: '/api/public/ping/webhook'
+      preLoaderRoute: typeof ApiPublicPingWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/webhooks/paystack': {
       id: '/api/public/webhooks/paystack'
       path: '/api/public/webhooks/paystack'
@@ -972,6 +1013,8 @@ const rootRouteChildren: RootRouteChildren = {
   RRefRoute: RRefRoute,
   ResultIdRoute: ResultIdRoute,
   VentureSlugRoute: VentureSlugRoute,
+  ApiPublicPingLinkCallbackRoute: ApiPublicPingLinkCallbackRoute,
+  ApiPublicPingWebhookRoute: ApiPublicPingWebhookRoute,
   ApiPublicWebhooksPaystackRoute: ApiPublicWebhooksPaystackRoute,
 }
 export const routeTree = rootRouteImport
