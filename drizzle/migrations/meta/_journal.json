@@ -43,6 +43,13 @@
       "when": 1794212354657,
       "tag": "0005_communities_directory",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794305708047,
+      "tag": "0006_restrict_wallet_settings_reads",
+      "breakpoints": true
     }
   ]
 }
