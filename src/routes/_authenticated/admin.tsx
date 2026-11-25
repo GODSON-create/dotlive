@@ -51,6 +51,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { formatDot, formatNaira, ROLE_LABELS, type AppRole } from "@/lib/constants";
 import { elevateUser, revokeAdmin, claimSuperAdmin, adminUpdateUser } from "@/lib/admin.functions";
 import { getAdminCampaigns, updateCampaignStatus } from "@/lib/spotlight.functions";
+import { SpotlightStatusBadge } from "@/components/spotlight/spotlight-ui";
 import { toast } from "sonner";
 import { PingAdminPanel } from "@/components/ping/PingStatus";
 
@@ -1544,108 +1545,82 @@ function SpotlightTab() {
   }
 
   return (
-    <div className="space-y-6 mt-6">
-      {/* Metrics Cards */}
-      <div className="grid gap-4 sm:grid-cols-5">
-        <div className="rounded-2xl border border-slate-900 bg-slate-950/40 p-4">
-          <span className="text-[10px] font-bold text-slate-500 uppercase">Spotlight Revenue</span>
-          <p className="mt-2 font-display text-lg font-black text-white">{formatDot(metrics.revenue)} DOT</p>
-        </div>
-        <div className="rounded-2xl border border-slate-900 bg-slate-950/40 p-4">
-          <span className="text-[10px] font-bold text-slate-500 uppercase">Featured Ventures</span>
-          <p className="mt-2 font-display text-lg font-black text-white">{metrics.activeCount}</p>
-        </div>
-        <div className="rounded-2xl border border-slate-900 bg-slate-950/40 p-4">
-          <span className="text-[10px] font-bold text-slate-500 uppercase">Total Impressions</span>
-          <p className="mt-2 font-display text-lg font-black text-white">{metrics.impressions.toLocaleString()}</p>
-        </div>
-        <div className="rounded-2xl border border-slate-900 bg-slate-950/40 p-4">
-          <span className="text-[10px] font-bold text-slate-500 uppercase">Total Clicks</span>
-          <p className="mt-2 font-display text-lg font-black text-white">{metrics.clicks.toLocaleString()}</p>
-        </div>
-        <div className="rounded-2xl border border-slate-900 bg-slate-950/40 p-4">
-          <span className="text-[10px] font-bold text-slate-500 uppercase">Leads Generated</span>
-          <p className="mt-2 font-display text-lg font-black text-white">{metrics.leads.toLocaleString()}</p>
-        </div>
-      </div>
+    <div className="mt-6 space-y-6">
+      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+        {[
+          ["DOT charged (excl. rejected)", formatDot(metrics.revenue)],
+          ["Live or completed", metrics.activeCount.toLocaleString()],
+          ["Views recorded", metrics.impressions.toLocaleString()],
+          ["Clicks recorded", metrics.clicks.toLocaleString()],
+          ["Leads recorded", metrics.leads.toLocaleString()],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-xl border border-border bg-card p-4">
+            <dt className="text-xs text-muted-foreground">{label}</dt>
+            <dd className="mt-1 font-display text-lg font-semibold tabular-nums text-foreground">{value}</dd>
+          </div>
+        ))}
+      </dl>
 
-      {/* Search and Table */}
-      <div className="rounded-3xl border border-slate-900 bg-slate-950/40 p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <h3 className="font-display font-bold text-white text-base">Venture Spotlight Requests</h3>
-          <div className="relative max-w-xs w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+      <section className="rounded-xl border border-border bg-card p-4 sm:p-6">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h3 className="font-display text-base font-semibold text-foreground">Spotlight submissions</h3>
+          <div className="relative w-full sm:max-w-xs">
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
             <Input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Filter by venture or founder..."
-              className="pl-9 bg-slate-905 border-slate-800 text-white text-xs"
+              placeholder="Filter by venture or founder"
+              aria-label="Filter submissions"
+              className="pl-9"
             />
           </div>
         </div>
 
         {isLoading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="size-8 animate-spin text-primary" />
+          <div className="space-y-2" aria-busy="true">
+            {[0, 1, 2].map((i) => <div key={i} className="h-14 animate-pulse rounded-lg bg-muted" />)}
           </div>
         ) : filteredCampaigns.length === 0 ? (
-          <p className="text-center text-xs text-slate-500 py-12">No spotlight campaigns found.</p>
+          <p className="py-12 text-center text-sm text-muted-foreground">
+            {campaigns.length === 0 ? "No Spotlight submissions yet." : "No submissions match this filter."}
+          </p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+            <table className="w-full min-w-[760px] text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-900 text-slate-500 font-bold uppercase tracking-wider pb-3">
-                  <th className="pb-3">Venture / Pitch</th>
-                  <th className="pb-3">Founder</th>
-                  <th className="pb-3">Package / Cost</th>
-                  <th className="pb-3 text-center">Status</th>
-                  <th className="pb-3 text-center">Metrics (V/C/L)</th>
-                  <th className="pb-3">Created At</th>
-                  <th className="pb-3 text-right">Actions</th>
+                <tr className="border-b border-border text-xs text-muted-foreground">
+                  <th className="pb-3 font-medium">Venture</th>
+                  <th className="pb-3 font-medium">Founder</th>
+                  <th className="pb-3 font-medium">Package</th>
+                  <th className="pb-3 font-medium">Status</th>
+                  <th className="pb-3 text-right font-medium">Views / clicks / leads</th>
+                  <th className="pb-3 font-medium">Submitted</th>
+                  <th className="pb-3"><span className="sr-only">Actions</span></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-900/60">
+              <tbody className="divide-y divide-border">
                 {filteredCampaigns.map((c: any) => (
-                  <tr key={c.id} className="hover:bg-slate-900/10">
-                    <td className="py-4 pr-4">
-                      <div className="font-bold text-white mb-0.5">{c.venture_name}</div>
-                      <div className="text-[10px] text-slate-500 line-clamp-2 max-w-sm">{c.pitch}</div>
+                  <tr key={c.id}>
+                    <td className="py-3 pr-4">
+                      <div className="font-medium text-foreground">{c.venture_name}</div>
+                      <div className="line-clamp-1 max-w-xs text-xs text-muted-foreground">{c.pitch}</div>
                     </td>
-                    <td className="py-4">
-                      <div className="font-medium text-white">{c.profiles?.name || "Unknown"}</div>
-                      <div className="text-[10px] text-slate-500">{c.profiles?.email || ""}</div>
+                    <td className="py-3 pr-4">
+                      <div className="text-foreground">{c.profiles?.name || "Unknown"}</div>
+                      <div className="text-xs text-muted-foreground">{c.profiles?.email || ""}</div>
                     </td>
-                    <td className="py-4">
-                      <div className="font-bold text-white">{c.package_type}</div>
-                      <div className="text-[10px] text-slate-500">{formatDot(c.cost_dot)} DOT</div>
+                    <td className="py-3 pr-4">
+                      <div className="text-foreground">{c.package_type}</div>
+                      <div className="text-xs tabular-nums text-muted-foreground">{formatDot(c.cost_dot)} DOT</div>
                     </td>
-                    <td className="py-4 text-center">
-                      <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded ${
-                        c.status === "active" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" :
-                        c.status === "completed" ? "bg-blue-500/10 text-blue-400 border border-blue-500/20" :
-                        c.status === "approved" ? "bg-purple-500/10 text-purple-400 border border-purple-500/20" :
-                        c.status === "rejected" ? "bg-red-500/10 text-red-400 border border-red-500/20" :
-                        "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
-                      }`}>
-                        {c.status}
-                      </span>
+                    <td className="py-3 pr-4"><SpotlightStatusBadge status={c.status} /></td>
+                    <td className="py-3 pr-4 text-right tabular-nums">
+                      <div className="text-foreground">{c.impressions} / {c.clicks} / {c.leads_generated}</div>
+                      <div className="text-xs text-muted-foreground">Target {Number(c.target_impressions).toLocaleString()}</div>
                     </td>
-                    <td className="py-4 text-center">
-                      <div className="font-semibold text-white">{c.impressions} / {c.clicks} / {c.leads_generated}</div>
-                      <span className="text-[9px] text-slate-500">Target: {c.target_impressions}</span>
-                    </td>
-                    <td className="py-4 text-slate-400">
-                      {new Date(c.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="py-4 text-right">
-                      <Button
-                        onClick={() => openReview(c)}
-                        variant="outline"
-                        size="sm"
-                        className="border-slate-800 hover:bg-slate-900 text-xs font-bold"
-                      >
-                        Review
-                      </Button>
+                    <td className="py-3 pr-4 text-muted-foreground">{new Date(c.created_at).toLocaleDateString()}</td>
+                    <td className="py-3 text-right">
+                      <Button onClick={() => openReview(c)} variant="outline" size="sm">Review</Button>
                     </td>
                   </tr>
                 ))}
@@ -1653,7 +1628,7 @@ function SpotlightTab() {
             </table>
           </div>
         )}
-      </div>
+      </section>
 
       {/* Review Dialog */}
       <Dialog open={!!selectedCampaign} onOpenChange={() => setSelectedCampaign(null)}>
@@ -1686,11 +1661,11 @@ function SpotlightTab() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-bold text-muted-foreground">Campaign Status</Label>
+                  <Label htmlFor="spotStatus" className="text-xs font-bold text-muted-foreground">Campaign status</Label>
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value as any)}
-                    className="w-full bg-background border border-border rounded-lg p-2.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                    id="spotStatus" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <option value="pending">Pending</option>
                     <option value="approved">Approved</option>
