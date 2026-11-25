@@ -31,4 +31,5 @@
 - [x] Member directory at /explore-communities with search, type and location filters, real member counts, detail pages.
 - [x] Join/leave through server-side functions; multiple memberships; invite links still work; referral codes hidden from directory.
 - [ ] Wallet settings readable by all signed-in users (security finding) — left alone: payments out of scope this pass.
-- [ ] Spotlight redesign (founder /spotlight + admin panel), no backend changes
+- [x] Spotlight redesign (founder + admin). Not checked visually while signed in. Open: the wallet is charged before the campaign is saved
+- [ ] Security: pitchathon_judges is readable by every signed-in user (finding still open)
